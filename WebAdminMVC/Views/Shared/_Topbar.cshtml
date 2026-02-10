@@ -1,0 +1,18 @@
+﻿@{
+    var email = Context.Session.GetString("ADMIN_EMAIL") ?? "Admin User";
+}
+<div class="topbar-left">
+    <!-- removed sim badge -->
+</div>
+
+<div class="topbar-right">
+    <button class="icon-btn" title="Notifications">🔔</button>
+
+    <div class="profile">
+        <div class="profile-text">
+            <div class="profile-name">Admin User</div>
+            <div class="profile-role">Super Admin</div>
+        </div>
+        <div class="profile-avatar">@email.Substring(0, 1).ToUpper()</div>
+    </div>
+</div>

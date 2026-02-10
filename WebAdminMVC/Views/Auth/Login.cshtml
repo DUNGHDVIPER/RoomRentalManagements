@@ -1,0 +1,50 @@
+﻿@model WebAdmin.MVC.Models.Auth.LoginVm
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Login";
+}
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <div class="brand-logo">R</div>
+            <div>
+                <div class="brand-title">Admin<span class="brand-accent">MVC</span></div>
+                <div class="muted">Sign in to continue</div>
+            </div>
+        </div>
+
+        <div class="auth-title">Admin Login</div>
+        <div class="muted auth-sub">FE-only demo. Use: <b>admin@demo.com</b> / <b>Admin@123</b></div>
+
+        <form method="post" class="auth-form">
+            @Html.AntiForgeryToken()
+
+            <div class="fg">
+                <label class="lbl">Email</label>
+                <input class="inp" asp-for="Email" placeholder="admin@demo.com" />
+            </div>
+
+            <div class="fg">
+                <label class="lbl">Password</label>
+                <input class="inp" asp-for="Password" placeholder="Admin@123" />
+            </div>
+
+            <div class="auth-row">
+                <label class="muted"><input type="checkbox" asp-for="RememberMe" /> Remember me</label>
+                <a class="link" href="/Auth/ForgotPassword">Forgot?</a>
+            </div>
+
+            <button class="btn-gradient w100" type="submit">Login</button>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="err mt12">
+                    @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <div>• @e.ErrorMessage</div>
+                    }
+                </div>
+            }
+        </form>
+    </div>
+</div>

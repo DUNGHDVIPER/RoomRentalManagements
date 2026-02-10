@@ -1,0 +1,26 @@
+﻿@page
+@model WebHostRazor.Pages.Host.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="card p-18">
+    <h2 class="h2">Host Dashboard</h2>
+    <div class="muted">KPI • quick actions • latest tickets/contracts (mock)</div>
+    <hr class="hr" />
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;">
+        <div class="card p-18 glass">
+            <div class="muted">Rooms</div><div style="font-weight:950;font-size:22px;margin-top:6px;">12</div>
+        </div>
+        <div class="card p-18 glass">
+            <div class="muted">Occupied</div><div style="font-weight:950;font-size:22px;margin-top:6px;">8</div>
+        </div>
+        <div class="card p-18 glass">
+            <div class="muted">Open Tickets</div><div style="font-weight:950;font-size:22px;margin-top:6px;">3</div>
+        </div>
+        <div class="card p-18 glass">
+            <div class="muted">This Month Bills</div><div style="font-weight:950;font-size:22px;margin-top:6px;">24</div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+﻿@model List<WebAdmin.MVC.Models.Rooms.RoomListItemVm>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Rooms";
+}
+<div class="container">
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title">Rooms</div>
+            <a class="btn-gradient" href="/Rooms/Create">+ Add New Room</a>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ROOM</th>
+                        <th>BLOCK</th>
+                        <th>FLOOR</th>
+                        <th>PRICE</th>
+                        <th>STATUS</th>
+                        <th class="th-right">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td class="user-email">@r.Name</td>
+                            <td>@r.Block</td>
+                            <td>@r.Floor</td>
+                            <td>@r.Price.ToString("N0")</td>
+                            <td>
+                                @{
+                                    var chip = r.Status == "Available" ? "success" : (r.Status == "Occupied" ? "info" : "danger");
+                                }
+                                <span class="chip @chip">@r.Status</span>
+                            </td>
+                            <td class="td-right">
+                                <a class="link" href="/Rooms/Details/@r.Id">Details</a>
+                                <a class="link" href="/Rooms/Edit/@r.Id">Edit</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

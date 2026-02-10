@@ -1,0 +1,24 @@
+﻿@model WebAdmin.MVC.Models.Rooms.RoomDetailsVm
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Room Details";
+}
+<div class="container">
+    <div class="card pad-20">
+        <div class="card-head">
+            <div class="card-title">Room Details</div>
+            <div>
+                <a class="link" href="/Rooms/Edit/@Model.Id">Edit</a>
+                <a class="link" href="/Rooms/Index">Back</a>
+            </div>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-item"><div class="muted">Name</div><div class="user-email">@Model.Name</div></div>
+            <div class="detail-item"><div class="muted">Block</div><div class="user-email">@Model.Block</div></div>
+            <div class="detail-item"><div class="muted">Floor</div><div class="user-email">@Model.Floor</div></div>
+            <div class="detail-item"><div class="muted">Price</div><div class="user-email">@Model.Price.ToString("N0")</div></div>
+            <div class="detail-item"><div class="muted">Status</div><span class="chip info">@Model.Status</span></div>
+        </div>
+    </div>
+</div>

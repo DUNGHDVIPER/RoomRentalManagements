@@ -1,0 +1,32 @@
+﻿@{
+    var title = (string)(ViewData["Title"] ?? "Admin");
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title - AdminMVC</title>
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            @await Html.PartialAsync("_Sidebar")
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                @await Html.PartialAsync("_Topbar")
+            </header>
+
+            <section class="page">
+                @RenderBody()
+            </section>
+        </main>
+    </div>
+
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

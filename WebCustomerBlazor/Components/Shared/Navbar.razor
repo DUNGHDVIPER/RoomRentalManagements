@@ -1,0 +1,35 @@
+﻿@inject NavigationManager Nav
+
+<header class="header glass">
+    <div class="container">
+        <div class="header-inner">
+            <a class="brand" href="/">
+                <div class="brand-badge">R</div>
+                <div>
+                    <div class="brand-title">Roomy <span style="color:var(--blue)">Customer</span></div>
+                    <div class="brand-sub">Modern rental portal • FE-only</div>
+                </div>
+            </a>
+
+            <nav class="nav">
+                <a class="@(IsActive("/") ? "active" : "")" href="/">Home</a>
+                <a class="@(IsActive("/rooms") ? "active" : "")" href="/rooms">Rooms</a>
+                <a class="@(IsActive("/my-room") ? "active" : "")" href="/my-room">My Room</a>
+                <a class="@(IsActive("/tickets/create") ? "active" : "")" href="/tickets/create">Create Ticket</a>
+                <a class="@(IsActive("/profile") ? "active" : "")" href="/profile">Profile</a>
+                <a class="btn-grad" href="/login" style="padding:10px 14px;">Login</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+@code {
+    bool IsActive(string path)
+    {
+        var p = Nav.ToBaseRelativePath(Nav.Uri);
+        if (string.IsNullOrEmpty(p)) p = "/";
+        if (!path.StartsWith("/")) path = "/" + path;
+        if (p == "" && path == "/") return true;
+        return ("/" + p).StartsWith(path, StringComparison.OrdinalIgnoreCase);
+    }
+}

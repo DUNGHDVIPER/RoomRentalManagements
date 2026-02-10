@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "WebAdminMVC\\WebAdminMVC.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "WebCustomerBlazor\\WebCustomerBlazor.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "WebHostRazor\\WebHostRazor.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

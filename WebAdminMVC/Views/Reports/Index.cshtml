@@ -1,0 +1,42 @@
+﻿@model List<WebAdmin.MVC.Models.Reports.ReportListItemVm>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Reports";
+}
+<div class="container">
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title">Reports</div>
+            <a class="btn-gradient" href="/Reports/Create">+ Create Report</a>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>NAME</th>
+                        <th>TYPE</th>
+                        <th>PERIOD</th>
+                        <th>GENERATED</th>
+                        <th class="th-right">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td class="user-email">@r.Name</td>
+                            <td><span class="chip info">@r.Type</span></td>
+                            <td>@r.Period</td>
+                            <td>@r.GeneratedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td class="td-right">
+                                <a class="link" href="/Reports/Details/@r.Id">Details</a>
+                                <a class="link" href="/Reports/Edit/@r.Id">Edit</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+﻿@page
+@model WebHostRazor.Pages.Host.Contracts.IndexModel
+@{
+    ViewData["Title"] = "Contracts";
+}
+
+<div class="card p-18">
+    <h2 class="h2">Contracts</h2>
+    <div class="muted">Skeleton: list/filter • renew • terminate • versioning • reminders • export pdf stub</div>
+    <hr class="hr" />
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn-grad" href="/Host/Contracts/Wizard">+ Create Contract (Wizard)</a>
+        <a class="btn-ghost" href="/Host/Contracts">Refresh</a>
+    </div>
+
+    <hr class="hr" />
+    <div class="muted">TODO: bind DTO + call API later.</div>
+</div>

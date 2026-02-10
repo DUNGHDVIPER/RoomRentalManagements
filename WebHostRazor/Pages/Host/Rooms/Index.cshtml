@@ -1,0 +1,52 @@
+﻿@page
+@model WebHostRazor.Pages.Host.Rooms.IndexModel
+@{
+    ViewData["Title"] = "Rooms";
+}
+
+<div class="card p-18">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div>
+            <h2 class="h2">Rooms</h2>
+            <div class="muted">Manage rooms • images • amenities • pricing history</div>
+        </div>
+        <a class="btn-grad" href="/Host/Rooms/Create">+ New Room</a>
+    </div>
+
+    <hr class="hr" />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Area</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th style="width:280px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Rooms)
+            {
+                <tr class="row-hover">
+                    <td><b>@r.Name</b></td>
+                   @*  <td>@r.District, @r.City</td>
+                    <td>@r.Area m²</td> *@  
+                    <td>@r.Price.ToString("N0") ₫</td>
+                    <td>
+                        <span class="badge @(r.Status == "Available" ? "ok" : "info")">@r.Status</span>
+                    </td>
+                    <td style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <a class="btn-ghost" href="/Host/Rooms/Details?id=@r.Id">Details</a>
+                        <a class="btn-ghost" href="/Host/Rooms/Edit?id=@r.Id">Edit</a>
+                        <a class="btn-ghost" href="/Host/Rooms/Images?id=@r.Id">Images</a>
+                        <a class="btn-ghost" href="/Host/Rooms/Amenities?id=@r.Id">Amenities</a>
+                        <a class="btn-ghost" href="/Host/Rooms/PricingHistory?id=@r.Id">Pricing</a>
+                        <a class="btn-ghost" href="/Host/Rooms/Delete?id=@r.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

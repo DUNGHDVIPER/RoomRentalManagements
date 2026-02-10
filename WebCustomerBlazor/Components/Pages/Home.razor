@@ -1,0 +1,68 @@
+﻿@page "/"
+@inject NavigationManager Nav
+
+<div class="bg-grad">
+    <div class="section">
+        <div class="container">
+            <div class="hero">
+                <div class="card glass p-22">
+                    <div class="kicker">ROOM SEARCH</div>
+                    <h1 class="h1" style="margin-top:10px;">Find your next room</h1>
+                    <p class="muted" style="margin-top:12px; max-width:620px;">
+                        Modern rental portal UI (Customer). Filter by location, price, amenities — FE-only mock today.
+                    </p>
+
+                    <div class="card glass p-16 hero-search" style="margin-top:16px;">
+                        <input class="input" placeholder="Try: District 1, studio..." @bind="kw" />
+                        <button class="btn-grad" @onclick="GoRooms">Search</button>
+                    </div>
+
+                    <div class="chips">
+                        @foreach (var c in cities)
+                        {
+                            <button class="chip" @onclick="() => GoCity(c)">@c</button>
+                        }
+                    </div>
+
+                    <hr class="hr" />
+                    <div class="muted small">
+                        Tip: Click a city chip to pre-filter your listing.
+                    </div>
+                </div>
+
+                <div class="card glass p-22">
+                    <h2 class="h2">Quick actions</h2>
+                    <p class="muted" style="margin-top:10px;">
+                        Jump into room browsing or login to see My Room + Profile.
+                    </p>
+
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
+                        <a class="btn-grad" href="/rooms">Browse Rooms</a>
+                        <a class="btn-ghost" href="/login">Login</a>
+                        <a class="btn-ghost" href="/tickets/create">Create Ticket</a>
+                    </div>
+
+                    <hr class="hr" />
+                    <div class="muted small">
+                        Theme: gradient + glass • Responsive layout
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <div class="footer-inner">
+                    <div>© 2026 Roomy Customer — FE-only demo</div>
+                    <div>Theme: gradient + glass</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    string kw = "";
+    string[] cities = new[] { "Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Bình Dương" };
+
+    void GoRooms() => Nav.NavigateTo($"/rooms?kw={Uri.EscapeDataString(kw)}");
+    void GoCity(string c) => Nav.NavigateTo($"/rooms?city={Uri.EscapeDataString(c)}");
+}

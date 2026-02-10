@@ -1,0 +1,110 @@
+﻿@model WebAdmin.MVC.Models.Dashboard.DashboardVm
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container">
+
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Total Revenue</div>
+            <div class="kpi-row">
+                <div class="kpi-value">@Model.TotalRevenue</div>
+                <span class="pill success">+12.5%</span>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-label">Total Profit</div>
+            <div class="kpi-row">
+                <div class="kpi-value">@Model.TotalProfit</div>
+                <span class="pill success">+8.2%</span>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-label">Occupancy Rate</div>
+            <div class="kpi-row">
+                <div class="kpi-value">@Model.OccupancyRate</div>
+                <span class="pill success">+2.1%</span>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-label">Open Tickets</div>
+            <div class="kpi-row">
+                <div class="kpi-value">@Model.OpenTickets</div>
+                <span class="pill danger">-2</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-24">
+        <div class="card-head">
+            <div class="card-title">User Management</div>
+            <a class="btn-gradient" href="/Users/Create">+ Add New User</a>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>USER EMAIL</th>
+                        <th>ROLE</th>
+                        <th>STATUS</th>
+                        <th class="th-right">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar-box">A</div>
+                                <div class="user-email">admin@system.com</div>
+                            </div>
+                        </td>
+                        <td><span class="chip info">SuperAdmin</span></td>
+                        <td><span class="chip success">Active</span></td>
+                        <td class="td-right">
+                            <a class="link" href="#">Edit</a>
+                            <a class="link danger" href="#">Lock</a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar-box">H</div>
+                                <div class="user-email">host@apartment.vn</div>
+                            </div>
+                        </td>
+                        <td><span class="chip info">Host</span></td>
+                        <td><span class="chip success">Active</span></td>
+                        <td class="td-right">
+                            <a class="link" href="#">Edit</a>
+                            <a class="link danger" href="#">Lock</a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar-box">T</div>
+                                <div class="user-email">tenant@gmail.com</div>
+                            </div>
+                        </td>
+                        <td><span class="chip info">Customer</span></td>
+                        <td><span class="chip danger">Locked</span></td>
+                        <td class="td-right">
+                            <a class="link" href="#">Edit</a>
+                            <a class="link danger" href="#">Lock</a>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,46 @@
+﻿@model List<WebAdmin.MVC.Models.Contracts.ContractListItemVm>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Contracts";
+}
+<div class="container">
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title">Contracts</div>
+            <a class="btn-gradient" href="/Contracts/Create">+ Add New Contract</a>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ROOM</th>
+                        <th>TENANT</th>
+                        <th>START</th>
+                        <th>END</th>
+                        <th>STATUS</th>
+                        <th class="th-right">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td class="user-email">@c.RoomName</td>
+                            <td>@c.TenantName</td>
+                            <td>@c.StartDate.ToString("yyyy-MM-dd")</td>
+                            <td>@c.EndDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <span class="chip @(c.Status == "Active" ? "success" : (c.Status == "Expired" ? "danger" : "info"))">@c.Status</span>
+                            </td>
+                            <td class="td-right">
+                                <a class="link" href="/Contracts/Details/@c.Id">Details</a>
+                                <a class="link" href="/Contracts/Edit/@c.Id">Edit</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

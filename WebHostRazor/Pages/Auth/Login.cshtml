@@ -1,0 +1,40 @@
+﻿@page
+@model WebHostRazor.Pages.Auth.LoginModel
+@{
+    Layout = null;
+}
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Host Login</title>
+    <link rel="stylesheet" href="~/css/theme.css" />
+</head>
+<body class="bg-grad">
+    <div class="shell" style="justify-content:center;align-items:center;">
+        <div class="card p-18" style="width:min(520px,calc(100vw - 32px));">
+            <div style="display:flex;gap:12px;align-items:center;">
+                <div class="brand-logo">H</div>
+                <div>
+                    <div style="font-weight:950;font-size:18px;">Host Portal Login</div>
+                    <div class="muted">Use: <b>host@demo.com</b> / <b>Host@123</b></div>
+                </div>
+            </div>
+
+            <hr class="hr" />
+
+            <form method="post" style="display:grid;gap:12px;">
+                <input class="input" asp-for="Email" placeholder="Email" />
+                <input class="input" asp-for="Password" type="password" placeholder="Password" />
+                <button class="btn-grad" type="submit">Login</button>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Error))
+                {
+                    <div class="badge danger" style="padding:12px;border-radius:16px;">@Model.Error</div>
+                }
+            </form>
+        </div>
+    </div>
+</body>
+</html>
