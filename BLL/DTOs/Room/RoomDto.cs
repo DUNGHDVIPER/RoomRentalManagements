@@ -3,8 +3,8 @@
 public class RoomDto
 {
     public Guid Id { get; set; }
-    public string RoomNo { get; set; } = null!;
+    public required string RoomNo { get; set; }
     public string? Name { get; set; }
     public decimal Price { get; set; }
-    public string Status { get; set; } = null!;
+    public required string Status { get; set; }
 }

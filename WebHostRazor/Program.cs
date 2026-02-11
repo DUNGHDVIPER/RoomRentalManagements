@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BLL;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using WebCustomer.Blazor.Seed;
-using WebHostRazor;
-
+using DAL.Seed; // Chỉ dùng namespace này cho AddDal
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Sử dụng AddDal từ ServiceCollectionExtensions (có Identity + seed) - fully qualified
+builder.Services.AddDal(builder.Configuration);
+builder.Services.AddBll(builder.Configuration);
 
 // Authorization policy "Host"
 builder.Services.AddAuthorization(o =>
@@ -20,27 +23,11 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AllowAnonymousToFolder("/Auth");
 });
 
-// EF InMemory + Identity (FE-only)
-builder.Services.AddDbContext<AuthDbContext>(opt =>
-    opt.UseInMemoryDatabase("HostPortalAuth"));
-
-builder.Services
-    .AddIdentity<IdentityUser, IdentityRole>(opt =>
-    {
-        opt.Password.RequireNonAlphanumeric = false;
-        opt.Password.RequiredLength = 6;
-    })
-    .AddEntityFrameworkStores<AuthDbContext>()
-    .AddDefaultTokenProviders();
-
 builder.Services.ConfigureApplicationCookie(opt =>
 {
     opt.LoginPath = "/Auth/Login";
     opt.AccessDeniedPath = "/Auth/AccessDenied";
 });
-
-// FE mock store
-
 
 var app = builder.Build();
 
@@ -49,9 +36,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-// seed roles/users
-await app.SeedIdentityAsync();
 
 app.MapRazorPages();
 app.Run();
