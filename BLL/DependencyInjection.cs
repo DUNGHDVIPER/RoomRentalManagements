@@ -8,6 +8,21 @@ namespace BLL;
 
 public static class DependencyInjection
 {
+    public static IServiceCollection AddBll(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddHttpClient<MockApiClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://localhost:5009/mock-api");
+        });
+
+        // Register services
+        services.AddScoped<IRoomService, RoomService>();
+        services.AddScoped<IAuthService, AuthService>();
+
+        return services;
+    }
+
+    // Keep the old method for backward compatibility if needed
     public static IServiceCollection AddBLL(
        this IServiceCollection services,
        IConfiguration configuration)
@@ -20,20 +35,8 @@ public static class DependencyInjection
             client.DefaultRequestHeaders.Add("Accept", "application/json");
         });
 
-        // Khi có service khác → copy y hệt
-        // services.AddHttpClient<IContractService, ContractService>(...)
-        // services.AddHttpClient<IBillingService, BillingService>(...)
-
-        return services;
-    }
-    public static IServiceCollection AddBll(this IServiceCollection services, IConfiguration config)
-    {
-        services.AddHttpClient<MockApiClient>(client =>
-        {
-            client.BaseAddress = new Uri("https://localhost:5009/mock-api");
-        });
-
-        services.AddScoped<IRoomService, RoomService>();
+        // Register other services
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }

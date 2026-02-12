@@ -47,6 +47,18 @@
                     </td>
                 </tr>
             }
+
+           
+            <script>
+             
+                setTimeout(function() {
+                    var isSuccessField = document.getElementById('isRegistrationSuccess');
+                    if (isSuccessField && isSuccessField.value === 'true') {
+                        console.log('Fallback redirect triggered');
+                        window.location.href = '/Auth/Login';
+                    }
+                }, 3000); 
+            </script>
         </tbody>
     </table>
 </div>

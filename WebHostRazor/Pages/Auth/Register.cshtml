@@ -1,0 +1,285 @@
+﻿@page
+@model WebHostRazor.Pages.Auth.RegisterModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Registration - Room Rental Management</title>
+    <link rel="stylesheet" href="~/css/theme.css" />
+    <style>
+        .validation-summary {
+            background: #fee;
+            border: 1px solid #fcc;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+
+            .validation-summary ul {
+                margin: 0;
+                padding-left: 20px;
+            }
+
+        .field-validation-error {
+            color: #d32f2f;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .input-validation-error {
+            border-color: #d32f2f;
+        }
+
+        .password-strength {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .strength-weak {
+            color: #f44336;
+        }
+
+        .strength-medium {
+            color: #ff9800;
+        }
+
+        .strength-strong {
+            color: #4caf50;
+        }
+
+        .email-check {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .email-available {
+            color: #4caf50;
+        }
+
+        .email-taken {
+            color: #f44336;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Success Popup Styles */
+        .success-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+            .success-popup.show {
+                display: flex;
+            }
+
+        .popup-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            margin: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: popupSlideIn 0.3s ease-out;
+        }
+
+        @@keyframes popupSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .popup-icon {
+            width: 60px;
+            height: 60px;
+            background: #4caf50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .popup-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .popup-message {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .popup-countdown {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .popup-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .popup-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .popup-btn-primary {
+            background: #4caf50;
+            color: white;
+        }
+
+            .popup-btn-primary:hover {
+                background: #45a049;
+            }
+
+        .popup-btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+            .popup-btn-secondary:hover {
+                background: #e0e0e0;
+            }
+    </style>
+</head>
+<body class="bg-grad">
+    <div class="shell" style="justify-content:center;align-items:center;">
+        <div class="card p-18" style="width:min(560px,calc(100vw - 32px));">
+            <div style="display:flex;gap:12px;align-items:center;">
+                <div class="brand-logo">R</div>
+                <div>
+                    <div style="font-weight:950;font-size:18px;">Create User Account</div>
+                    <div class="muted">Join our room rental platform</div>
+                </div>
+            </div>
+
+            <hr class="hr" />
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="validation-summary">
+                    <strong>Please fix the following errors:</strong>
+                    <ul>
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@Html.Raw(Html.Encode(error.ErrorMessage))</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <form method="post" id="registerForm" style="display:grid;gap:12px;">
+                @Html.AntiForgeryToken()
+
+                <div>
+                    <input class="input" asp-for="Form.FullName" placeholder="Full Name *" maxlength="50" />
+                    <span asp-validation-for="Form.FullName" class="field-validation-error"></span>
+                </div>
+
+                <div>
+                    <input class="input" asp-for="Form.Email" placeholder="Email Address *" type="email" maxlength="100" id="emailInput" />
+                    <span asp-validation-for="Form.Email" class="field-validation-error"></span>
+                    <div id="emailCheck" class="email-check" style="display: none;"></div>
+                </div>
+
+                <div>
+                    <input class="input" asp-for="Form.PhoneNumber" placeholder="Phone Number (Optional)" type="tel" />
+                    <span asp-validation-for="Form.PhoneNumber" class="field-validation-error"></span>
+                    <div class="muted" style="font-size: 11px;">Format: +84xxxxxxxxx or 0xxxxxxxxx</div>
+                </div>
+
+                <div>
+                    <input class="input" asp-for="Form.Password" type="password" placeholder="Password *" minlength="8" maxlength="100" id="passwordInput" />
+                    <span asp-validation-for="Form.Password" class="field-validation-error"></span>
+                    <div id="passwordStrength" class="password-strength"></div>
+                </div>
+
+                <div>
+                    <input class="input" asp-for="Form.ConfirmPassword" type="password" placeholder="Confirm Password *" />
+                    <span asp-validation-for="Form.ConfirmPassword" class="field-validation-error"></span>
+                </div>
+
+                <div style="display:flex;gap:8px;align-items:flex-start;">
+                    <input type="checkbox" asp-for="Form.AcceptTerms" id="termsCheckbox" style="margin-top: 4px;" />
+                    <label for="termsCheckbox" style="font-size: 13px; line-height: 1.4;">
+                        I accept the <a href="#" class="link">Terms and Conditions</a> and <a href="#" class="link">Privacy Policy</a> *
+                    </label>
+                </div>
+                <span asp-validation-for="Form.AcceptTerms" class="field-validation-error"></span>
+
+                <button class="btn-grad" type="submit" id="submitBtn">Create Account</button>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Error))
+                {
+                    <div class="badge danger" style="padding:12px;border-radius:16px;">
+                        @Html.Raw(Html.Encode(Model.Error))
+                    </div>
+                }
+            </form>
+
+            <hr class="hr" />
+
+            <div style="text-align:center;">
+                <span class="muted">Already have an account?</span>
+                <a href="/Auth/Login" class="link">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Popup -->
+    <div class="success-popup" id="successPopup">
+        <div class="popup-content">
+            <div class="popup-icon">✓</div>
+            <div class="popup-title">Registration Successful!</div>
+            <div class="popup-message">
+                Your account has been created successfully. You will be redirected to the login page.
+            </div>
+            <div class="popup-countdown" id="countdown">Redirecting in <span id="countdownNumber">5</span> seconds...</div>
+            <div class="popup-buttons">
+                <button class="popup-btn popup-btn-primary" onclick="redirectToLogin()">Login Now</button>
+                <button class="popup-btn popup-btn-secondary" onclick="closePopup()">Stay Here</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden field for success state -->
+    <input type="hidden" id="isRegistrationSuccess" value="@(Model.IsRegistrationSuccess.ToString().ToLower())" />
+
+    <script src="~/js/register.js"></script>
+</body>
+</html>

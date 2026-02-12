@@ -1,12 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using DAL; // Thêm using này
-using BLL; // Thêm using này
+using DAL.Seed; // Thay đổi từ DAL thành DAL.Seed
+using BLL; // BLL OK
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Thêm DAL và BLL services
-builder.Services.AddDal(builder.Configuration);  // ← Thêm dòng này
-builder.Services.AddBll(builder.Configuration);  // ← Thêm dòng này
+try
+{
+    builder.Services.AddDal(builder.Configuration);
+    builder.Services.AddBll(builder.Configuration);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error configuring services: {ex.Message}");
+    throw;
+}
 
 builder.Services.AddControllersWithViews();
 
@@ -32,8 +40,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 // Thêm middleware authentication và authorization
-app.UseAuthentication(); // ← Thêm dòng này
-app.UseAuthorization();  // ← Thêm dòng này
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseSession();
 

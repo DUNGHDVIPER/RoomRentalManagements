@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Host Login</title>
+    <title>Host Login - Room Rental Management</title>
     <link rel="stylesheet" href="~/css/theme.css" />
 </head>
 <body class="bg-grad">
@@ -27,6 +27,15 @@
             <form method="post" style="display:grid;gap:12px;">
                 <input class="input" asp-for="Email" placeholder="Email" />
                 <input class="input" asp-for="Password" type="password" placeholder="Password" />
+
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <label style="display:flex;gap:6px;align-items:center;font-size:13px;">
+                        <input type="checkbox" name="RememberMe" value="true" />
+                        Remember me
+                    </label>
+                    <a href="/Auth/ForgotPassword" class="link" style="font-size:13px;">Forgot password?</a>
+                </div>
+
                 <button class="btn-grad" type="submit">Login</button>
 
                 @if (!string.IsNullOrWhiteSpace(Model.Error))
@@ -34,6 +43,13 @@
                     <div class="badge danger" style="padding:12px;border-radius:16px;">@Model.Error</div>
                 }
             </form>
+
+            <hr class="hr" />
+
+            <div style="text-align:center;">
+                <span class="muted">New to our platform?</span>
+                <a href="/Auth/Register" class="link">Create Host Account</a>
+            </div>
         </div>
     </div>
 </body>
