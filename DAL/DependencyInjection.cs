@@ -13,7 +13,7 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        services.AddDbContext<AppDbContext>(options =>
+        services.AddDbContext<MotelManagementDbContext>(options =>
             options.UseSqlServer(connectionString));
 
         services.AddScoped<IRoomRepository, RoomRepository>();

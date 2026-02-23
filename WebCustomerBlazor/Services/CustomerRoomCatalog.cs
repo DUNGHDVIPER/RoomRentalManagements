@@ -53,13 +53,8 @@ public class CustomerRoomCatalog : ICustomerRoomCatalog
             .Take(page.PageSize)
             .ToList();
 
-        var res = new PagedResultDto<RoomPublicDto>
-        {
-            Items = items,
-            TotalCount = total,
-            PageNumber = page.PageNumber,
-            PageSize = page.PageSize
-        };
+        // Fix: Use the constructor of PagedResultDto with the required parameters
+        PagedResultDto<RoomPublicDto> res = new(items, total, page.PageNumber, page.PageSize);
 
         return Task.FromResult(res);
     }

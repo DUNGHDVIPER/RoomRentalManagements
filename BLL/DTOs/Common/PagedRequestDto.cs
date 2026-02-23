@@ -2,9 +2,16 @@
 
 public class PagedRequestDto
 {
+    public PagedRequestDto(int page, int pageSize)
+    {
+        Page = page;
+        PageSize = pageSize;
+    }
+
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 12;
     public string? SortBy { get; set; }
     public string? Keyword { get; internal set; }
     public int PageIndex { get; internal set; }
+    public int Page { get; internal set; }
 }

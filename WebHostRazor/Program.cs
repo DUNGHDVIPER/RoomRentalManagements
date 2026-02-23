@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BLL.Services;
+using BLL.Services.Interfaces;
+using DAL.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Infrastructure;
 using WebCustomer.Blazor.Seed;
-using WebHostRazor;
-
+using WebHostRazor.BackgroundJobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,27 +22,47 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AllowAnonymousToFolder("/Auth");
 });
 
-// EF InMemory + Identity (FE-only)
+QuestPDF.Settings.License = LicenseType.Community;
+
+// ✅ Motel DB (DB thật) => dùng cho nghiệp vụ Contracts/Rooms/...
+builder.Services.AddDbContext<MotelManagementDbContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// ✅ Identity DB (FE-only) => InMemory (seed users/roles)
 builder.Services.AddDbContext<AuthDbContext>(opt =>
     opt.UseInMemoryDatabase("HostPortalAuth"));
 
+// ✅ Identity (RoleManager/UserManager)
 builder.Services
     .AddIdentity<IdentityUser, IdentityRole>(opt =>
     {
         opt.Password.RequireNonAlphanumeric = false;
+        opt.Password.RequireUppercase = false;
+        opt.Password.RequireLowercase = false;
+        opt.Password.RequireDigit = false;
         opt.Password.RequiredLength = 6;
     })
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
 
+// Cookie paths
 builder.Services.ConfigureApplicationCookie(opt =>
 {
     opt.LoginPath = "/Auth/Login";
     opt.AccessDeniedPath = "/Auth/AccessDenied";
 });
 
-// FE mock store
+// ✅ BLL services
+builder.Services.Configure<HostOptions>(o =>
+{
+    o.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
+});
 
+builder.Services.AddScoped<IContractService, ContractService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
+
+// ✅ HostedService
+builder.Services.AddHostedService<ContractExpiryReminderHostedService>();
 
 var app = builder.Build();
 
@@ -50,7 +72,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// seed roles/users
+// ✅ seed roles/users (Identity chạy trên AuthDbContext InMemory)
 await app.SeedIdentityAsync();
 
 app.MapRazorPages();

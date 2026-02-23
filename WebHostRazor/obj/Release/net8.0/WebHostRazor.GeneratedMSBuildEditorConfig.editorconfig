@@ -36,8 +36,48 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Contracts/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxDb250cmFjdHNcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Contracts/ExportPdf.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxDb250cmFjdHNcRXhwb3J0UGRmLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Contracts/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxDb250cmFjdHNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Contracts/ReminderScan.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxDb250cmFjdHNcUmVtaW5kZXJTY2FuLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Contracts/Renew.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxDb250cmFjdHNcUmVuZXcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Contracts/Terminate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxDb250cmFjdHNcVGVybWluYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Contracts/UploadAttachment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxDb250cmFjdHNcVXBsb2FkQXR0YWNobWVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Contracts/Versions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxDb250cmFjdHNcVmVyc2lvbnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Contracts/Wizard/Step1.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxDb250cmFjdHNcV2l6YXJkXFN0ZXAxLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Contracts/Wizard/Step2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxDb250cmFjdHNcV2l6YXJkXFN0ZXAyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Contracts/Wizard/Step3.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxDb250cmFjdHNcV2l6YXJkXFN0ZXAzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/PRN222_PROJECT/RoomRentalManagement/WebHostRazor/Pages/Host/Dashboard/Index.cshtml]

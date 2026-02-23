@@ -1,0 +1,51 @@
+﻿@page "{id:int}"
+@model WebHostRazor.Pages.Host.Contracts.VersionsModel
+@{
+    ViewData["Title"] = "Contract Versions";
+}
+
+@if (TempData["Err"] != null)
+{
+    <div class="alert alert-danger">@TempData["Err"]</div>
+}
+
+<h2>Versions - Contract #@Model.ContractId</h2>
+
+<p>
+    <a class="btn btn-secondary" asp-page="./Details" asp-route-id="@Model.ContractId">Back</a>
+</p>
+
+@if (Model.Items.Count == 0)
+{
+    <div class="alert alert-info">No versions yet.</div>
+}
+else
+{
+    <div class="accordion" id="verAcc">
+        @for (int i = 0; i < Model.Items.Count; i++)
+        {
+            var v = Model.Items[i];
+            var collapseId = $"c{i}";
+            var headingId = $"h{i}";
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="@headingId">
+                    <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#@collapseId">
+                        v@v.VersionNumber
+                        &nbsp;|&nbsp; @v.ChangedAt.ToString("yyyy-MM-dd HH:mm")
+                        &nbsp;|&nbsp; user: @(v.ChangedByUserId?.ToString() ?? "-")
+                        &nbsp;|&nbsp; @v.ChangeNote
+                    </button>
+                </h2>
+                <div id="@collapseId" class="accordion-collapse collapse" data-bs-parent="#verAcc">
+                    <div class="accordion-body">
+                        <pre class="bg-light p-3 rounded" style="max-height: 420px; overflow:auto;">
+        @v.SnapshotJson
+                                </pre>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

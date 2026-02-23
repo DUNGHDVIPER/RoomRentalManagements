@@ -1,0 +1,21 @@
+﻿@page "{id:int}"
+@model WebHostRazor.Pages.Host.Contracts.TerminateModel
+@{
+    ViewData["Title"] = "Terminate Contract";
+}
+
+<h2>Terminate Contract</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">Terminate Date</label>
+        <input class="form-control" asp-for="TerminateDate" type="date" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Reason</label>
+        <input class="form-control" asp-for="Reason" />
+    </div>
+
+    <button class="btn btn-warning" type="submit">Confirm Terminate</button>
+    <a class="btn btn-secondary" asp-page="/Contracts/Details" asp-route-id="@RouteData.Values["id"]">Cancel</a>
+</form>

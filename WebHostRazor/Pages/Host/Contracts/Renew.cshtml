@@ -1,0 +1,59 @@
+﻿@page "{id:long}"
+@model WebHostRazor.Pages.Host.Contracts.RenewModel
+@{
+    ViewData["Title"] = "Renew Contract";
+}
+
+@if (TempData["Err"] != null)
+{
+    <div class="alert alert-danger">@TempData["Err"]</div>
+}
+
+@if (Model.Current == null)
+{
+    <div class="alert alert-warning">Not found.</div>
+}
+else
+{
+    <h2>Renew Contract #@Model.Current.Id</h2>
+
+    @if (!Model.Current.IsActive)
+    {
+        <div class="alert alert-warning">
+            This contract is not Active, so it cannot be renewed. (Status: @Model.Current.Status)
+        </div>
+        <a class="btn btn-secondary" asp-page="./Details" asp-route-id="@Model.Current.Id">Back</a>
+    }
+    else
+    {
+        <form method="post">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">New Start Date</label>
+                    <input class="form-control" type="date" asp-for="NewStartDate" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">New End Date</label>
+                    <input class="form-control" type="date" asp-for="NewEndDate" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">New Rent</label>
+                    <input class="form-control" asp-for="NewRent" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">New Deposit</label>
+                    <input class="form-control" asp-for="NewDeposit" />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Reason</label>
+                    <input class="form-control" asp-for="Reason" />
+                </div>
+            </div>
+
+            <div class="mt-3 d-flex gap-2">
+                <button class="btn btn-primary" type="submit">Renew</button>
+                <a class="btn btn-secondary" asp-page="./Details" asp-route-id="@Model.Current.Id">Cancel</a>
+            </div>
+        </form>
+    }
+}

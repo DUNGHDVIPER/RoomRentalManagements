@@ -1,50 +1,47 @@
-﻿using BLL.DTOs.Auth;
+﻿using System.Text.Json;
 using BLL.Services.Interfaces;
-using Microsoft.AspNetCore.Identity;
+using DAL.Data;
+using DAL.Entities.Motel;
 
 namespace BLL.Services;
 
-public class AuthService : IAuthService
+public class AuditService : IAuditService
 {
-    private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly MotelManagementDbContext _db;
 
-    public AuthService(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+    public AuditService(MotelManagementDbContext db)
     {
-        _signInManager = signInManager;
-        _userManager = userManager;
+        _db = db;
     }
 
-    public async Task<AuthResultDto> LoginAsync(LoginRequestDto dto, CancellationToken ct = default)
+    public async Task LogAsync(
+        int? actorUserId,
+        string action,
+        string entityType,
+        string entityId,
+        string? note = null,
+        object? oldValue = null,
+        object? newValue = null,
+        CancellationToken ct = default)
     {
-        var user = await _userManager.FindByEmailAsync(dto.Email);
-        if (user == null) return new AuthResultDto { Succeeded = false, Error = "Invalid credentials" };
+        var opt = new JsonSerializerOptions { WriteIndented = false };
 
-        var res = await _signInManager.PasswordSignInAsync(user, dto.Password, dto.RememberMe, lockoutOnFailure: true);
-        if (!res.Succeeded) return new AuthResultDto { Succeeded = false, Error = "Invalid credentials" };
+        string? oldJson = oldValue == null ? null : JsonSerializer.Serialize(oldValue, opt);
+        string? newJson = newValue == null ? null : JsonSerializer.Serialize(newValue, opt);
 
-        var roles = await _userManager.GetRolesAsync(user);
-        return new AuthResultDto
+        _db.AuditLogs.Add(new AuditLog
         {
-            Succeeded = true,
-            UserId = user.Id,
-            Email = user.Email,
-            Roles = roles.ToArray()
-        };
-    }
+            ActorUserId = actorUserId,
+            Action = action,
+            EntityType = entityType,
+            EntityId = entityId,
+            Note = note,
+            OldValueJson = oldJson,
+            NewValueJson = newJson,
+            CreatedAt = DateTime.UtcNow
+        });
 
-    public Task LogoutAsync(CancellationToken ct = default)
-        => _signInManager.SignOutAsync();
-
-    public Task ForgotPasswordAsync(ForgotPasswordRequestDto dto, CancellationToken ct = default)
-    {
-        // Stub: sau này generate token + email sender
-        return Task.CompletedTask;
-    }
-
-    public Task<AuthResultDto> GoogleLoginStubAsync(string idToken, CancellationToken ct = default)
-    {
-        // Stub: sau này verify Google token
-        return Task.FromResult(new AuthResultDto { Succeeded = false, Error = "Google login not implemented" });
+        // IMPORTANT: dùng chung DbContext => chạy cùng transaction nếu caller đang BeginTransaction
+        await _db.SaveChangesAsync(ct);
     }
 }

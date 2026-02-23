@@ -1,13 +1,14 @@
-﻿using BLL.DTOs.Auth;
+﻿namespace BLL.Services.Interfaces;
 
-namespace BLL.Services.Interfaces;
-
-public interface IAuthService
+public interface IAuditService
 {
-    Task<AuthResultDto> LoginAsync(LoginRequestDto dto, CancellationToken ct = default);
-    Task LogoutAsync(CancellationToken ct = default);
-    Task ForgotPasswordAsync(ForgotPasswordRequestDto dto, CancellationToken ct = default);
-
-    // Google stub (sau này tích hợp OAuth)
-    Task<AuthResultDto> GoogleLoginStubAsync(string idToken, CancellationToken ct = default);
+    Task LogAsync(
+        int? actorUserId,
+        string action,
+        string entityType,
+        string entityId,
+        string? note = null,
+        object? oldValue = null,
+        object? newValue = null,
+        CancellationToken ct = default);
 }

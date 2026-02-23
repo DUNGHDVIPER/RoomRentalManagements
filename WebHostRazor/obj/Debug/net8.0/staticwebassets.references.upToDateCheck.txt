@@ -2,3 +2,15 @@ D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\static
 D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
 D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
 D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\obj\Debug\net8.0\staticwebassets.build.json

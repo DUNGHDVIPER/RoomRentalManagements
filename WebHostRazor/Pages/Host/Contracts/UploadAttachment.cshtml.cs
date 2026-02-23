@@ -1,0 +1,53 @@
+﻿using BLL.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace WebHostRazor.Pages.Host.Contracts;
+
+public class UploadAttachmentModel : PageModel
+{
+    private readonly IContractService _service;
+    private readonly IWebHostEnvironment _env;
+
+    public UploadAttachmentModel(IContractService service, IWebHostEnvironment env)
+    {
+        _service = service;
+        _env = env;
+    }
+
+    [BindProperty] public IFormFile? File { get; set; }
+
+    public IActionResult OnGet(long id) => Page();
+
+    public async Task<IActionResult> OnPost(long id)
+    {
+        if (File == null || File.Length == 0)
+        {
+            ModelState.AddModelError("", "Please choose a file.");
+            return Page();
+        }
+
+        if (File.Length > 10 * 1024 * 1024)
+        {
+            ModelState.AddModelError("", "File too large (max 10MB).");
+            return Page();
+        }
+
+        var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "contracts");
+        Directory.CreateDirectory(uploadsDir);
+
+        var safeFileName = Path.GetFileName(File.FileName);
+        var storedName = $"{Guid.NewGuid():N}_{safeFileName}";
+        var fullPath = Path.Combine(uploadsDir, storedName);
+
+        await using (var stream = System.IO.File.Create(fullPath))
+        {
+            await File.CopyToAsync(stream);
+        }
+
+        var url = $"/uploads/contracts/{storedName}";
+        await _service.AddAttachmentStubAsync((int)id, safeFileName, url);
+
+        return RedirectToPage("./Details", new { id });
+    }
+}
