@@ -3,6 +3,7 @@ using DAL.Entities.Tenanting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace WebHostRazor.Pages.Host.Tenants
 {
@@ -52,12 +53,7 @@ namespace WebHostRazor.Pages.Host.Tenants
                 if (age < 18)
                     return new JsonResult(new { success = false, message = "Tenant must be at least 18 years old" });
 
-                //// ===== CHECK-IN VALIDATION =====
-                //if (TenantCheckInAt == default)
-                //    return new JsonResult(new { success = false, message = "Check-in date is required" });
-
-                //if (TenantCheckInAt < today)
-                //    return new JsonResult(new { success = false, message = "Check-in date cannot be in the past" });
+         
 
                 // ===== DUPLICATE CHECK =====
                 if (!string.IsNullOrWhiteSpace(Tenant.CCCD) &&
@@ -102,7 +98,6 @@ namespace WebHostRazor.Pages.Host.Tenants
                 tenantInDb.CCCD = Tenant.CCCD;
                 tenantInDb.Gender = Tenant.Gender;
                 tenantInDb.Status = Tenant.Status;
-                //tenantInDbCheckInAt = TenantCheckInAt;
                 tenantInDb.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();

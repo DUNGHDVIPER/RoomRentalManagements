@@ -1,12 +1,14 @@
 ﻿using BLL.Common;
 using DAL.Data;
 using DAL.Entities.Tenanting;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-
+using System.Security.Claims;
 namespace WebHostRazor.Pages.Host.Tenants;
 
+[Authorize]
 public class CreateModel : PageModel
 {
     private readonly AppDbContext _context;
@@ -109,6 +111,7 @@ public class CreateModel : PageModel
                 await _context.Tenants.AnyAsync(x => x.Email == Input.Email))
                 return new JsonResult(new { success = false, message = "Email already exists" });
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             // ===== CREATE =====
             var tenant = new Tenant
             {
@@ -120,6 +123,7 @@ public class CreateModel : PageModel
                 Gender = Input.Gender,
                 Status = Input.Status,
                 Address = Input.Address,
+                IdentityUserId = userId,
                 CreatedAt = DateTime.UtcNow
             };
 

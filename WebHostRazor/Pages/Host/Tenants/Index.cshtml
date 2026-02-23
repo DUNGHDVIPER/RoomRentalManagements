@@ -70,16 +70,36 @@
     <!-- Table Card -->
     <div class="tp-table-card">
 
-        <div class="tp-toolbar">
-            <input type="text"
-                   placeholder="Search tenant by name, phone, email..."
-                   class="tp-search"
-                   onkeyup="filterTenant(this)" />
+        <form method="get" class="tp-toolbar" style="display:flex; gap:10px; align-items:center;">
 
-            <div class="tp-total">
+            <input type="text"
+                   name="SearchTerm"
+                   value="@Model.SearchTerm"
+                   placeholder="Search..."
+                   class="tp-search"
+                   style="width:200px;" />
+
+            <select name="StatusFilter" class="tp-select" style="width:130px;">
+                <option value="">Status</option>
+                <option value="Active" selected="@(Model.StatusFilter=="Active")">Active</option>
+                <option value="Inactive" selected="@(Model.StatusFilter=="Inactive")">Inactive</option>
+            </select>
+
+            <select name="GenderFilter" class="tp-select" style="width:130px;">
+                <option value="">Gender</option>
+                <option value="Male" selected="@(Model.GenderFilter=="Male")">Male</option>
+                <option value="Female" selected="@(Model.GenderFilter=="Female")">Female</option>
+            </select>
+
+            <button type="submit" class="tp-add-btn" style="padding:6px 16px;">
+                Filter
+            </button>
+
+            <div class="tp-total" style="margin-left:auto;">
                 @Model.Tenants.Count tenants
             </div>
-        </div>
+
+        </form>
 
         <table class="tp-table">
             <thead>
@@ -152,6 +172,24 @@
 
             </tbody>
         </table>
+        @if (Model.TotalPages > 1)
+        {
+            <div style="margin-top:20px; text-align:center;">
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <a asp-page="Index"
+                       asp-route-PageNumber="@i"
+                       asp-route-SearchTerm="@Model.SearchTerm"
+                       asp-route-StatusFilter="@Model.StatusFilter"
+                       asp-route-GenderFilter="@Model.GenderFilter"
+                       class="@(Model.PageNumber == i ? "tp-page active" : "tp-page")">
+                        @i
+                    </a>
+                }
+
+            </div>
+        }
 
     </div>
 
