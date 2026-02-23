@@ -26,7 +26,6 @@
 	  <Folder Include="Pages\Notifications\" />
 	  <Folder Include="Pages\Utilities\" />
 	  <Folder Include="Pages\Tickets\" />
-	  <Folder Include="Pages\Tenants\" />
   </ItemGroup>
 
   <ItemGroup>

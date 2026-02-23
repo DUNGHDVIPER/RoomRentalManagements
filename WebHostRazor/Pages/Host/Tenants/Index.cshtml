@@ -1,0 +1,158 @@
+﻿@page
+@model WebHostRazor.Pages.Host.Tenants.IndexModel
+@{
+    ViewData["Title"] = "Tenant Management";
+}
+
+<div class="tenant-page">
+
+    <!-- Top Header -->
+    <div class="tp-header">
+
+        <div>
+            <div class="tp-badge">Tenant Management</div>
+            <h1 class="tp-title">All Tenants</h1>
+            <div class="tp-sub">
+                Manage all tenants registered in your property system.
+            </div>
+        </div>
+
+        <a asp-page="Create" class="tp-add-btn">
+            + Add Tenant
+        </a>
+
+    </div>
+
+    <!-- Stats -->
+    <div class="tp-stats">
+
+        <div class="stat-card">
+            <div class="stat-icon purple">👥</div>
+            <div>
+                <div class="stat-number">@Model.Tenants.Count</div>
+                <div class="stat-label">Total Tenants</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon green">✔</div>
+            <div>
+                <div class="stat-number">
+                    @Model.Tenants.Count(x => x.Status == "Active")
+                </div>
+                <div class="stat-label">Active</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon red">⛔</div>
+            <div>
+                <div class="stat-number">
+                    @Model.Tenants.Count(x => x.Status != "Active")
+                </div>
+                <div class="stat-label">Disabled</div>
+            </div>
+        </div>
+
+        @* <div class="stat-card"> *@
+        @*     <div class="stat-icon yellow">📅</div> *@
+        @*     <div> *@
+        @*         <div class="stat-number"> *@
+        @*             @(Model.Tenants.OrderByDescending(x => x.CheckInAt) *@
+        @*                 .FirstOrDefault()?.CheckInAt.ToString("MMM") ?? "-") *@
+        @*         </div> *@
+        @*         <div class="stat-label">Latest Check-in</div> *@
+        @*     </div> *@
+        @* </div> *@
+
+    </div>
+
+    <!-- Table Card -->
+    <div class="tp-table-card">
+
+        <div class="tp-toolbar">
+            <input type="text"
+                   placeholder="Search tenant by name, phone, email..."
+                   class="tp-search"
+                   onkeyup="filterTenant(this)" />
+
+            <div class="tp-total">
+                @Model.Tenants.Count tenants
+            </div>
+        </div>
+
+        <table class="tp-table">
+            <thead>
+                <tr>
+                    <th>Tenant</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th style="width:140px;">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="tenantBody">
+
+                @foreach (var t in Model.Tenants)
+                {
+                    <tr>
+                        <td>
+                            <div class="tp-tenant-cell">
+                                <div class="tp-avatar">
+                                    @t.FullName.Substring(0, 1)
+                                </div>
+
+                                <div>
+                                    <div class="tp-name">@t.FullName</div>
+                                    <div class="tp-subtext">
+                                        @t.Gender • @t.CCCD
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>@t.Phone</td>
+                        <td>@t.Email</td>
+                        
+
+                        <td>
+                            @if (t.Status == "Active")
+                            {
+                                <span class="tp-status active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="tp-status disabled">Disabled</span>
+                            }
+                        </td>
+
+                        <td>
+                            <a asp-page="Details"
+                               asp-route-id="@t.Id"
+                               class="tp-icon-btn">👁</a>
+
+                            <a asp-page="Edit"
+                               asp-route-id="@t.Id"
+                               class="tp-icon-btn">✏</a>
+
+                            <form method="post"
+                                  asp-page-handler="Delete"
+                                  asp-route-id="@t.Id"
+                                  style="display:inline;">
+                                <button type="submit"
+                                        class="tp-icon-btn"
+                                        onclick="return confirm('Delete this tenant?')">
+                                    🗑
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+    </div>
+
+</div>

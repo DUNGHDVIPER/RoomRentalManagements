@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BLL.Services.Interfaces;
+using BLL.Services;
+using DAL.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebCustomer.Blazor.Seed;
 using WebHostRazor;
+using DAL.Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,10 +23,28 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/Host", "Host");
     options.Conventions.AllowAnonymousToFolder("/Auth");
 });
+// Tenants
+builder.Services.AddScoped<ITenantService, TenantService>();
+builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 
 // EF InMemory + Identity (FE-only)
-builder.Services.AddDbContext<AuthDbContext>(opt =>
-    opt.UseInMemoryDatabase("HostPortalAuth"));
+//builder.Services.AddDbContext<AuthDbContext>(opt =>
+//    opt.UseInMemoryDatabase("HostPortalAuth"));
+
+//builder.Services
+//    .AddIdentity<IdentityUser, IdentityRole>(opt =>
+//    {
+//        opt.Password.RequireNonAlphanumeric = false;
+//        opt.Password.RequiredLength = 6;
+//    })
+//    .AddEntityFrameworkStores<AuthDbContext>()
+//    .AddDefaultTokenProviders();
+
+//builder.Services.AddDbContext<AppDbContext>(opt =>
+//    opt.UseInMemoryDatabase("HostPortalApp"));
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services
     .AddIdentity<IdentityUser, IdentityRole>(opt =>
@@ -30,9 +52,8 @@ builder.Services
         opt.Password.RequireNonAlphanumeric = false;
         opt.Password.RequiredLength = 6;
     })
-    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
-
 builder.Services.ConfigureApplicationCookie(opt =>
 {
     opt.LoginPath = "/Auth/Login";
