@@ -25,8 +25,9 @@
 						<th>Room</th>
                         <th>Price</th>
                         <th>Status</th>
-                        <th>Check In / Out</th>
                         <th>Actions</th>
+                        <th>Check In/Out</th> 
+                        <th>StayHistories</th>
                     </tr>
                 </thead>
 
@@ -91,7 +92,17 @@
                                        class="btn btn-sm btn-outline-danger rounded-pill">
                                         Delete
                                     </a>
+
+                                  
                                 </div>
+                            </td>
+
+                            <td>
+                                <a asp-page="CheckInOut/RoomHistory"
+                                   asp-route-roomId="@room.Id"
+                                   class="btn btn-info">
+                                    📜 History
+                                </a>
                             </td>
                         </tr>
                     }
