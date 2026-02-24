@@ -1,17 +1,30 @@
 ﻿using Microsoft.AspNetCore.Components.Web;
 using WebCustomerBlazor.Components;
-using DAL; // Thêm using này
-using BLL; // Thêm using này
+using DAL.Seed;
+using BLL;
+using BLL.Services;
+using BLL.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Thêm DAL và BLL services
-builder.Services.AddDal(builder.Configuration);  // ← Thêm dòng này
-builder.Services.AddBll(builder.Configuration);  // ← Thêm dòng này
+builder.Services.AddDal(builder.Configuration);
+builder.Services.AddBll(builder.Configuration);
 
-// Blazor Web App (.NET 8)
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddAuthentication()
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.LogoutPath = "/Auth/Logout";
+        options.AccessDeniedPath = "/Auth/AccessDenied";
+    });
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
@@ -23,9 +36,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseAntiforgery();
 
-// Map root component
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();
 

@@ -20,11 +20,11 @@ public static class IdentitySeeder
             }
         }
 
-        // 2) Users
-        await EnsureUserAsync(userManager, "admin@demo.com", "Admin@12345!", "Admin", ct);
-        await EnsureUserAsync(userManager, "host@demo.com", "Host@12345!", "Host", ct);
-        await EnsureUserAsync(userManager, "customer@demo.com", "Customer@12345!", "Customer", ct);
-        await EnsureUserAsync(userManager, "user@demo.com", "User@12345!", "User", ct);
+        // 2) Users với password đơn giản hơn
+        await EnsureUserAsync(userManager, "admin@demo.com", "Admin@123!", "Admin", ct);
+        await EnsureUserAsync(userManager, "host@demo.com", "Host@123!", "Host", ct);
+        await EnsureUserAsync(userManager, "customer@demo.com", "Customer@123!", "Customer", ct);
+        await EnsureUserAsync(userManager, "user@demo.com", "User@123!", "User", ct);
     }
 
     private static async Task EnsureUserAsync(
@@ -52,7 +52,9 @@ public static class IdentitySeeder
             }
         }
 
-        if (!await userManager.IsInRoleAsync(user, role))
+        // ✅ Kiểm tra user đã có role chưa trước khi thêm
+        var userRoles = await userManager.GetRolesAsync(user);
+        if (!userRoles.Contains(role))
         {
             var addRole = await userManager.AddToRoleAsync(user, role);
             if (!addRole.Succeeded)

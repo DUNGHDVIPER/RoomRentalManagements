@@ -1,6 +1,10 @@
-﻿namespace BLL.DTOs.Auth;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BLL.DTOs.Auth;
 
 public class ForgotPasswordRequestDto
 {
-    public string Email { get; set; } = null!;
+    [Required(ErrorMessage = "Email is required")]
+    [EmailAddress(ErrorMessage = "Invalid email format")]
+    public string Email { get; set; } = string.Empty;
 }

@@ -1626,22 +1626,6 @@
         "frameworkReferences": [
           "Microsoft.AspNetCore.App"
         ]
-      },
-      "WebCustomerBlazor/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v8.0",
-        "dependencies": {
-          "BLL": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/WebCustomerBlazor.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/WebCustomerBlazor.dll": {}
-        },
-        "frameworkReferences": [
-          "Microsoft.AspNetCore.App"
-        ]
       }
     }
   },
@@ -4260,11 +4244,6 @@
       "type": "project",
       "path": "../DAL/DAL.csproj",
       "msbuildProject": "../DAL/DAL.csproj"
-    },
-    "WebCustomerBlazor/1.0.0": {
-      "type": "project",
-      "path": "../WebCustomerBlazor/WebCustomerBlazor.csproj",
-      "msbuildProject": "../WebCustomerBlazor/WebCustomerBlazor.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -4273,8 +4252,7 @@
       "DAL >= 1.0.0",
       "Microsoft.EntityFrameworkCore.InMemory >= 8.0.23",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.23",
-      "Microsoft.Extensions.Caching.Memory >= 8.0.1",
-      "WebCustomerBlazor >= 1.0.0"
+      "Microsoft.Extensions.Caching.Memory >= 8.0.1"
     ]
   },
   "packageFolders": {
@@ -4315,9 +4293,6 @@
             },
             "D:\\PRN222_PROJECT\\RoomRentalManagements\\DAL\\DAL.csproj": {
               "projectPath": "D:\\PRN222_PROJECT\\RoomRentalManagements\\DAL\\DAL.csproj"
-            },
-            "D:\\PRN222_PROJECT\\RoomRentalManagements\\WebCustomerBlazor\\WebCustomerBlazor.csproj": {
-              "projectPath": "D:\\PRN222_PROJECT\\RoomRentalManagements\\WebCustomerBlazor\\WebCustomerBlazor.csproj"
             }
           }
         }

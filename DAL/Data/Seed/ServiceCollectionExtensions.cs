@@ -22,6 +22,8 @@ public static class ServiceCollectionExtensions
             {
                 // đảm bảo migrations nằm trong DAL/Migrations
                 sql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                // Đặt CommandTimeout ĐÚNG CÁCH thông qua Entity Framework
+                sql.CommandTimeout(30);
             });
         });
 

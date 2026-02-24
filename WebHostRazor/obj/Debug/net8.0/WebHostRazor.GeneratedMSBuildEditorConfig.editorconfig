@@ -24,6 +24,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFxBY2Nlc3NEZW5pZWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Auth/ForgotPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFxGb3Jnb3RQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Auth/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -36,6 +40,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Auth/ResetPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFxSZXNldFBhc3N3b3JkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Debug/FixRoles.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVidWdcRml4Um9sZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Debug/UserInfo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVidWdcVXNlckluZm8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -46,6 +62,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Host/Dashboard/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxEYXNoYm9hcmRcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Host/Profile/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxQcm9maWxlXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Host/Rooms/Amenities/Index.cshtml]
@@ -80,6 +100,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxSb29tc1xQcmljaW5nSGlzdG9yeVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Host/Shared/_HostLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxTaGFyZWRcX0hvc3RMYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Host/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxTaGFyZWRcX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Host/Shared/_Sidebar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxTaGFyZWRcX1NpZGViYXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -90,6 +118,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Host/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxTaGFyZWRcX1ZhbGlkYXRpb25TY3JpcHRzUGFydGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Host/Shared/_ViewImport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxTaGFyZWRcX1ZpZXdJbXBvcnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Host/_ViewStart.cshtml]
@@ -104,6 +136,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Shared/_AuthLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9BdXRoTGF5b3V0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Shared/_UserMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9Vc2VyTWVudS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -111,7 +151,3 @@ build_metadata.AdditionalFiles.CssScope =
 [D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
-
-[D:/PRN222_PROJECT/RoomRentalManagements/WebHostRazor/Pages/Host/Shared/_HostLayout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9zdFxTaGFyZWRcX0hvc3RMYXlvdXQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = b-1hmksa730g

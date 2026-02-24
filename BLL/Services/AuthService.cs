@@ -1,7 +1,6 @@
 ﻿using BLL.DTOs.Auth;
 using BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Services;
 
@@ -9,11 +8,16 @@ public class AuthService : IAuthService
 {
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly IEmailService _emailService; // ✅ Thêm dependency
 
-    public AuthService(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+    public AuthService(
+        SignInManager<IdentityUser> signInManager,
+        UserManager<IdentityUser> userManager,
+        IEmailService emailService) // ✅ Inject EmailService
     {
         _signInManager = signInManager;
         _userManager = userManager;
+        _emailService = emailService;
     }
 
     public async Task<AuthResultDto> RegisterAsync(RegisterRequestDto dto, CancellationToken ct = default)
@@ -72,7 +76,7 @@ public class AuthService : IAuthService
                 Message = "Registration successful! Welcome to Host Portal."
             };
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return new AuthResultDto
             {
@@ -115,10 +119,87 @@ public class AuthService : IAuthService
     public Task LogoutAsync(CancellationToken ct = default)
         => _signInManager.SignOutAsync();
 
-    public Task ForgotPasswordAsync(ForgotPasswordRequestDto dto, CancellationToken ct = default)
+    // ✅ Implement đầy đủ ForgotPassword
+    public async Task<ForgotPasswordResponseDto> ForgotPasswordAsync(ForgotPasswordRequestDto dto, CancellationToken ct = default)
     {
-        // Stub: sau này generate token + email sender
-        return Task.CompletedTask;
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+            {
+                // Không tiết lộ rằng email không tồn tại (security best practice)
+                return new ForgotPasswordResponseDto
+                {
+                    Succeeded = true,
+                    Message = "If your email is registered, you will receive a password reset link shortly."
+                };
+            }
+
+            // Generate password reset token
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            // Create reset link with proper URL encoding
+            var resetLink = $"https://localhost:7121/Auth/ResetPassword?email={Uri.EscapeDataString(dto.Email)}&token={Uri.EscapeDataString(token)}";
+
+            // Send email with reset link
+            await _emailService.SendPasswordResetEmailAsync(dto.Email, resetLink, ct);
+
+            return new ForgotPasswordResponseDto
+            {
+                Succeeded = true,
+                Message = "If your email is registered, you will receive a password reset link shortly."
+            };
+        }
+        catch (Exception)
+        {
+            return new ForgotPasswordResponseDto
+            {
+                Succeeded = false,
+                Message = "An error occurred while processing your request. Please try again."
+            };
+        }
+    }
+
+    // ✅ Thêm method ResetPassword
+    public async Task<ForgotPasswordResponseDto> ResetPasswordAsync(ResetPasswordRequestDto dto, CancellationToken ct = default)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+            {
+                return new ForgotPasswordResponseDto
+                {
+                    Succeeded = false,
+                    Message = "Invalid request. Please try the forgot password process again."
+                };
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return new ForgotPasswordResponseDto
+                {
+                    Succeeded = false,
+                    Message = errors
+                };
+            }
+
+            return new ForgotPasswordResponseDto
+            {
+                Succeeded = true,
+                Message = "Your password has been reset successfully. You can now login with your new password."
+            };
+        }
+        catch (Exception)
+        {
+            return new ForgotPasswordResponseDto
+            {
+                Succeeded = false,
+                Message = "An error occurred while resetting your password. Please try again."
+            };
+        }
     }
 
     public Task<AuthResultDto> GoogleLoginStubAsync(string idToken, CancellationToken ct = default)

@@ -1,7 +1,5 @@
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\bin\Debug\net8.0\appsettings.Development.json
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\bin\Debug\net8.0\appsettings.json
-D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\bin\Debug\net8.0\WebAdminMVC.staticwebassets.runtime.json
-D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\bin\Debug\net8.0\WebAdminMVC.staticwebassets.endpoints.json
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\bin\Debug\net8.0\WebAdminMVC.exe
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\bin\Debug\net8.0\WebAdminMVC.deps.json
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\bin\Debug\net8.0\WebAdminMVC.runtimeconfig.json
@@ -136,17 +134,9 @@ D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\WebAdminMVC
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\WebAdminMVC.RazorAssemblyInfo.cache
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\WebAdminMVC.RazorAssemblyInfo.cs
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\WebAdminMVC.sourcelink.json
-D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
-D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\scopedcss\bundle\WebAdminMVC.styles.css
-D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\scopedcss\projectbundle\WebAdminMVC.bundle.scp.css
-D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\staticwebassets.build.json
-D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\staticwebassets.build.json.cache
-D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\staticwebassets.development.json
-D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\WebAdmin.E4047825.Up2Date
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\WebAdminMVC.dll
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\refint\WebAdminMVC.dll
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\WebAdminMVC.pdb
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\WebAdminMVC.genruntimeconfig.cache
 D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\ref\WebAdminMVC.dll
-D:\PRN222_PROJECT\RoomRentalManagements\WebAdminMVC\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

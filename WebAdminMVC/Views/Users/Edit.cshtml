@@ -1,50 +1,57 @@
 ﻿@model WebAdmin.MVC.Models.Users.UserEditVm
 @{
-    Layout = "_Layout";
     ViewData["Title"] = "Edit User";
 }
-<div class="ui-card form-card">
-    <div class="toolbar">
-        <div>
-            <h1 class="h1">Edit User</h1>
-            <div class="muted">FE-only edit</div>
-        </div>
-        <div class="toolbar-right">
-            <a class="btn btn-ghost" href="/Users/Index">Back</a>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Edit User</h3>
+                </div>
+                <form asp-action="Edit" method="post">
+                    <div class="card-body">
+                        <input asp-for="Id" type="hidden" />
+
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="PhoneNumber" class="control-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Role" class="control-label"></label>
+                            <select asp-for="Role" class="form-control" asp-items="@(new SelectList(ViewBag.Roles))">
+                                <option value="">Select Role</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group form-check">
+                            <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label"></label>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-
-    <form method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="Id" />
-
-        <div class="form-row">
-            <div class="form-group">
-                <div class="label">Email</div>
-                <input class="input" asp-for="Email" />
-            </div>
-            <div class="form-group">
-                <div class="label">Role</div>
-                <select class="input" asp-for="Role">
-                    <option>SuperAdmin</option>
-                    <option>Admin</option>
-                    <option>Host</option>
-                    <option>Customer</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="label">Status</div>
-            <select class="input" asp-for="Status">
-                <option>Active</option>
-                <option>Locked</option>
-            </select>
-        </div>
-
-        <div class="row-end mt">
-            <a class="btn btn-ghost" href="/Users/Index">Cancel</a>
-            <button class="btn btn-primary" type="submit">Save</button>
-        </div>
-    </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -4,6 +4,9 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<GenerateStaticWebAssetsManifest>false</GenerateStaticWebAssetsManifest>
+		<StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
+		<NoWarn>CS0168;CS8602</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -17,7 +20,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\BLL\BLL.csproj" />
 		<ProjectReference Include="..\DAL\DAL.csproj" />
-		<ProjectReference Include="..\WebCustomerBlazor\WebCustomerBlazor.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
