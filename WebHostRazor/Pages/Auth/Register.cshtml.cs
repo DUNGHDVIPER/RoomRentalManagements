@@ -60,7 +60,7 @@ public class RegisterModel : PageModel
         // Assign Host role
         try
         {
-            await _userManager.AddToRoleAsync(user, "Host");
+            await _userManager.AddToRoleAsync(user, "User");
         }
         catch (Exception)
         {
