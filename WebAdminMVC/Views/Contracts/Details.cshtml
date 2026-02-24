@@ -1,6 +1,172 @@
-﻿namespace WebAdminMVC.Views.Contracts
-{
-    public class Details
+﻿@model WebAdmin.MVC.Models.Contracts.ContractDetailsVm
+@{
+    ViewData["Title"] = "Contract Details";
+    Layout = "_Layout";
+    var c = Model.Contract;
+
+    string StatusText(int s) => s switch
     {
-    }
+        0 => "Pending",
+        1 => "Active",
+        2 => "Expired",
+        3 => "Terminated",
+        4 => "Renewed",
+        _ => "Unknown"
+    };
+
+    var statusText = StatusText(c.Status);
 }
+
+<h2 class="mb-3">Contract Details</h2>
+
+@if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
+{
+    <div class="alert alert-danger">@err</div>
+}
+@if (TempData["Success"] is string ok && !string.IsNullOrWhiteSpace(ok))
+{
+    <div class="alert alert-success">@ok</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a class="btn btn-outline-secondary" asp-action="Index">← Back</a>
+
+    <div class="d-flex gap-2 flex-wrap justify-content-end">
+        <a class="btn btn-outline-info" asp-action="Versions" asp-route-id="@c.Id">Versions</a>
+        <a class="btn btn-outline-dark" asp-action="ExportPdf" asp-route-id="@c.Id">Export PDF</a>
+        <a class="btn btn-outline-primary" asp-action="UploadAttachment" asp-route-id="@c.Id">Upload Attachment</a>
+
+        <a class="btn btn-warning" asp-action="Renew" asp-route-id="@c.Id">Renew</a>
+        <a class="btn btn-danger" asp-action="Terminate" asp-route-id="@c.Id">Terminate</a>
+        @if (!c.IsActive)
+        {
+            <form asp-action="Activate" asp-route-id="@c.Id" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-success">Activate</button>
+            </form>
+        }
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="text-muted">Contract Id</div>
+                <div class="fw-semibold">@c.Id</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted">Contract Code</div>
+                <div class="fw-semibold">@(!string.IsNullOrWhiteSpace(c.ContractCode) ? c.ContractCode : "-")</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted">Room Id</div>
+                <div class="fw-semibold">@c.RoomId</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted">Tenant Id</div>
+                <div class="fw-semibold">@c.TenantId</div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="text-muted">Status</div>
+                <div class="fw-semibold">
+                    @if (c.IsActive || c.Status == 1)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else if (c.Status == 0)
+                    {
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    }
+                    else if (c.Status == 2)
+                    {
+                        <span class="badge bg-secondary">Expired</span>
+                    }
+                    else if (c.Status == 3)
+                    {
+                        <span class="badge bg-danger">Terminated</span>
+                    }
+                    else if (c.Status == 4)
+                    {
+                        <span class="badge bg-info text-dark">Renewed</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-light text-dark">@statusText</span>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="text-muted">Start Date</div>
+                <div class="fw-semibold">@c.StartDate.ToString("yyyy-MM-dd")</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted">End Date</div>
+                <div class="fw-semibold">@c.EndDate.ToString("yyyy-MM-dd")</div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="text-muted">Rent</div>
+                <div class="fw-semibold">@c.Rent.ToString("N0")</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted">Deposit</div>
+                <div class="fw-semibold">@c.Deposit.ToString("N0")</div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="text-muted">Deposit Status</div>
+                <div class="fw-semibold">@c.DepositStatus</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted">Deposit Paid At</div>
+                <div class="fw-semibold">@((c.DepositPaidAt.HasValue) ? c.DepositPaidAt.Value.ToString("yyyy-MM-dd HH:mm") : "-")</div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-muted">Deposit Paid Amount</div>
+                <div class="fw-semibold">@((c.DepositPaidAmount.HasValue) ? c.DepositPaidAmount.Value.ToString("N0") : "-")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Attachments</span>
+        <a class="btn btn-sm btn-outline-primary" asp-action="UploadAttachment" asp-route-id="@c.Id">Upload</a>
+    </div>
+    <div class="card-body">
+        @if (Model.Attachments == null || Model.Attachments.Count == 0)
+        {
+            <div class="text-muted">No attachments yet.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th style="width: 180px;">Uploaded At</th>
+                            <th style="width: 80px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in Model.Attachments)
+                        {
+                            <tr>
+                                <td>@a.FileName</td>
+                                <td>@a.UploadedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-secondary" href="@a.Url" target="_blank">Open</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

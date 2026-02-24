@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure;
 using WebCustomer.Blazor.Seed;
 using WebHostRazor.BackgroundJobs;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +68,15 @@ builder.Services.AddHostedService<ContractExpiryReminderHostedService>();
 var app = builder.Build();
 
 app.UseStaticFiles();
+var sharedUploadsPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
+Directory.CreateDirectory(sharedUploadsPath);
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(sharedUploadsPath),
+    RequestPath = "/uploads"
+});
+
 app.UseRouting();
 
 app.UseAuthentication();

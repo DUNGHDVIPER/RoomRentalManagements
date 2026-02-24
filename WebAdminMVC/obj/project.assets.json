@@ -1085,7 +1085,7 @@
           "lib/netstandard2.0/Mono.TextTemplating.dll": {}
         }
       },
-      "QuestPDF/2026.2.0": {
+      "QuestPDF/2026.2.1": {
         "type": "package",
         "compile": {
           "lib/net8.0/QuestPDF.dll": {
@@ -3270,10 +3270,10 @@
         "mono.texttemplating.nuspec"
       ]
     },
-    "QuestPDF/2026.2.0": {
-      "sha512": "BRjl/iXknSC/uyWmn2eOwKLqgFhwVwrtic181IzFiCe49idGnjlQ1QiiXBxb7MKPd2Tgd/JL9yCija6MiQB1yA==",
+    "QuestPDF/2026.2.1": {
+      "sha512": "MSAvKf6bM6hxwmvitSFUaKq9VI+yt/s9l79va8++igRt8UMDdai7XFaSLZNbCiJ6hnl375bCpqcrjM9YgrqBDQ==",
       "type": "package",
-      "path": "questpdf/2026.2.0",
+      "path": "questpdf/2026.2.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3330,7 +3330,7 @@
         "lib/net8.0/QuestPDF.xml",
         "lib/netstandard2.0/QuestPDF.dll",
         "lib/netstandard2.0/QuestPDF.xml",
-        "questpdf.2026.2.0.nupkg.sha512",
+        "questpdf.2026.2.1.nupkg.sha512",
         "questpdf.nuspec",
         "runtimes/linux-arm64/native/libQuestPdfSkia.so",
         "runtimes/linux-arm64/native/libqpdf.so",
@@ -4115,7 +4115,8 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
-      "BLL >= 1.0.0"
+      "BLL >= 1.0.0",
+      "QuestPDF >= 2026.2.1"
     ]
   },
   "packageFolders": {
@@ -4172,6 +4173,12 @@
     "frameworks": {
       "net8.0": {
         "targetAlias": "net8.0",
+        "dependencies": {
+          "QuestPDF": {
+            "target": "Package",
+            "version": "[2026.2.1, )"
+          }
+        },
         "imports": [
           "net461",
           "net462",

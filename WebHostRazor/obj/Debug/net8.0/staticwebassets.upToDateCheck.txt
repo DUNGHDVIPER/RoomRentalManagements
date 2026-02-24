@@ -62,7 +62,7 @@ wwwroot\lib\jquery\dist\jquery.min.map
 wwwroot\lib\jquery\LICENSE.txt
 wwwroot\mock-api\rooms.json
 wwwroot\uploads\contracts\5bc3e9facb664eb08d8f9b0ddf3d2cb4_Screenshot 2026-01-20 183447.png
-wwwroot\uploads\contracts\6e2d72069d5c4302b4f842ac0267b690_Screenshot 2026-01-20 163223.png
 wwwroot\uploads\contracts\80c6c784aeb34109aed306e389b6010a_Screenshot 2026-01-20 190332.png
 wwwroot\uploads\contracts\850e80468d22490db58942b595474761_Screenshot 2026-01-20 183447.png
 wwwroot\uploads\contracts\8dd815935cb34559bb966706c12d34a4_Screenshot 2026-01-20 183447.png
+wwwroot\uploads\contracts\6e2d72069d5c4302b4f842ac0267b690_Screenshot 2026-01-20 163223.png

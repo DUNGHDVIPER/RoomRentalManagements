@@ -8,7 +8,8 @@
     ".NETCoreApp,Version=v8.0": {
       "WebAdminMVC/1.0.0": {
         "dependencies": {
-          "BLL": "1.0.0"
+          "BLL": "1.0.0",
+          "QuestPDF": "2026.2.1"
         },
         "runtime": {
           "WebAdminMVC.dll": {}
@@ -794,11 +795,11 @@
           }
         }
       },
-      "QuestPDF/2026.2.0": {
+      "QuestPDF/2026.2.1": {
         "runtime": {
           "lib/net8.0/QuestPDF.dll": {
-            "assemblyVersion": "2026.2.0.0",
-            "fileVersion": "2026.2.0.0"
+            "assemblyVersion": "2026.2.1.0",
+            "fileVersion": "2026.2.1.0"
           }
         },
         "runtimeTargets": {
@@ -1127,7 +1128,7 @@
           "DAL": "1.0.0",
           "Microsoft.Data.SqlClient": "6.1.4",
           "Microsoft.EntityFrameworkCore": "8.0.24",
-          "QuestPDF": "2026.2.0"
+          "QuestPDF": "2026.2.1"
         },
         "runtime": {
           "BLL.dll": {
@@ -1512,12 +1513,12 @@
       "path": "mono.texttemplating/2.2.1",
       "hashPath": "mono.texttemplating.2.2.1.nupkg.sha512"
     },
-    "QuestPDF/2026.2.0": {
+    "QuestPDF/2026.2.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-BRjl/iXknSC/uyWmn2eOwKLqgFhwVwrtic181IzFiCe49idGnjlQ1QiiXBxb7MKPd2Tgd/JL9yCija6MiQB1yA==",
-      "path": "questpdf/2026.2.0",
-      "hashPath": "questpdf.2026.2.0.nupkg.sha512"
+      "sha512": "sha512-MSAvKf6bM6hxwmvitSFUaKq9VI+yt/s9l79va8++igRt8UMDdai7XFaSLZNbCiJ6hnl375bCpqcrjM9YgrqBDQ==",
+      "path": "questpdf/2026.2.1",
+      "hashPath": "questpdf.2026.2.1.nupkg.sha512"
     },
     "System.ClientModel/1.8.0": {
       "type": "package",

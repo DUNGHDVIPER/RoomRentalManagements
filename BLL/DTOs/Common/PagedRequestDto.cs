@@ -2,16 +2,17 @@
 
 public class PagedRequestDto
 {
-    public PagedRequestDto(int page, int pageSize)
+    public PagedRequestDto() { }
+
+    public PagedRequestDto(int pageNumber, int pageSize)
     {
-        Page = page;
-        PageSize = pageSize;
+        PageNumber = pageNumber < 1 ? 1 : pageNumber;
+        PageSize = pageSize < 1 ? 12 : pageSize;
     }
 
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 12;
+
     public string? SortBy { get; set; }
-    public string? Keyword { get; internal set; }
-    public int PageIndex { get; internal set; }
-    public int Page { get; internal set; }
+    public string? Keyword { get; set; }   // ✅ set được từ MVC
 }

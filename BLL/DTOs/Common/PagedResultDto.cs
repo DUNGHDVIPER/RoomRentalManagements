@@ -1,27 +1,13 @@
-﻿using BLL.DTOs.Contract;
-using BLL.DTOs.Room.Public;
-
-namespace BLL.Common;
+﻿namespace BLL.Common;
 
 public class PagedResultDto<T>
 {
-    private List<ContractDto> items;
-    private int total;
-    private int page;
-    private List<RoomPublicDto> items1;
+    public PagedResultDto() { }
 
-    public PagedResultDto(List<ContractDto> items, int total, int page, int pageSize)
+    public PagedResultDto(List<T> items, int totalCount, int pageNumber, int pageSize)
     {
-        this.items = items;
-        this.total = total;
-        this.page = page;
-        PageSize = pageSize;
-    }
-
-    public PagedResultDto(List<RoomPublicDto> items1, int total, int pageNumber, int pageSize)
-    {
-        this.items1 = items1;
-        this.total = total;
+        Items = items ?? new List<T>();
+        TotalCount = totalCount;
         PageNumber = pageNumber;
         PageSize = pageSize;
     }
@@ -30,5 +16,6 @@ public class PagedResultDto<T>
     public int TotalCount { get; set; }
     public int PageNumber { get; set; }
     public int PageSize { get; set; }
-    public int PageIndex { get; internal set; }
+
+    public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
 }

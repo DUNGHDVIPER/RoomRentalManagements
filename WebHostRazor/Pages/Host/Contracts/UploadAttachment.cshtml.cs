@@ -33,19 +33,20 @@ public class UploadAttachmentModel : PageModel
             return Page();
         }
 
-        var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "contracts");
-        Directory.CreateDirectory(uploadsDir);
+        // shared folder: ../SharedUploads/contracts
+        var sharedContractsDir = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "..", "SharedUploads", "contracts"));
+        Directory.CreateDirectory(sharedContractsDir);
 
         var safeFileName = Path.GetFileName(File.FileName);
         var storedName = $"{Guid.NewGuid():N}_{safeFileName}";
-        var fullPath = Path.Combine(uploadsDir, storedName);
+        var fullPath = Path.Combine(sharedContractsDir, storedName);
 
         await using (var stream = System.IO.File.Create(fullPath))
         {
             await File.CopyToAsync(stream);
         }
 
-        var url = $"/uploads/contracts/{storedName}";
+        var url = $"/uploads/contracts/{storedName}"; // ✅ URL chung
         await _service.AddAttachmentStubAsync((int)id, safeFileName, url);
 
         return RedirectToPage("./Details", new { id });

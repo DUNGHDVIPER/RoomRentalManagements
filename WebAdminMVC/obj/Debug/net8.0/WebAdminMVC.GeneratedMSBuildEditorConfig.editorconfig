@@ -84,6 +84,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udHJhY3RzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/PRN222_PROJECT/RoomRentalManagement/WebAdminMVC/Views/Contracts/Renew.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udHJhY3RzXFJlbmV3LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebAdminMVC/Views/Contracts/Terminate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udHJhY3RzXFRlcm1pbmF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebAdminMVC/Views/Contracts/UploadAttachment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udHJhY3RzXFVwbG9hZEF0dGFjaG1lbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222_PROJECT/RoomRentalManagement/WebAdminMVC/Views/Contracts/Versions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udHJhY3RzXFZlcnNpb25zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/PRN222_PROJECT/RoomRentalManagement/WebAdminMVC/Views/Dashboard/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

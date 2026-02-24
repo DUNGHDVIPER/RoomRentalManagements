@@ -1,59 +1,68 @@
-﻿@page "{id:long}"
+﻿@page
 @model WebHostRazor.Pages.Host.Contracts.RenewModel
 @{
     ViewData["Title"] = "Renew Contract";
 }
 
-@if (TempData["Err"] != null)
+<h2>Renew Contract</h2>
+
+@if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
 {
-    <div class="alert alert-danger">@TempData["Err"]</div>
+    <div class="alert alert-danger">@err</div>
+}<p>
+    <a class="btn btn-primary" asp-page="/Host/Contracts/Create">
+        + Create Contract
+    </a>
+</p>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <div asp-validation-summary="All"></div>
+    </div>
 }
 
-@if (Model.Current == null)
-{
-    <div class="alert alert-warning">Not found.</div>
-}
-else
-{
-    <h2>Renew Contract #@Model.Current.Id</h2>
+<div class="mb-3">
+    <a class="btn btn-outline-secondary" asp-page="./Details" asp-route-id="@Model.Vm.ContractId">← Back</a>
+</div>
 
-    @if (!Model.Current.IsActive)
-    {
-        <div class="alert alert-warning">
-            This contract is not Active, so it cannot be renewed. (Status: @Model.Current.Status)
-        </div>
-        <a class="btn btn-secondary" asp-page="./Details" asp-route-id="@Model.Current.Id">Back</a>
-    }
-    else
-    {
-        <form method="post">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">New Start Date</label>
-                    <input class="form-control" type="date" asp-for="NewStartDate" />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">New End Date</label>
-                    <input class="form-control" type="date" asp-for="NewEndDate" />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">New Rent</label>
-                    <input class="form-control" asp-for="NewRent" />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">New Deposit</label>
-                    <input class="form-control" asp-for="NewDeposit" />
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Reason</label>
-                    <input class="form-control" asp-for="Reason" />
-                </div>
-            </div>
+<form method="post" class="row g-3">
+    <input type="hidden" asp-for="Vm.ContractId" />
 
-            <div class="mt-3 d-flex gap-2">
-                <button class="btn btn-primary" type="submit">Renew</button>
-                <a class="btn btn-secondary" asp-page="./Details" asp-route-id="@Model.Current.Id">Cancel</a>
-            </div>
-        </form>
-    }
+    <div class="col-md-3">
+        <label asp-for="Vm.NewStartDate" class="form-label"></label>
+        <input asp-for="Vm.NewStartDate" type="date" class="form-control" />
+        <span asp-validation-for="Vm.NewStartDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Vm.NewEndDate" class="form-label"></label>
+        <input asp-for="Vm.NewEndDate" type="date" class="form-control" />
+        <span asp-validation-for="Vm.NewEndDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Vm.NewRent" class="form-label"></label>
+        <input asp-for="Vm.NewRent" class="form-control" />
+        <span asp-validation-for="Vm.NewRent" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Vm.NewDeposit" class="form-label"></label>
+        <input asp-for="Vm.NewDeposit" class="form-control" />
+        <span asp-validation-for="Vm.NewDeposit" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Vm.Reason" class="form-label"></label>
+        <input asp-for="Vm.Reason" class="form-control" />
+        <span asp-validation-for="Vm.Reason" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <button class="btn btn-warning" type="submit">Renew</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

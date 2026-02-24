@@ -8,7 +8,14 @@
 {
     <div class="alert alert-danger">@TempData["Err"]</div>
 }
-
+@if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
+{
+    <div class="alert alert-danger">@err</div>
+}
+@if (TempData["Success"] is string ok && !string.IsNullOrWhiteSpace(ok))
+{
+    <div class="alert alert-success">@ok</div>
+}
 @if (Model.Contract == null)
 {
     <div>Not found.</div>
@@ -56,6 +63,11 @@ else
         <a class="btn btn-success" asp-page="./ExportPdf" asp-route-id="@Model.Contract.Id">Export PDF</a>
 
         <a class="btn btn-outline-dark" asp-page="./Versions" asp-route-id="@Model.Contract.Id">Change History</a>
+
+        <form method="post" asp-page-handler="Activate" asp-route-id="@Model.Contract.Id" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button class="btn btn-success" type="submit">Activate</button>
+        </form>
     </div>
 
 }

@@ -5,16 +5,22 @@
 }
 
 <h2>Contracts</h2>
-
+@if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
+{
+    <div class="alert alert-danger">@err</div>
+}
+@if (TempData["Success"] is string ok && !string.IsNullOrWhiteSpace(ok))
+{
+    <div class="alert alert-success">@ok</div>
+}
 <div class="alert alert-secondary">
     <div><b>DB Server:</b> @Model.DbServer</div>
     <div><b>DB Name:</b> @Model.DbName</div>
     <div><b>Total Contracts (count):</b> @Model.TotalContracts</div>
 </div>
-
 <p>
-    <a class="btn btn-primary" asp-page="/Host/Contracts/Wizard/Step1">
-        + Create Contract (Wizard)
+    <a class="btn btn-primary" asp-page="/Host/Contracts/Create">
+        + Create Contract
     </a>
 </p>
 

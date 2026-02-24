@@ -4,12 +4,19 @@ namespace WebAdmin.MVC.Models.Auth;
 
 public class LoginVm
 {
-    [Required, EmailAddress]
-    public string Email { get; set; } = null!;
+    [Required]
+    [StringLength(50)]
+    public string Username { get; set; } = "";
 
     [Required]
-    public string Password { get; set; } = null!;
+    [DataType(DataType.Password)]
+    public string Password { get; set; } = "";
+
+    // Chọn role để test nhanh
+    [Required]
+    public string Role { get; set; } = "Host";
 
     public bool RememberMe { get; set; }
+
     public string? ReturnUrl { get; set; }
 }

@@ -211,10 +211,10 @@ D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\staticwebas
 D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\staticwebassets.build.json.cache
 D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\staticwebassets.development.json
 D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\WebHostR.EDB8A31C.Up2Date
 D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\WebHostRazor.dll
 D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\refint\WebHostRazor.dll
 D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\WebHostRazor.pdb
 D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\WebHostRazor.genruntimeconfig.cache
 D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\ref\WebHostRazor.dll
-D:\PRN222_PROJECT\RoomRentalManagement\WebHostRazor\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

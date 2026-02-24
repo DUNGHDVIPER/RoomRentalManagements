@@ -11,6 +11,9 @@ public interface IContractService
     Task<PagedResultDto<ContractDto>> GetContractsAsync(PagedRequestDto req, CancellationToken ct = default);
     Task<ContractDto> GetByIdAsync(int id, CancellationToken ct = default);
 
+    public Task<ContractDto> GetByIdAsync(long contractId, CancellationToken ct = default)
+    => GetByIdAsync((int)contractId, ct);
+
     Task UpdateDepositAsync(UpdateDepositDto dto, int? actorUserId = null, CancellationToken ct = default);
     Task UpdateDepositAsync(int contractId, decimal newDeposit, int? actorUserId = null, CancellationToken ct = default);
 
@@ -28,4 +31,5 @@ public interface IContractService
         string remindType = "Expiry_7d",
         int? actorUserId = null,
         CancellationToken ct = default);
+    /*Task GetByIdAsync(long contractId, CancellationToken ct);*/
 }

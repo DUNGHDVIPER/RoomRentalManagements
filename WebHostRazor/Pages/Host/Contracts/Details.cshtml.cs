@@ -25,4 +25,18 @@ public class DetailsModel : PageModel
             return RedirectToPage("/Host/Contracts/Index");
         }
     }
+    public async Task<IActionResult> OnPostActivateAsync(int id, CancellationToken ct)
+    {
+        try
+        {
+            // activate trực tiếp DB thì cần DbContext; nếu HostRazor không có DbContext thì bạn làm Activate bên MVC thôi.
+            TempData["Error"] = "Activate handler not implemented in HostRazor.";
+            return RedirectToPage(new { id });
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToPage(new { id });
+        }
+    }
 }

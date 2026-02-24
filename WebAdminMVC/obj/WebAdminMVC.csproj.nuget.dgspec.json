@@ -244,6 +244,12 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "QuestPDF": {
+              "target": "Package",
+              "version": "[2026.2.1, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

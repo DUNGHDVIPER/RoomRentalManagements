@@ -1,50 +1,57 @@
 ﻿@model WebAdmin.MVC.Models.Auth.LoginVm
 @{
-    Layout = "_Layout";
     ViewData["Title"] = "Login";
+    Layout = "_Layout";
 }
-<div class="auth-wrap">
-    <div class="auth-card">
-        <div class="auth-brand">
-            <div class="brand-logo">R</div>
-            <div>
-                <div class="brand-title">Admin<span class="brand-accent">MVC</span></div>
-                <div class="muted">Sign in to continue</div>
-            </div>
-        </div>
 
-        <div class="auth-title">Admin Login</div>
-        <div class="muted auth-sub">FE-only demo. Use: <b>admin@demo.com</b> / <b>Admin@123</b></div>
+<h2 class="mb-3">Login</h2>
 
-        <form method="post" class="auth-form">
-            @Html.AntiForgeryToken()
-
-            <div class="fg">
-                <label class="lbl">Email</label>
-                <input class="inp" asp-for="Email" placeholder="admin@demo.com" />
-            </div>
-
-            <div class="fg">
-                <label class="lbl">Password</label>
-                <input class="inp" asp-for="Password" placeholder="Admin@123" />
-            </div>
-
-            <div class="auth-row">
-                <label class="muted"><input type="checkbox" asp-for="RememberMe" /> Remember me</label>
-                <a class="link" href="/Auth/ForgotPassword">Forgot?</a>
-            </div>
-
-            <button class="btn-gradient w100" type="submit">Login</button>
-
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="err mt12">
-                    @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                    {
-                        <div>• @e.ErrorMessage</div>
-                    }
-                </div>
-            }
-        </form>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <div asp-validation-summary="All"></div>
     </div>
-</div>
+}
+
+<form asp-action="Login" method="post" class="card p-3" style="max-width:520px;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ReturnUrl" />
+
+    <div class="mb-3">
+        <label asp-for="Username" class="form-label"></label>
+        <input asp-for="Username" class="form-control" />
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Role" class="form-label">Role</label>
+        <select asp-for="Role" class="form-select">
+            <option value="Host">Host</option>
+            <option value="Admin">Admin</option>
+        </select>
+        <span asp-validation-for="Role" class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" asp-for="RememberMe" />
+        <label class="form-check-label" asp-for="RememberMe">Remember me</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+
+    <div class="text-muted mt-3" style="font-size:0.9rem;">
+        Demo accounts:<br />
+        - admin / 123 (Admin or Host)<br />
+        - host / 123 (Host)
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
