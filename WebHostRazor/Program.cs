@@ -27,6 +27,9 @@ builder.Services.AddRazorPages(options =>
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 
+// Rooms
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
 // EF InMemory + Identity (FE-only)
 //builder.Services.AddDbContext<AuthDbContext>(opt =>
 //    opt.UseInMemoryDatabase("HostPortalAuth"));

@@ -20,3 +20,17 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.table th {
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.badge {
+    font-size: 12px;
+}
