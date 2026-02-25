@@ -7,10 +7,17 @@ namespace WebHostRazor.Pages.Host.Rooms
     public class CreateModel : PageModel
     {
         [BindProperty]
-        public RoomFormModel Form { get; set; }
+        public RoomFormModel Form { get; set; } = new()
+        {
+            Name = string.Empty,
+            City = string.Empty,
+            District = string.Empty,
+            Status = "Available"
+        };
 
         public void OnGet()
         {
+            // This method is intentionally left blank for the initial page load.
         }
 
         public IActionResult OnPost()
@@ -30,15 +37,15 @@ namespace WebHostRazor.Pages.Host.Rooms
     {
         [Required]
         [StringLength(100)]
-        public string Name { get; set; }
+        public required string Name { get; set; } = string.Empty;
 
         [Required]
         [StringLength(50)]
-        public string City { get; set; }
+        public required string City { get; set; } = string.Empty;
 
         [Required]
         [StringLength(50)]
-        public string District { get; set; }
+        public required string District { get; set; } = string.Empty;
 
         [Range(1, 10000)]
         public double Area { get; set; }
@@ -47,6 +54,6 @@ namespace WebHostRazor.Pages.Host.Rooms
         public decimal Price { get; set; }
 
         [Required]
-        public string Status { get; set; }
+        public required string Status { get; set; } = "Available";
     }
 }

@@ -1,0 +1,165 @@
+﻿@page "/Host/Profile"
+@model WebHostRazor.Pages.Host.Profile.IndexModel
+@{
+    ViewData["Title"] = "Manage Profile";
+}
+
+<div class="container-profile">
+
+    <h1>Manage Personal Profile</h1>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert-success">
+            @Model.SuccessMessage
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert-error">
+            @Model.ErrorMessage
+        </div>
+    }
+
+    <!-- PROFILE FORM -->
+    <div class="card">
+        <h2>Profile Information</h2>
+
+        <form method="post" asp-page-handler="UpdateProfile">
+            @Html.AntiForgeryToken()
+
+            <div>
+                <label asp-for="ProfileForm.FullName"></label>
+                <input asp-for="ProfileForm.FullName" class="form-control" />
+                <span asp-validation-for="ProfileForm.FullName" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="ProfileForm.Email"></label>
+                <input asp-for="ProfileForm.Email" type="email" class="form-control" />
+                <span asp-validation-for="ProfileForm.Email" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="ProfileForm.PhoneNumber"></label>
+                <input asp-for="ProfileForm.PhoneNumber" class="form-control" />
+                <span asp-validation-for="ProfileForm.PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Update Profile
+            </button>
+        </form>
+    </div>
+
+    <!-- PASSWORD FORM -->
+    <div class="card">
+        <h2>Change Password</h2>
+
+        <form method="post" asp-page-handler="ChangePassword">
+            @Html.AntiForgeryToken()
+
+            <div>
+                <label asp-for="PasswordForm.CurrentPassword"></label>
+                <input asp-for="PasswordForm.CurrentPassword" type="password" class="form-control" />
+                <span asp-validation-for="PasswordForm.CurrentPassword" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="PasswordForm.NewPassword"></label>
+                <input asp-for="PasswordForm.NewPassword" type="password" id="newPasswordInput" class="form-control" />
+                <span asp-validation-for="PasswordForm.NewPassword" class="text-danger"></span>
+                <div id="passwordStrength"></div>
+            </div>
+
+            <div>
+                <label asp-for="PasswordForm.ConfirmNewPassword"></label>
+                <input asp-for="PasswordForm.ConfirmNewPassword" type="password" class="form-control" />
+                <span asp-validation-for="PasswordForm.ConfirmNewPassword" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-warning">
+                Change Password
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<style>
+    .container-profile {
+        max-width: 700px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    .card {
+        background: #f9f9f9;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 8px;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        color: #155724;
+    }
+
+    .alert-error {
+        background: #f8d7da;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        color: #721c24;
+    }
+
+    @@keyframes slideDown {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+</style>
+
+@section Scripts {
+    <partial name="~/Pages/Host/Shared/_ValidationScriptsPartial.cshtml" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var input = document.getElementById("newPasswordInput");
+            var strengthDiv = document.getElementById("passwordStrength");
+
+            if (!input) return;
+
+            input.addEventListener("input", function () {
+                var val = this.value;
+                var strength = 0;
+
+                if (val.length >= 8) strength++;
+                if (/[a-z]/.test(val)) strength++;
+                if (/[A-Z]/.test(val)) strength++;
+                if (/[0-9]/.test(val)) strength++;
+
+                if (strength <= 2)
+                    strengthDiv.innerHTML = "<span style='color:red'>Weak</span>";
+                else if (strength == 3)
+                    strengthDiv.innerHTML = "<span style='color:orange'>Medium</span>";
+                else
+                    strengthDiv.innerHTML = "<span style='color:green'>Strong</span>";
+            });
+        });
+    </script>
+}

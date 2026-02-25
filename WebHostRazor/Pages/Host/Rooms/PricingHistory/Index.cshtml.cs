@@ -6,7 +6,7 @@ namespace WebHostRazor.Pages.Host.Rooms.PricingHistory
 {
     public class IndexModel : PageModel
     {
-        public RoomModel Room { get; set; }
+        public RoomModel? Room { get; set; }
 
         public void OnGet(int id)
         {
@@ -33,8 +33,8 @@ namespace WebHostRazor.Pages.Host.Rooms.PricingHistory
     public class RoomModel
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public List<PricingHistoryModel> PricingHistory { get; set; }
+        public required string Name { get; set; } = string.Empty;
+        public required List<PricingHistoryModel> PricingHistory { get; set; } = new();
     }
 
     public class PricingHistoryModel

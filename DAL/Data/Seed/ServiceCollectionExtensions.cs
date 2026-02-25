@@ -21,7 +21,13 @@ public static class ServiceCollectionExtensions
             opt.UseSqlServer(conn, sql =>
             {
                 // đảm bảo migrations nằm trong DAL/Migrations
+<<<<<<< HEAD
                 sql.MigrationsAssembly(typeof(MotelManagementDbContext).Assembly.FullName);
+=======
+                sql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                // Đặt CommandTimeout ĐÚNG CÁCH thông qua Entity Framework
+                sql.CommandTimeout(30);
+>>>>>>> origin/main
             });
         });
 

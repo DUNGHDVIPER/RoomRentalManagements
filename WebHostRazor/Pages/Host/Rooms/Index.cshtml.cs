@@ -1,4 +1,5 @@
 ﻿using BLL.Dtos;
+using BLL.DTOs;
 using BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,8 +18,8 @@ public class IndexModel : PageModel
 
     public IReadOnlyList<RoomDto> Rooms { get; private set; } = [];
 
- /*   public async Task OnGetAsync()
+ public async Task OnGetAsync()
     {
         Rooms = await _roomService.GetAllAsync();
-    }*/
+    }
 }
