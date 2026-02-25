@@ -34,5 +34,6 @@ public interface IRoomService
     // Pricing history
     Task AddRoomPriceHistoryAsync(int roomId, RoomPriceHistoryDto dto, CancellationToken ct = default);
     Task<List<RoomPriceHistoryDto>> GetRoomPriceHistoryAsync(int roomId, CancellationToken ct = default);
-    Task<string?> GetAllAsync();
+    //Task<string?> GetAllAsync();
+    Task<List<RoomDto>> GetAllAsync(CancellationToken ct = default);
 }

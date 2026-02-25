@@ -6,7 +6,8 @@ namespace BLL.Services.Interfaces;
 
 public interface ITenantService
 {
-    Task<PagedResultDto<TenantDto>> GetTenantsAsync(PagedRequestDto req, CancellationToken ct = default);
+    Task<
+        PagedResultDto<TenantDto>> GetTenantsAsync(PagedRequestDto req, CancellationToken ct = default);
     Task<TenantDto> GetByIdAsync(int id, CancellationToken ct = default);
     Task<TenantDto> CreateAsync(CreateTenantDto dto, CancellationToken ct = default);
     Task<TenantDto> UpdateAsync(int id, UpdateTenantDto dto, CancellationToken ct = default);
