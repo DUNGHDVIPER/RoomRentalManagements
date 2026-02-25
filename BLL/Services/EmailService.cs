@@ -86,15 +86,16 @@ public class EmailService : IEmailService
     {
         try
         {
-            //if (_configuration["ASPNETCORE_ENVIRONMENT"] == "Development")
-            //{
-            //    _logger.LogInformation("=== EMAIL SENT (DEV MODE) ===");
-            //    _logger.LogInformation("To: {ToEmail}", toEmail);
-            //    _logger.LogInformation("Subject: {Subject}", subject);
-            //    _logger.LogInformation("Body: {Body}", htmlBody);
-            //    _logger.LogInformation("===============================");
-            //    return;
-            //}
+            var enableDevEmailLogging = _configuration.GetValue<bool>("EmailSettings:EnableDevEmailLogging");
+            if (enableDevEmailLogging)
+            {
+                _logger.LogInformation("=== EMAIL SENT (DEV MODE) ===");
+                _logger.LogInformation("To: {ToEmail}", toEmail);
+                _logger.LogInformation("Subject: {Subject}", subject);
+                _logger.LogInformation("Body: {Body}", htmlBody);
+                _logger.LogInformation("===============================");
+                return;
+            }
 
             var smtpSettings = _configuration.GetSection("EmailSettings");
             var smtpHost = smtpSettings["SmtpHost"];
