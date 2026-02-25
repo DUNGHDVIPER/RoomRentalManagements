@@ -86,18 +86,15 @@ public class EmailService : IEmailService
     {
         try
         {
-            // Use SendRealEmails flag from configuration; when false, enable dev logging only.
-            var sendRealEmails = _configuration.GetValue<bool>("EmailSettings:SendRealEmails", true);
-            var enableDevEmailLogging = !sendRealEmails;
-            if (enableDevEmailLogging)
-            {
-                _logger.LogInformation("=== EMAIL SENT (DEV MODE) ===");
-                _logger.LogInformation("To: {ToEmail}", toEmail);
-                _logger.LogInformation("Subject: {Subject}", subject);
-                _logger.LogInformation("Body: {Body}", htmlBody);
-                _logger.LogInformation("===============================");
-                return;
-            }
+            //if (_configuration["ASPNETCORE_ENVIRONMENT"] == "Development")
+            //{
+            //    _logger.LogInformation("=== EMAIL SENT (DEV MODE) ===");
+            //    _logger.LogInformation("To: {ToEmail}", toEmail);
+            //    _logger.LogInformation("Subject: {Subject}", subject);
+            //    _logger.LogInformation("Body: {Body}", htmlBody);
+            //    _logger.LogInformation("===============================");
+            //    return;
+            //}
 
             var smtpSettings = _configuration.GetSection("EmailSettings");
             var smtpHost = smtpSettings["SmtpHost"];
