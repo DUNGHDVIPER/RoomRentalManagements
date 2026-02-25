@@ -86,7 +86,9 @@ public class EmailService : IEmailService
     {
         try
         {
-            var enableDevEmailLogging = _configuration.GetValue<bool>("EmailSettings:EnableDevEmailLogging");
+            // Use SendRealEmails flag from configuration; when false, enable dev logging only.
+            var sendRealEmails = _configuration.GetValue<bool>("EmailSettings:SendRealEmails", true);
+            var enableDevEmailLogging = !sendRealEmails;
             if (enableDevEmailLogging)
             {
                 _logger.LogInformation("=== EMAIL SENT (DEV MODE) ===");
