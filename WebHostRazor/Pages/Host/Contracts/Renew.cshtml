@@ -1,0 +1,68 @@
+﻿@page
+@model WebHostRazor.Pages.Host.Contracts.RenewModel
+@{
+    ViewData["Title"] = "Renew Contract";
+}
+
+<h2>Renew Contract</h2>
+
+@if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
+{
+    <div class="alert alert-danger">@err</div>
+}<p>
+    <a class="btn btn-primary" asp-page="/Host/Contracts/Create">
+        + Create Contract
+    </a>
+</p>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <div asp-validation-summary="All"></div>
+    </div>
+}
+
+<div class="mb-3">
+    <a class="btn btn-outline-secondary" asp-page="./Details" asp-route-id="@Model.Vm.ContractId">← Back</a>
+</div>
+
+<form method="post" class="row g-3">
+    <input type="hidden" asp-for="Vm.ContractId" />
+
+    <div class="col-md-3">
+        <label asp-for="Vm.NewStartDate" class="form-label"></label>
+        <input asp-for="Vm.NewStartDate" type="date" class="form-control" />
+        <span asp-validation-for="Vm.NewStartDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Vm.NewEndDate" class="form-label"></label>
+        <input asp-for="Vm.NewEndDate" type="date" class="form-control" />
+        <span asp-validation-for="Vm.NewEndDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Vm.NewRent" class="form-label"></label>
+        <input asp-for="Vm.NewRent" class="form-control" />
+        <span asp-validation-for="Vm.NewRent" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Vm.NewDeposit" class="form-label"></label>
+        <input asp-for="Vm.NewDeposit" class="form-control" />
+        <span asp-validation-for="Vm.NewDeposit" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Vm.Reason" class="form-label"></label>
+        <input asp-for="Vm.Reason" class="form-control" />
+        <span asp-validation-for="Vm.Reason" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <button class="btn btn-warning" type="submit">Renew</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

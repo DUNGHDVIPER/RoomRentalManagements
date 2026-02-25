@@ -16,14 +16,18 @@ public static class ServiceCollectionExtensions
         var conn = configuration.GetConnectionString("DefaultConnection")
                    ?? throw new InvalidOperationException("Missing ConnectionStrings:DefaultConnection");
 
-        services.AddDbContext<AppDbContext>(opt =>
+        services.AddDbContext<MotelManagementDbContext>(opt =>
         {
             opt.UseSqlServer(conn, sql =>
             {
                 // đảm bảo migrations nằm trong DAL/Migrations
+<<<<<<< HEAD
+                sql.MigrationsAssembly(typeof(MotelManagementDbContext).Assembly.FullName);
+=======
                 sql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
                 // Đặt CommandTimeout ĐÚNG CÁCH thông qua Entity Framework
                 sql.CommandTimeout(30);
+>>>>>>> origin/main
             });
         });
 
@@ -36,7 +40,7 @@ public static class ServiceCollectionExtensions
             options.Password.RequireNonAlphanumeric = true;
             options.Password.RequiredLength = 8;
         })
-        .AddEntityFrameworkStores<AppDbContext>()
+        .AddEntityFrameworkStores<MotelManagementDbContext>()
         .AddDefaultTokenProviders();
 
         // tự migrate + seed roles/users khi web start

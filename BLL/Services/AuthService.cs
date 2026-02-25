@@ -1,11 +1,19 @@
-﻿using BLL.DTOs.Auth;
+﻿using System.Text.Json;
 using BLL.Services.Interfaces;
-using Microsoft.AspNetCore.Identity;
+using DAL.Data;
+using DAL.Entities.Motel;
 
 namespace BLL.Services;
 
-public class AuthService : IAuthService
+public class AuditService : IAuditService
 {
+<<<<<<< HEAD
+    private readonly MotelManagementDbContext _db;
+
+    public AuditService(MotelManagementDbContext db)
+    {
+        _db = db;
+=======
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IEmailService _emailService; // ✅ Thêm dependency
@@ -90,10 +98,25 @@ public class AuthService : IAuthService
     {
         var user = await _userManager.FindByEmailAsync(email);
         return user != null;
+>>>>>>> origin/main
     }
 
-    public async Task<AuthResultDto> LoginAsync(LoginRequestDto dto, CancellationToken ct = default)
+    public async Task LogAsync(
+        int? actorUserId,
+        string action,
+        string entityType,
+        string entityId,
+        string? note = null,
+        object? oldValue = null,
+        object? newValue = null,
+        CancellationToken ct = default)
     {
+<<<<<<< HEAD
+        var opt = new JsonSerializerOptions { WriteIndented = false };
+
+        string? oldJson = oldValue == null ? null : JsonSerializer.Serialize(oldValue, opt);
+        string? newJson = newValue == null ? null : JsonSerializer.Serialize(newValue, opt);
+=======
         var user = await _userManager.FindByEmailAsync(dto.Email);
         if (user == null)
             return new AuthResultDto { Succeeded = false, Error = "Invalid email or password" };
@@ -105,17 +128,25 @@ public class AuthService : IAuthService
 
         if (!result.Succeeded)
             return new AuthResultDto { Succeeded = false, Error = "Invalid email or password" };
+>>>>>>> origin/main
 
-        var roles = await _userManager.GetRolesAsync(user);
-        return new AuthResultDto
+        _db.AuditLogs.Add(new AuditLog
         {
-            Succeeded = true,
-            UserId = user.Id,
-            Email = user.Email,
-            Roles = roles.ToArray()
-        };
-    }
+            ActorUserId = actorUserId,
+            Action = action,
+            EntityType = entityType,
+            EntityId = entityId,
+            Note = note,
+            OldValueJson = oldJson,
+            NewValueJson = newJson,
+            CreatedAt = DateTime.UtcNow
+        });
 
+<<<<<<< HEAD
+        // IMPORTANT: dùng chung DbContext => chạy cùng transaction nếu caller đang BeginTransaction
+        await _db.SaveChangesAsync(ct);
+    }
+=======
     public Task LogoutAsync(CancellationToken ct = default)
         => _signInManager.SignOutAsync();
 
@@ -207,4 +238,5 @@ public class AuthService : IAuthService
         // Stub: sau này verify Google token
         return Task.FromResult(new AuthResultDto { Succeeded = false, Error = "Google login not implemented" });
     }
+>>>>>>> origin/main
 }

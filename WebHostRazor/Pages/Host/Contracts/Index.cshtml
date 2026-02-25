@@ -4,16 +4,117 @@
     ViewData["Title"] = "Contracts";
 }
 
-<div class="card p-18">
-    <h2 class="h2">Contracts</h2>
-    <div class="muted">Skeleton: list/filter • renew • terminate • versioning • reminders • export pdf stub</div>
-    <hr class="hr" />
-
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a class="btn-grad" href="/Host/Contracts/Wizard">+ Create Contract (Wizard)</a>
-        <a class="btn-ghost" href="/Host/Contracts">Refresh</a>
-    </div>
-
-    <hr class="hr" />
-    <div class="muted">TODO: bind DTO + call API later.</div>
+<h2>Contracts</h2>
+@if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
+{
+    <div class="alert alert-danger">@err</div>
+}
+@if (TempData["Success"] is string ok && !string.IsNullOrWhiteSpace(ok))
+{
+    <div class="alert alert-success">@ok</div>
+}
+<div class="alert alert-secondary">
+    <div><b>DB Server:</b> @Model.DbServer</div>
+    <div><b>DB Name:</b> @Model.DbName</div>
+    <div><b>Total Contracts (count):</b> @Model.TotalContracts</div>
 </div>
+<p>
+    <a class="btn btn-primary" asp-page="/Host/Contracts/Create">
+        + Create Contract
+    </a>
+</p>
+
+@if (Model.Items.Count == 0)
+{
+    <div class="alert alert-info">No contracts found.</div>
+}
+else
+{
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>ROOMID</th>
+                <th>TENANTID</th>
+                <th>START</th>
+                <th>END</th>
+                <th class="text-end">RENT</th>
+                <th class="text-end">DEPOSIT</th>
+                <th>STATUS</th>
+                <th style="width:260px;">ACTIONS</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model.Items)
+            {
+                <tr>
+                    <td>@c.Id</td>
+                    <td>@c.RoomId</td>
+                    <td>@c.TenantId</td>
+                    <td>@c.StartDate.ToString("yyyy-MM-dd")</td>
+                    <td>@c.EndDate.ToString("yyyy-MM-dd")</td>
+                    <td class="text-end">@c.Rent.ToString("n0")</td>
+                    <td class="text-end">@c.Deposit.ToString("n0")</td>
+                    <td>
+                        @if (c.StatusText == "Active")
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else if (c.StatusText == "Pending")
+                        {
+                            <span class="badge bg-secondary">Pending</span>
+                        }
+                        else if (c.StatusText == "Expired")
+                        {
+                            <span class="badge bg-warning text-dark">Expired</span>
+                        }
+                        else if (c.StatusText == "Terminated")
+                        {
+                            <span class="badge bg-danger">Terminated</span>
+                        }
+                        else if (c.StatusText == "Renewed")
+                        {
+                            <span class="badge bg-info text-dark">Renewed</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-dark">@c. StatusText</span>
+                        }
+                    </td>
+
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a asp-page="./Details" asp-route-id="@c.Id" class="btn btn-outline-info">
+                                Details
+                            </a>
+
+                            <a asp-page="./Renew" asp-route-id="@c.Id"
+                               class="btn btn-outline-warning @(c.IsActive ? "" : "disabled")">
+                                Renew
+                            </a>
+
+                            <a asp-page="./Terminate" asp-route-id="@c.Id"
+                               class="btn btn-outline-danger @(c.IsActive ? "" : "disabled")"
+                               onclick="return confirm('Are you sure you want to terminate this contract?');">
+                                Terminate
+                            </a>
+
+                            <a asp-page="./UploadAttachment" asp-route-id="@c.Id" class="btn btn-outline-secondary">
+                                Upload
+                            </a>
+
+                            <a asp-page="./Versions" asp-route-id="@c.Id" class="btn btn-outline-dark">
+                                Versions
+                            </a>
+
+                            <a asp-page="./ExportPdf" asp-route-id="@c.Id" class="btn btn-outline-success">
+                                PDF
+                            </a>
+                            <a class="btn btn-outline-primary" asp-page="./ReminderScan">Run Reminder Scan</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

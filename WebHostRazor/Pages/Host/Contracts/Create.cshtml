@@ -1,0 +1,77 @@
+﻿@page
+@model WebHostRazor.Pages.Host.Contracts.CreateModel
+@{
+    ViewData["Title"] = "Create Contract";
+}
+
+<h2>Create Contract</h2>
+
+@if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
+{
+    <div class="alert alert-danger">@err</div>
+}
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <div asp-validation-summary="All"></div>
+    </div>
+}
+
+@if (TempData["Success"] is string ok && !string.IsNullOrWhiteSpace(ok))
+{
+    <div class="alert alert-success">@ok</div>
+}
+
+<form method="post" class="row g-3">
+    <div class="col-md-3">
+        <label asp-for="Vm.RoomId" class="form-label"></label>
+        <input asp-for="Vm.RoomId" class="form-control" />
+        <span asp-validation-for="Vm.RoomId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Vm.TenantId" class="form-label"></label>
+        <input asp-for="Vm.TenantId" class="form-control" />
+        <span asp-validation-for="Vm.TenantId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Vm.StartDate" class="form-label"></label>
+        <input asp-for="Vm.StartDate" type="date" class="form-control" />
+        <span asp-validation-for="Vm.StartDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Vm.EndDate" class="form-label"></label>
+        <input asp-for="Vm.EndDate" type="date" class="form-control" />
+        <span asp-validation-for="Vm.EndDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Vm.Rent" class="form-label"></label>
+        <input asp-for="Vm.Rent" class="form-control" />
+        <span asp-validation-for="Vm.Rent" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Vm.Deposit" class="form-label"></label>
+        <input asp-for="Vm.Deposit" class="form-control" />
+        <span asp-validation-for="Vm.Deposit" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6 d-flex align-items-end">
+        <div class="form-check">
+            <input class="form-check-input" asp-for="Vm.ActivateNow" />
+            <label class="form-check-label" asp-for="Vm.ActivateNow">Activate now</label>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <button class="btn btn-success" type="submit">Create</button>
+        <a class="btn btn-outline-secondary" asp-page="./Index">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

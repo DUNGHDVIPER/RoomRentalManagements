@@ -13,4 +13,20 @@
 		<ProjectReference Include="..\BLL\BLL.csproj" />
 	</ItemGroup>
 
+<<<<<<< HEAD
+  <ItemGroup>
+    <ProjectReference Include="..\BLL\BLL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Models\Shared\_Topbar.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="QuestPDF" Version="2026.2.1" />
+  </ItemGroup>
+
 </Project>
+=======
+</Project>
+>>>>>>> origin/main

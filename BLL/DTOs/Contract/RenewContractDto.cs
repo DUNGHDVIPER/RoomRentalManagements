@@ -8,4 +8,5 @@ public class RenewContractDto
     public decimal NewRent { get; set; }
     public decimal NewDeposit { get; set; }
     public string? Reason { get; set; }
+    public bool RequireStartNextDay { get; set; } = true; // default: EndDate + 1 day
 }

@@ -1,4 +1,4 @@
-﻿using DAL.Entities.Property;
+﻿using DAL.Entities.Motel;
 
 namespace DAL.Repositories.Abstractions;
 

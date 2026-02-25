@@ -1,4 +1,11 @@
 <<<<<<< HEAD
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+=======
+<<<<<<< HEAD
 # Visual Studio
 .vs/
 bin/
@@ -20,4 +27,5 @@ obj/
 obj/ 
 *.user 
 *.suo 
+>>>>>>> origin/main
 >>>>>>> origin/main

@@ -25,7 +25,26 @@
             </section>
         </main>
     </div>
-
+    <ul class="navbar-nav ms-auto">
+        @if (User?.Identity?.IsAuthenticated ?? false)
+        {
+            <li class="nav-item me-2">
+                <span class="nav-link">Hello, @User.Identity!.Name</span>
+            </li>
+            <li class="nav-item">
+                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-sm btn-outline-light" type="submit">Logout</button>
+                </form>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+            </li>
+        }
+    </ul>
     <script src="~/js/admin.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>

@@ -1,0 +1,73 @@
+﻿@page "{id:int}"
+@model WebHostRazor.Pages.Host.Contracts.DetailsModel
+@{
+    ViewData["Title"] = "Contract Details";
+}
+
+@if (TempData["Err"] != null)
+{
+    <div class="alert alert-danger">@TempData["Err"]</div>
+}
+@if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
+{
+    <div class="alert alert-danger">@err</div>
+}
+@if (TempData["Success"] is string ok && !string.IsNullOrWhiteSpace(ok))
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (Model.Contract == null)
+{
+    <div>Not found.</div>
+}
+else
+{
+    <h2>Contract #@Model.Contract.Id</h2>
+
+    <dl class="row">
+        <dt class="col-sm-2">RoomId</dt>
+        <dd class="col-sm-10">@Model.Contract.RoomId</dd>
+        <dt class="col-sm-2">TenantId</dt>
+        <dd class="col-sm-10">@Model.Contract.TenantId</dd>
+        <dt class="col-sm-2">Start</dt>
+        <dd class="col-sm-10">@Model.Contract.StartDate.ToString("yyyy-MM-dd")</dd>
+        <dt class="col-sm-2">End</dt>
+        <dd class="col-sm-10">@Model.Contract.EndDate.ToString("yyyy-MM-dd")</dd>
+        <dt class="col-sm-2">Rent</dt>
+        <dd class="col-sm-10">@Model.Contract.Rent.ToString("n0")</dd>
+        <dt class="col-sm-2">Deposit</dt>
+        <dd class="col-sm-10">@Model.Contract.Deposit.ToString("n0")</dd>
+        <dt class="col-sm-2">Active</dt>
+        <dd class="col-sm-10">@Model.Contract.IsActive</dd>
+        <dt class="col-sm-2">Status</dt>
+        <dd class="col-sm-10">@Model.Contract.Status</dd>
+
+        <dt class="col-sm-2">DepositStatus</dt>
+        <dd class="col-sm-10">@Model.Contract.DepositStatus</dd>
+
+        <dt class="col-sm-2">DepositPaidAt</dt>
+        <dd class="col-sm-10">@Model.Contract.DepositPaidAt?.ToString("yyyy-MM-dd HH:mm")</dd>
+
+        <dt class="col-sm-2">DepositPaidAmount</dt>
+        <dd class="col-sm-10">@Model.Contract.DepositPaidAmount?.ToString("n0")</dd>
+
+    </dl>
+
+    <div class="d-flex gap-2">
+        <a class="btn btn-secondary" asp-page="./Index">Back</a>
+
+        <a class="btn btn-primary" asp-page="./Renew" asp-route-id="@Model.Contract.Id">Renew</a>
+        <a class="btn btn-warning" asp-page="./Terminate" asp-route-id="@Model.Contract.Id">Terminate</a>
+
+        <a class="btn btn-info" asp-page="./UploadAttachment" asp-route-id="@Model.Contract.Id">Upload Attachment</a>
+        <a class="btn btn-success" asp-page="./ExportPdf" asp-route-id="@Model.Contract.Id">Export PDF</a>
+
+        <a class="btn btn-outline-dark" asp-page="./Versions" asp-route-id="@Model.Contract.Id">Change History</a>
+
+        <form method="post" asp-page-handler="Activate" asp-route-id="@Model.Contract.Id" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button class="btn btn-success" type="submit">Activate</button>
+        </form>
+    </div>
+
+}

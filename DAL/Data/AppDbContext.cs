@@ -1,7 +1,7 @@
-﻿using DAL.Entities.Billing;
+﻿/*using DAL.Entities.Billing;
 using DAL.Entities.Contracts;
 using DAL.Entities.Maintenance;
-using DAL.Entities.Property;
+using DAL.Entities.Motel;
 using DAL.Entities.System;
 using DAL.Entities.Tenanting;
 using Microsoft.AspNetCore.Identity;
@@ -56,3 +56,4 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }
+*/
