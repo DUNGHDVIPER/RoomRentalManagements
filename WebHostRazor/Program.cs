@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using BLL;
 using BLL.Services;
 using BLL.Services.Interfaces;
@@ -6,6 +7,18 @@ using DAL.Seed;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+=======
+﻿using BLL.Services.Interfaces;
+using BLL.Services;
+using DAL.Repositories;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using WebCustomer.Blazor.Seed;
+using WebHostRazor;
+using DAL.Data;
+
+>>>>>>> origin/main
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +62,44 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AllowAnonymousToFolder("/Debug");
 });
 
+<<<<<<< HEAD
+=======
+builder.Services.AddCascadingAuthenticationState();
+// Tenants
+builder.Services.AddScoped<ITenantService, TenantService>();
+builder.Services.AddScoped<ITenantRepository, TenantRepository>();
+
+// Rooms
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
+// EF InMemory + Identity (FE-only)
+//builder.Services.AddDbContext<AuthDbContext>(opt =>
+//    opt.UseInMemoryDatabase("HostPortalAuth"));
+
+//builder.Services
+//    .AddIdentity<IdentityUser, IdentityRole>(opt =>
+//    {
+//        opt.Password.RequireNonAlphanumeric = false;
+//        opt.Password.RequiredLength = 6;
+//    })
+//    .AddEntityFrameworkStores<AuthDbContext>()
+//    .AddDefaultTokenProviders();
+
+//builder.Services.AddDbContext<AppDbContext>(opt =>
+//    opt.UseInMemoryDatabase("HostPortalApp"));
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services
+    .AddIdentity<IdentityUser, IdentityRole>(opt =>
+    {
+        opt.Password.RequireNonAlphanumeric = false;
+        opt.Password.RequiredLength = 6;
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+>>>>>>> origin/main
 builder.Services.ConfigureApplicationCookie(opt =>
 {
     opt.LoginPath = "/Auth/Login";

@@ -56,9 +56,19 @@
 
     private async Task DoLogin()
     {
-        error = null;
-        var res = await SignInManager.PasswordSignInAsync(email, password, remember, lockoutOnFailure: false);
-        if (res.Succeeded) Nav.NavigateTo("/rooms", true);
-        else error = "Invalid email/password.";
+        var result = await SignInManager.PasswordSignInAsync(
+            email,
+            password,
+            remember,
+            false);
+
+        if (result.Succeeded)
+        {
+            Nav.NavigateTo("/", forceLoad: true); // reload toàn app
+        }
+        else
+        {
+            error = "Login failed";
+        }
     }
 }

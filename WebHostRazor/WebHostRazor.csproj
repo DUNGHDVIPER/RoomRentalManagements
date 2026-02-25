@@ -22,6 +22,7 @@
 		<ProjectReference Include="..\DAL\DAL.csproj" />
 	</ItemGroup>
 
+<<<<<<< HEAD
 	<ItemGroup>
 		<Folder Include="Pages\Bills\" />
 		<Folder Include="Pages\Audit\" />
@@ -31,6 +32,16 @@
 		<Folder Include="Pages\Tickets\" />
 		<Folder Include="Pages\Tenants\" />
 	</ItemGroup>
+=======
+  <ItemGroup>
+	  <Folder Include="Pages\Bills\" />
+	  <Folder Include="Pages\Audit\" />
+	  <Folder Include="Pages\Reports\" />
+	  <Folder Include="Pages\Notifications\" />
+	  <Folder Include="Pages\Utilities\" />
+	  <Folder Include="Pages\Tickets\" />
+  </ItemGroup>
+>>>>>>> origin/main
 
 	<ItemGroup>
 		<None Include="Pages\Host\Shared\TMP.cshtml" />
