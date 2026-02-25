@@ -133,11 +133,14 @@
             <button type="submit" class="btn-primary">Login</button>
         </form>
 
-        <div style="text-align: center; margin-top: 1rem; color: #666; font-size: 0.9rem;">
-            <p>Default Account:</p>
-            <p>Email: admin@system.com</p>
-            <p>Password: Admin@123456</p>
-        </div>
+        @if (System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+        {
+            <div style="text-align: center; margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                <p>Default Account:</p>
+                <p>Email: admin@system.com</p>
+                <p>Password: Admin@123456</p>
+            </div>
+        }
     </div>
 </body>
 </html>
