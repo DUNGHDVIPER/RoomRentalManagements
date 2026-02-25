@@ -23,6 +23,8 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/Host", "Host");
     options.Conventions.AllowAnonymousToFolder("/Auth");
 });
+
+builder.Services.AddCascadingAuthenticationState();
 // Tenants
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
