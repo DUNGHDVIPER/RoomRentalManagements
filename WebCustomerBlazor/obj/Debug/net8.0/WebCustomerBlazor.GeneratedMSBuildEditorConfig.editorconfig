@@ -9,113 +9,113 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = WebCustomerBlazor
 build_property.RootNamespace = WebCustomerBlazor
-build_property.ProjectDir = D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor\
+build_property.ProjectDir = D:\RoomRentalManagements\WebCustomerBlazor\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\PRN222_PROJECT\RoomRentalManagement\WebCustomerBlazor
+build_property.MSBuildProjectDirectory = D:\RoomRentalManagements\WebCustomerBlazor
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/App.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/App.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Auth/RedirectToLogin.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Auth/RedirectToLogin.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBdXRoXFJlZGlyZWN0VG9Mb2dpbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Pages/Counter.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Pages/Counter.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDb3VudGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Pages/Error.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Pages/Error.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFcnJvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Pages/Forgot.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Pages/Forgot.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xGb3Jnb3QucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Pages/Home.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Pages/Login.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xMb2dpbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Pages/MyRoom.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Pages/MyRoom.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xNeVJvb20ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Pages/Profile.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Pages/Profile.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQcm9maWxlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Pages/RoomDetail.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Pages/RoomDetail.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xSb29tRGV0YWlsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Pages/Rooms.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Pages/Rooms.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xSb29tcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Pages/Weather.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Pages/Weather.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXZWF0aGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Rooms/RoomCard.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Rooms/RoomCard.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb29tc1xSb29tQ2FyZC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Rooms/RoomFilterBar.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Rooms/RoomFilterBar.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb29tc1xSb29tRmlsdGVyQmFyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Rooms/RoomGallery.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Rooms/RoomGallery.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb29tc1xSb29tR2FsbGVyeS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Routes.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Routes.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Shared/FilterDrawer.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Shared/FilterDrawer.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcRmlsdGVyRHJhd2VyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Shared/Footer.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Shared/Footer.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcRm9vdGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Shared/Modal.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Shared/Modal.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcTW9kYWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Shared/Navbar.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Shared/Navbar.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcTmF2YmFyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Shared/Pagination.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Shared/Pagination.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcUGFnaW5hdGlvbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Shared/Toast.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Shared/Toast.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcVG9hc3QucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/_Imports.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xfSW1wb3J0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Layout/MainLayout.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTWFpbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-d69u904l8g
 
-[D:/PRN222_PROJECT/RoomRentalManagement/WebCustomerBlazor/Components/Layout/NavMenu.razor]
+[D:/RoomRentalManagements/WebCustomerBlazor/Components/Layout/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTmF2TWVudS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-znk8xib9o4
