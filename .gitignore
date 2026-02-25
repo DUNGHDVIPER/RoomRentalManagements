@@ -1,5 +1,23 @@
+<<<<<<< HEAD
+# Visual Studio
+.vs/
+bin/
+obj/
+
+# User specific
+*.user
+*.suo
+
+# Logs
+*.log
+
+# Rider / VSCode
+.idea/
+.vscode/
+=======
 .vs/ 
 .vs/ 
 obj/ 
 *.user 
 *.suo 
+>>>>>>> origin/main

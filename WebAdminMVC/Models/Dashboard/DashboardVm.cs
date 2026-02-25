@@ -2,8 +2,8 @@
 
 public class DashboardVm
 {
-    public string TotalRevenue { get; set; } = "$124,500";
-    public string TotalProfit { get; set; } = "$45,200";
-    public string OccupancyRate { get; set; } = "84.2%";
-    public string OpenTickets { get; set; } = "12";
+    public int TotalUsers { get; set; }
+    public int ActiveUsers { get; set; }
+    public string TotalRevenue { get; set; } = string.Empty;
+    public int PendingTasks { get; set; }
 }

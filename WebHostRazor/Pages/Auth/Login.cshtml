@@ -8,8 +8,39 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Host Login</title>
+    <title>Host Login - Room Rental Management</title>
     <link rel="stylesheet" href="~/css/theme.css" />
+    <style>
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @@keyframes slideDown {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        .success-icon {
+            color: #28a745;
+            margin-right: 8px;
+        }
+    </style>
 </head>
 <body class="bg-grad">
     <div class="shell" style="justify-content:center;align-items:center;">
@@ -18,15 +49,31 @@
                 <div class="brand-logo">H</div>
                 <div>
                     <div style="font-weight:950;font-size:18px;">Host Portal Login</div>
-                    <div class="muted">Use: <b>host@demo.com</b> / <b>Host@123</b></div>
+                    <div class="muted">Host: <b>host@demo.com</b> / <b>Host@12345!</b></div>
+                    <div class="muted">Admin: <b>admin@demo.com</b> / <b>Admin@12345!</b></div>
                 </div>
             </div>
 
             <hr class="hr" />
 
             <form method="post" style="display:grid;gap:12px;">
+                @Html.AntiForgeryToken()
+                <input name="ReturnUrl" type="hidden" value="@(Model.ReturnUrl ?? "")" />
+
                 <input class="input" asp-for="Email" placeholder="Email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+
                 <input class="input" asp-for="Password" type="password" placeholder="Password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <label style="display:flex;gap:6px;align-items:center;font-size:13px;">
+                        <input asp-for="RememberMe" type="checkbox" />
+                        Remember me
+                    </label>
+                    <a href="/Auth/ForgotPassword" class="link" style="font-size:13px;">Forgot password?</a>
+                </div>
+
                 <button class="btn-grad" type="submit">Login</button>
 
                 @if (!string.IsNullOrWhiteSpace(Model.Error))
@@ -34,7 +81,25 @@
                     <div class="badge danger" style="padding:12px;border-radius:16px;">@Model.Error</div>
                 }
             </form>
+
+            <hr class="hr" />
+
+            <div style="text-align:center;">
+                <span class="muted">New to our platform?</span>
+                <a href="/Auth/Register" class="link">Create Host Account</a>
+            </div>
         </div>
     </div>
+
+    <!-- ❌ Remove this duplicate section -->
+    <!--
+    <div class="row mb-3">
+        <div class="col d-flex justify-content-end">
+            <a href="/auth/forgot-password" class="text-decoration-none text-muted">
+                Forgot your password?
+            </a>
+        </div>
+    </div>
+    -->
 </body>
 </html>

@@ -1,11 +1,24 @@
+<<<<<<< HEAD
+﻿using Microsoft.AspNetCore.Components.Web;
+=======
 ﻿using DAL.Data;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+>>>>>>> origin/main
 using WebCustomerBlazor.Components;
+using DAL.Seed;
+using BLL;
+using BLL.Services;
+using BLL.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+<<<<<<< HEAD
+builder.Services.AddDal(builder.Configuration);
+builder.Services.AddBll(builder.Configuration);
+=======
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
@@ -16,14 +29,38 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+>>>>>>> origin/main
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddAuthentication()
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.LogoutPath = "/Auth/Logout";
+        options.AccessDeniedPath = "/Auth/AccessDenied";
+    });
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+<<<<<<< HEAD
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseAntiforgery();
+
+app.MapRazorComponents<App>()
+   .AddInteractiveServerRenderMode();
+
+=======
 
 app.UseRouting();            // 👈 BẮT BUỘC
 
@@ -57,4 +94,5 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+>>>>>>> origin/main
 app.Run();
