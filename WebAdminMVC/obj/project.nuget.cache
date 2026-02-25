@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "fgy3S7iCjOA=",
+  "dgSpecHash": "f2fuCtAm1ow=",
   "success": true,
-  "projectFilePath": "D:\\PRN222_PROJECT\\RoomRentalManagement\\WebAdminMVC\\WebAdminMVC.csproj",
+  "projectFilePath": "D:\\RoomRentalManagements\\WebAdminMVC\\WebAdminMVC.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dungb\\.nuget\\packages\\azure.core\\1.50.0\\azure.core.1.50.0.nupkg.sha512",
     "C:\\Users\\dungb\\.nuget\\packages\\azure.identity\\1.17.1\\azure.identity.1.17.1.nupkg.sha512",

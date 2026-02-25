@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Mw4qY2fD/mc=",
+  "dgSpecHash": "FNG+wPWkPjA=",
   "success": true,
-  "projectFilePath": "D:\\PRN222_PROJECT\\RoomRentalManagement\\WebCustomerBlazor\\WebCustomerBlazor.csproj",
+  "projectFilePath": "D:\\RoomRentalManagements\\WebCustomerBlazor\\WebCustomerBlazor.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dungb\\.nuget\\packages\\azure.core\\1.50.0\\azure.core.1.50.0.nupkg.sha512",
     "C:\\Users\\dungb\\.nuget\\packages\\azure.identity\\1.17.1\\azure.identity.1.17.1.nupkg.sha512",

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebAdminMVC")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dad032ac4e0540078ca999e373abf4ee85bc266d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+62846bee371ecf2fd1bd6f7a9f5ed385f36d992d")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebAdminMVC")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebAdminMVC")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
