@@ -25,7 +25,6 @@
 	  <Folder Include="Pages\Reports\" />
 	  <Folder Include="Pages\Notifications\" />
 	  <Folder Include="Pages\Utilities\" />
-	  <Folder Include="Pages\Tickets\" />
   </ItemGroup>
 
   <ItemGroup>

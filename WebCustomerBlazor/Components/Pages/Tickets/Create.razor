@@ -47,16 +47,11 @@
                 <div>
                     <div class="label">CATEGORY</div>
 
-                    <InputRadioGroup @bind-Value="ticket.Category" TValue="string">
-                        <div class="chips">
-                            @foreach (var cat in categories)
-                            {
-                                <label class="chip @(ticket.Category == cat ? "chip-active" : "")">
-                                    <InputRadio Value="@cat" TValue="string" />
-                                    @cat
-                                </label>
-                            }
-                        </div>
+                    <InputRadioGroup @bind-Value="ticket.Category" class="form-select">
+                        @foreach (TicketCategory c in Enum.GetValues(typeof(TicketCategory)))
+                        {
+                            <option value="@c">@c</option>
+                        }
                     </InputRadioGroup>
                 </div>
 
@@ -81,23 +76,8 @@
 @code {
     private Ticket ticket = new()
         {
-            Category = "Other"
+            Category = TicketCategory.Other
         };
-
-    private List<string> categories = new()
-    {
-        "Plumbing",
-        "Electricity",
-        "Internet",
-        "Contract",
-        "Other"
-    };
-
-    private void SelectCategory(string cat)
-    {
-        ticket.Category = cat;
-        StateHasChanged(); // 👈 fix không highlight
-    }
 
     private async Task HandleSubmit()
     {

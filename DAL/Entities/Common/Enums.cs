@@ -40,3 +40,12 @@ public enum PaymentStatus
     Failed = 3,
     Refunded = 4
 }
+
+    public enum TicketCategory
+    {
+        Other = 0,
+        Electricity = 1,
+        Water = 2,
+        Internet = 3,
+        Maintenance = 4
+    }

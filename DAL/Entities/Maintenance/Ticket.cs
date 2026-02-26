@@ -23,8 +23,7 @@ public class Ticket : AuditableEntity<int>
     public Room Room { get; set; } = null!;
     public Tenant? Tenant { get; set; }
 
-
     [Required]
-    public string? Category { get; set; } = "Other";
+    public TicketCategory? Category { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

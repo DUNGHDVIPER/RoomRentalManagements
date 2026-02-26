@@ -1011,3 +1011,176 @@ textarea {
     font-size: 14px;
     color: #475569;
 }
+
+/* ===== Ticket Page ===== */
+.ticket-container {
+    background: #f4f6f9;
+    padding: 30px;
+}
+
+/* ===== Layout ===== */
+.ticket-wrapper {
+    background: #f4f6f9;
+    padding: 30px;
+}
+
+.ticket-card {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.ticket-header h3 {
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* ===== Filter ===== */
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.btn-filter {
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+    color: white;
+    border: none;
+}
+
+/* ===== Table ===== */
+.ticket-table thead {
+    background: #f8fafc;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.ticket-table tbody tr {
+    transition: 0.2s;
+}
+
+    .ticket-table tbody tr:hover {
+        background: #f9fafb;
+    }
+
+/* ===== Status Badge ===== */
+.badge-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+    .badge-status.open {
+        background: #e0f2fe;
+        color: #0284c7;
+    }
+
+    .badge-status.progress {
+        background: #fef9c3;
+        color: #ca8a04;
+    }
+
+    .badge-status.done {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+/* ===== Update Button ===== */
+.btn-update {
+    background: #6366f1;
+    color: white;
+    border-radius: 8px;
+    padding: 4px 12px;
+}
+
+    .btn-update:hover {
+        background: #4f46e5;
+        color: white;
+    }
+
+/* ===== Pagination ===== */
+.pagination-wrapper {
+    margin-top: 20px;
+}
+
+.page-btn {
+    padding: 6px 12px;
+    margin-right: 5px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #555;
+}
+
+    .page-btn.active {
+        background: #6366f1;
+        color: white;
+        border: none;
+    }
+
+.status-dropdown {
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background: #f9fafb;
+}
+
+    .status-dropdown:focus {
+        outline: none;
+        border-color: #6366f1;
+    }
+
+/* TOAST */
+.toast-success {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #16a34a;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+    .toast-success.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+.ticket-card {
+    padding: 25px;
+    border-radius: 12px;
+}
+
+    .ticket-card form {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+    }
+.ticket-filter {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    flex-wrap: nowrap; /* 👈 ép nằm 1 hàng */
+}
+
+    .ticket-filter .filter-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ticket-filter .search {
+        flex: 2; /* ô search rộng hơn */
+    }
+
+    .ticket-filter .filter-item input,
+    .ticket-filter .filter-item select {
+        min-width: 140px;
+    }
+
+    .ticket-filter .button {
+        justify-content: flex-end;
+    }
