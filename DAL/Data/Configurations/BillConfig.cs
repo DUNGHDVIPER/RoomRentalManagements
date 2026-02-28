@@ -11,22 +11,13 @@ public class BillConfig : IEntityTypeConfiguration<Bill>
         b.ToTable("Bills");
         b.HasKey(x => x.Id);
 
-        b.Property(x => x.TotalAmount).HasPrecision(18, 2);
+        b.Property(x => x.TotalAmount).HasColumnType("decimal(18,2)");
 
         b.HasOne(x => x.Contract)
-         .WithMany(x => x.Bills)
-         .HasForeignKey(x => x.ContractId)
-         .OnDelete(DeleteBehavior.Restrict);
-
-        b.HasMany(x => x.BillItems)
-         .WithOne(x => x.Bill)
-         .HasForeignKey(x => x.BillId)
-         .OnDelete(DeleteBehavior.Cascade);
-
-        b.HasMany(x => x.Payments)
-         .WithOne(x => x.Bill)
-         .HasForeignKey(x => x.BillId)
-         .OnDelete(DeleteBehavior.Cascade);
+            .WithMany(c => c.Bills)
+            .HasForeignKey(x => x.ContractId)
+            .HasPrincipalKey(c => c.ContractId) // ✅ quan trọng
+            .OnDelete(DeleteBehavior.Cascade);
 
         b.HasIndex(x => new { x.ContractId, x.Period }).IsUnique();
     }

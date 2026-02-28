@@ -12,9 +12,9 @@ public class NotificationConfig : IEntityTypeConfiguration<Notification>
         b.HasKey(x => x.Id);
 
         b.Property(x => x.Title).HasMaxLength(200).IsRequired();
-        b.Property(x => x.Content).HasMaxLength(4000).IsRequired();
-        b.Property(x => x.UserId).HasMaxLength(450); // Identity key length safe
+        b.Property(x => x.Message).HasMaxLength(4000).IsRequired();
+        b.Property(x => x.Type).HasMaxLength(450); // Identity key length safe
 
-        b.HasIndex(x => new { x.UserId, x.IsRead, x.CreatedAt });
+        b.HasIndex(x => new { x.Type, x.CreatedAt });
     }
 }

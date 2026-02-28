@@ -67,13 +67,27 @@ public class RenewModel : PageModel
 
             var renewed = await _service.RenewAsync(dto, actorUserId: null, ct);
 
-            TempData["Success"] = "Renewed successfully.";
+            TempData["Ok"] = "Renewed successfully.";
+            TempData["Success"] = TempData["Ok"];
             return RedirectToPage("./Details", new { id = renewed.Id });
+        }
+        catch (ValidationException ex)
+        {
+            TempData["Err"] = ex.Message;
+            TempData["Error"] = TempData["Err"];
+            return RedirectToPage(new { id = Vm.ContractId }); // PRG về lại Renew để sửa
         }
         catch (InvalidOperationException ex)
         {
-            TempData["Error"] = ex.Message;
-            return RedirectToPage("./Details", new { id = Vm.ContractId });
+            TempData["Err"] = ex.Message;
+            TempData["Error"] = TempData["Err"];
+            return RedirectToPage(new { id = Vm.ContractId });
+        }
+        catch (Exception ex)
+        {
+            TempData["Err"] = ex.Message;
+            TempData["Error"] = TempData["Err"];
+            return RedirectToPage(new { id = Vm.ContractId });
         }
     }
 

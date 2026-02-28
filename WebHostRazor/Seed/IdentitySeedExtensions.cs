@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿/*using Microsoft.AspNetCore.Identity;
 
 namespace WebHostRazor.Seed;
 
@@ -33,3 +33,4 @@ public static class IdentitySeedExtensions
             await userMgr.AddToRoleAsync(u, role);
     }
 }
+*/

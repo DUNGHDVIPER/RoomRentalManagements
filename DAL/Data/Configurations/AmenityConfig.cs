@@ -9,9 +9,14 @@ public class AmenityConfig : IEntityTypeConfiguration<Amenity>
     public void Configure(EntityTypeBuilder<Amenity> b)
     {
         b.ToTable("Amenities");
-        b.HasKey(x => x.Id);
 
-        b.Property(x => x.Name).HasMaxLength(80).IsRequired();
-        b.HasIndex(x => x.Name).IsUnique();
+        b.HasKey(x => x.Id);
+        b.Property(x => x.Id).HasColumnName("AmenityId"); // ✅ map về cột cũ
+
+        b.Property(x => x.AmenityName)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        b.HasIndex(x => x.AmenityName).IsUnique(false);
     }
 }

@@ -1,16 +1,13 @@
-﻿using DAL.Entities.Billing;
-using DAL.Entities.Common;
+﻿using DAL.Entities.Common;
 using DAL.Entities.Contracts;
 
 namespace DAL.Entities.Billing;
 
 public class Bill : AuditableEntity<int>
 {
-    public int ContractId { get; set; }
+    public long ContractId { get; set; }   // ✅ int -> long
 
-    // YYYYMM dạng int
     public int Period { get; set; }
-
     public DateTime IssuedAt { get; set; } = DateTime.UtcNow;
     public DateTime DueDate { get; set; }
     public BillStatus Status { get; set; } = BillStatus.Draft;

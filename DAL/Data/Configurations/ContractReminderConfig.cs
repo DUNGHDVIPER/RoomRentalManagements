@@ -14,9 +14,9 @@ public class ContractReminderConfig : IEntityTypeConfiguration<ContractReminder>
         b.Property(x => x.Type).HasMaxLength(30).IsRequired();
 
         b.HasOne(x => x.Contract)
-         .WithMany(x => x.Reminders)
-         .HasForeignKey(x => x.ContractId)
-         .OnDelete(DeleteBehavior.Cascade);
+            .WithMany() // hoặc .WithMany(x => x.Reminders) nếu Contract có navigation
+            .HasForeignKey(x => x.ContractId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         b.HasIndex(x => new { x.ContractId, x.RemindAt });
     }

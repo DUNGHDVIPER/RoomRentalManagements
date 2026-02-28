@@ -1,4 +1,5 @@
-﻿using DAL.Entities.Motel;
+﻿using DAL.Entities.Contracts;
+using DAL.Entities.Motel;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -17,7 +18,7 @@ public static class ContractPdfExporter
             : c.ContractCode.Trim();
 
         var roomLine = c.Room != null
-            ? $"{(string.IsNullOrWhiteSpace(c.Room.RoomCode) ? "" : c.Room.RoomCode + " - ")}{c.Room.RoomName} (Id={c.RoomId})"
+            ? $"{(string.IsNullOrWhiteSpace(c.Room.RoomNo) ? "" : c.Room.RoomNo + " - ")}{c.Room.RoomNo} (Id={c.RoomId})"
             : $"RoomId = {c.RoomId}";
 
         var tenantLine = c.Tenant != null

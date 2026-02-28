@@ -11,14 +11,14 @@ public class VersionsModel : PageModel
     public VersionsModel(IContractService service) => _service = service;
 
     public int ContractId { get; set; }
-    public List<ContractVersionItemDto> Items { get; set; } = new();
+    public List<ContractVersionItemDto> Versions { get; set; } = new();
 
-    public async Task<IActionResult> OnGet(int id)
+    public async Task<IActionResult> OnGet(int id, CancellationToken ct)
     {
         try
         {
             ContractId = id;
-            Items = await _service.GetVersionsAsync(id);
+            Versions = await _service.GetVersionsAsync(id, ct);
             return Page();
         }
         catch (Exception ex)

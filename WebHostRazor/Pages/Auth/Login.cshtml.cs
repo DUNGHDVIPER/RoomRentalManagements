@@ -79,7 +79,7 @@ public class LoginModel : PageModel
                     // Redirect admin to WebAdminMVC
                     if (roles.Contains("Admin") || roles.Contains("SuperAdmin"))
                     {
-                        var adminUrl = _configuration["AdminUrl"] ?? "https://localhost:7282";
+                        var adminUrl = _configuration["AdminUrl"] ?? "https://localhost:5220";
                         var token = GenerateSimpleToken(user.Email!, roles);
                         return Redirect($"{adminUrl}/Auth/AdminLogin?token={token}");
                     }

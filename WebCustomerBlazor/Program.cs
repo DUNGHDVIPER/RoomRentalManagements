@@ -1,98 +1,87 @@
-<<<<<<< HEAD
-﻿using Microsoft.AspNetCore.Components.Web;
-=======
-﻿using DAL.Data;
-using Microsoft.AspNetCore.Components.Web;
+using DAL.Data;
+using DAL.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
->>>>>>> origin/main
 using WebCustomerBlazor.Components;
-using DAL.Seed;
-using BLL;
 using BLL.Services;
 using BLL.Services.Interfaces;
-using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-<<<<<<< HEAD
-builder.Services.AddDal(builder.Configuration);
-builder.Services.AddBll(builder.Configuration);
-=======
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// =====================
+// 1) DB + Identity
+// =====================
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(opt =>
+{
+    opt.Password.RequireNonAlphanumeric = false;
+    opt.Password.RequireUppercase = false;
+    opt.Password.RequireLowercase = false;
+    opt.Password.RequireDigit = false;
+    opt.Password.RequiredLength = 6;
+})
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
 
+// Cookie Auth (Identity dùng cookie mặc định, nhưng bạn có thể set path)
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Auth/Login";
+    options.LogoutPath = "/Auth/Logout";
+    options.AccessDeniedPath = "/Auth/AccessDenied";
+});
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
-
-builder.Services.AddAuthentication();
+// Authorization (nếu cần policy thì add ở đây)
 builder.Services.AddAuthorization();
->>>>>>> origin/main
 
+// =====================
+// 2) Razor Components (Blazor Web App)
+// =====================
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddAuthentication()
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Auth/Login";
-        options.LogoutPath = "/Auth/Logout";
-        options.AccessDeniedPath = "/Auth/AccessDenied";
-    });
-
-builder.Services.AddAuthorization();
-
+// =====================
+// 3) DI khác
+// =====================
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-<<<<<<< HEAD
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseAntiforgery();
-
-app.MapRazorComponents<App>()
-   .AddInteractiveServerRenderMode();
-
-=======
-
-app.UseRouting();            // 👈 BẮT BUỘC
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseAntiforgery();        // 👈 BẮT BUỘC (sau Auth)
-
-app.MapRazorComponents<App>()
-   .AddInteractiveServerRenderMode();
-
-using (var scope = app.Services.CreateScope())
+// =====================
+// 4) Migrate + Seed (PHẢI sau app.Build())
+// =====================
+await using (var scope = app.Services.CreateAsyncScope())
 {
-    var userManager = scope.ServiceProvider
-        .GetRequiredService<UserManager<IdentityUser>>();
+    // Migrate trước (khuyến nghị)
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
 
-    var email = "customer@demo.com";
-    var password = "Customer@123";
-
-    var user = await userManager.FindByEmailAsync(email);
-    if (user == null)
-    {
-        user = new IdentityUser
-        {
-            UserName = email,
-            Email = email,
-            EmailConfirmed = true
-        };
-
-        await userManager.CreateAsync(user, password);
-    }
+    // Seed duy nhất từ DAL
+    var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    await IdentitySeeder.SeedAsync(roleMgr, userMgr);
 }
 
->>>>>>> origin/main
+// =====================
+// 5) Middleware
+// =====================
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Nếu bạn có dùng antiforgery với form POST:
+app.UseAntiforgery();
+
+// =====================
+// 6) Map Blazor components
+// =====================
+app.MapRazorComponents<App>()
+   .AddInteractiveServerRenderMode();
+
 app.Run();

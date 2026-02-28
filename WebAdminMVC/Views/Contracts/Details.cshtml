@@ -17,7 +17,10 @@
     var statusText = StatusText(c.Status);
 }
 
-<h2 class="mb-3">Contract Details</h2>
+<div class="d-flex align-items-center gap-2 mb-3">
+    <h2 class="m-0">Contract Details</h2>
+    <span class="badge bg-danger">ADMIN MODE – System-wide</span>
+</div>
 
 @if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
 {
@@ -38,7 +41,70 @@
 
         <a class="btn btn-warning" asp-action="Renew" asp-route-id="@c.Id">Renew</a>
         <a class="btn btn-danger" asp-action="Terminate" asp-route-id="@c.Id">Terminate</a>
-        @if (!c.IsActive)
+        <a class="btn btn-outline-primary" asp-action="ReminderScan">Reminder Scan</a>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header fw-semibold">G1) Update Deposit Amount</div>
+                    <div class="card-body">
+                        <form asp-action="UpdateDepositAmount" asp-route-id="@c.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-2">
+                                <label class="form-label">New Deposit Amount</label>
+                                <input class="form-control" type="number" step="0.01" name="newDeposit" value="@c.Deposit" />
+                            </div>
+                            <button class="btn btn-primary" type="submit">Update Amount</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header fw-semibold">G2) Update Deposit Status</div>
+                    <div class="card-body">
+                        <form asp-action="UpdateDepositStatus" asp-route-id="@c.Id" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <div class="mb-2">
+                                <label class="form-label">Deposit Amount</label>
+                                <input class="form-control" type="number" step="0.01" name="depositAmount" value="@c.Deposit" />
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">Deposit Status</label>
+                                <select class="form-select" name="depositStatus">
+                                    <option value="Unpaid" selected="@(string.Equals(c.DepositStatus, "Unpaid", StringComparison.OrdinalIgnoreCase))">Unpaid</option>
+                                    <option value="Paid" selected="@(string.Equals(c.DepositStatus, "Paid", StringComparison.OrdinalIgnoreCase))">Paid</option>
+                                    <option value="Refunded" selected="@(string.Equals(c.DepositStatus, "Refunded", StringComparison.OrdinalIgnoreCase))">Refunded</option>
+                                    <option value="Forfeit" selected="@(string.Equals(c.DepositStatus, "Forfeit", StringComparison.OrdinalIgnoreCase))">Forfeit</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">Paid Amount (required if Paid)</label>
+                                <input class="form-control" type="number" step="0.01" name="paidAmount"
+                                       value="@(c.DepositPaidAmount.HasValue? c.DepositPaidAmount.Value.ToString("0.##") : "")" />
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">Paid At (required if Paid)</label>
+                                <input class="form-control" type="datetime-local" name="paidAt"
+                                       value="@(c.DepositPaidAt.HasValue? c.DepositPaidAt.Value.ToString("yyyy-MM-ddTHH:mm") : "")" />
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">Note</label>
+                                <input class="form-control" name="note" />
+                            </div>
+
+                            <button class="btn btn-primary" type="submit">Update Status</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (c.Status == 0) // Pending
         {
             <form asp-action="Activate" asp-route-id="@c.Id" method="post" class="d-inline">
                 @Html.AntiForgeryToken()
@@ -128,6 +194,16 @@
                 <div class="text-muted">Deposit Paid Amount</div>
                 <div class="fw-semibold">@((c.DepositPaidAmount.HasValue) ? c.DepositPaidAmount.Value.ToString("N0") : "-")</div>
             </div>
+            @if (c.Status == 1 && c.EndDate.Date < DateTime.Today)
+            {
+                <form asp-action="ForceExpire" asp-route-id="@c.Id" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-danger"
+                            onclick="return confirm('Force expire this contract?');">
+                        Force Expire
+                    </button>
+                </form>
+            }
         </div>
     </div>
 </div>

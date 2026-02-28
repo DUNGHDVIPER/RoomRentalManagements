@@ -13,7 +13,7 @@
 		<ProjectReference Include="..\BLL\BLL.csproj" />
 	</ItemGroup>
 
-<<<<<<< HEAD
+
   <ItemGroup>
     <ProjectReference Include="..\BLL\BLL.csproj" />
   </ItemGroup>
@@ -27,6 +27,4 @@
   </ItemGroup>
 
 </Project>
-=======
-</Project>
->>>>>>> origin/main
+

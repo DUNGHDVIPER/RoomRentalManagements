@@ -6,10 +6,10 @@ namespace WebHostRazor.Pages.Host.Contracts;
 
 public class IndexModel : PageModel
 {
-    private readonly MotelManagementDbContext _db;
+    private readonly AppDbContext _db;
     private readonly ILogger<IndexModel> _logger;
 
-    public IndexModel(MotelManagementDbContext db, ILogger<IndexModel> logger)
+    public IndexModel(AppDbContext db, ILogger<IndexModel> logger)
     {
         _db = db;
         _logger = logger;

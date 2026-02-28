@@ -23,6 +23,7 @@ public class CreateModel : PageModel
         if (Vm.StartDate == default) Vm.StartDate = DateTime.Today;
         if (Vm.EndDate == default) Vm.EndDate = DateTime.Today.AddMonths(6);
         Vm.ActivateNow = true;
+
     }
 
     public async Task<IActionResult> OnPostAsync(CancellationToken ct)
@@ -42,16 +43,30 @@ public class CreateModel : PageModel
                 ActivateNow = Vm.ActivateNow
             };
 
-            // host portal tạm chưa có actor -> null
             var created = await _service.CreateAsync(dto, actorUserId: null, ct);
 
-            TempData["Success"] = "Created successfully.";
+            TempData["Ok"] = "Created successfully.";
+            TempData["Success"] = TempData["Ok"]; // tương thích UI cũ
+
             return RedirectToPage("./Details", new { id = created.Id });
+        }
+        catch (ValidationException ex)
+        {
+            TempData["Err"] = ex.Message;
+            TempData["Error"] = TempData["Err"]; // tương thích UI cũ
+            return RedirectToPage(); // PRG về lại Create
         }
         catch (InvalidOperationException ex)
         {
-            TempData["Error"] = ex.Message;
-            return Page();
+            TempData["Err"] = ex.Message;
+            TempData["Error"] = TempData["Err"];
+            return RedirectToPage();
+        }
+        catch (Exception ex)
+        {
+            TempData["Err"] = ex.Message;
+            TempData["Error"] = TempData["Err"];
+            return RedirectToPage();
         }
     }
 
