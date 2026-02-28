@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@title - AdminMVC</title>
     <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
+
 </head>
 <body>
     <div class="app-shell">
@@ -28,5 +29,30 @@
 
     <script src="~/js/admin.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("ReceiveNotification", function (title, content) {
+
+            const toast = document.createElement("div");
+            toast.className = "notification-toast";
+            toast.innerHTML = `<strong>${title}</strong><br/>${content}`;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        });
+
+        connection.start()
+            .catch(err => console.error(err));
+    </script>
 </body>
 </html>

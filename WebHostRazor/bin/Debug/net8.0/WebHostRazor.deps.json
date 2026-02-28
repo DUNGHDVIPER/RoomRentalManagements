@@ -9,6 +9,7 @@
       "WebHostRazor/1.0.0": {
         "dependencies": {
           "BLL": "1.0.0",
+          "DAL": "1.0.0",
           "Microsoft.EntityFrameworkCore.InMemory": "8.0.23",
           "Microsoft.Extensions.Caching.Memory": "8.0.1",
           "WebCustomerBlazor": "1.0.0"

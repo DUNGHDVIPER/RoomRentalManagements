@@ -28,4 +28,14 @@ public class BillingService : IBillingService
 
     public Task<BillDto> PreviewBillStubAsync(int contractId, int period, CancellationToken ct = default)
         => throw new NotImplementedException();
+
+    // SAU NAY XONG CHUC NANG HOADON THI THEM VAO
+//    await _notificationService.BroadcastAsync(
+//    new BroadcastNotificationDto
+//    {
+//        Title = "Hóa đơn mới",
+//        Content = $"Bạn có hóa đơn tháng {invoice.Month}/{invoice.Year}",
+//        ContractId = invoice.ContractId,
+//        SourceType = SourceType.Billing
+//});
 }

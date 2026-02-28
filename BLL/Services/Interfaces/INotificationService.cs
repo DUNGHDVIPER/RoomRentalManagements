@@ -6,7 +6,16 @@ namespace BLL.Services.Interfaces;
 
 public interface INotificationService
 {
-    Task BroadcastAsync(BroadcastNotificationDto dto, CancellationToken ct = default);
-    Task<PagedResultDto<NotificationDto>> GetUserNotificationsAsync(string userId, PagedRequestDto req, CancellationToken ct = default);
-    Task MarkReadAsync(long notificationId, CancellationToken ct = default);
-}
+  
+        Task BroadcastAsync(BroadcastNotificationDto dto, CancellationToken ct = default);
+
+        Task<PagedResultDto<NotificationDto>> GetUserNotificationsAsync(
+            int tenantId,
+            PagedRequestDto request,
+            CancellationToken ct = default);
+
+        Task MarkReadAsync(int notificationId, CancellationToken ct = default);
+
+        Task<List<NotificationDto>> GetHostHistoryAsync(CancellationToken ct = default);
+    }
+

@@ -4,6 +4,7 @@ using DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260228035311_AddContractIdToNotification")]
+    partial class AddContractIdToNotification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -691,7 +694,10 @@ namespace DAL.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)");
 
-                    b.Property<int?>("ContractId")
+                    b.Property<long?>("ContractId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("ContractId1")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -716,7 +722,7 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContractId");
+                    b.HasIndex("ContractId1");
 
                     b.HasIndex("IsRead", "CreatedAt");
 
@@ -1235,7 +1241,7 @@ namespace DAL.Migrations
                 {
                     b.HasOne("DAL.Entities.Contracts.Contract", "Contract")
                         .WithMany()
-                        .HasForeignKey("ContractId");
+                        .HasForeignKey("ContractId1");
 
                     b.Navigation("Contract");
                 });

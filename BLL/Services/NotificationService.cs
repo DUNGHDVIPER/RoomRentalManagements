@@ -1,18 +1,21 @@
-﻿using BLL.DTOs.Notification;
+﻿using BLL.Common;
 using BLL.DTOs.Common;
-using BLL.Common;
+using BLL.DTOs.Notification;
 using BLL.Services.Interfaces;
+using DAL.Data;
+using DAL.Entities.System;
+using Microsoft.EntityFrameworkCore;
 
-namespace BLL.Services;
-
-public class NotificationService : INotificationService
+public interface INotificationService
 {
-    public Task BroadcastAsync(BroadcastNotificationDto dto, CancellationToken ct = default)
-        => throw new NotImplementedException();
+    Task BroadcastAsync(BroadcastNotificationDto dto, CancellationToken ct = default);
 
-    public Task<PagedResultDto<NotificationDto>> GetUserNotificationsAsync(string userId, PagedRequestDto req, CancellationToken ct = default)
-        => throw new NotImplementedException();
+    Task<PagedResultDto<NotificationDto>> GetUserNotificationsAsync(
+        int tenantId,
+        PagedRequestDto request,
+        CancellationToken ct = default);
 
-    public Task MarkReadAsync(long notificationId, CancellationToken ct = default)
-        => throw new NotImplementedException();
+    Task MarkReadAsync(int notificationId, CancellationToken ct = default);
+
+    Task<List<NotificationDto>> GetHostHistoryAsync(CancellationToken ct = default);
 }

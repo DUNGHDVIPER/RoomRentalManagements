@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\Notifications\**" />
+    <Content Remove="Pages\Notifications\**" />
+    <EmbeddedResource Remove="Pages\Notifications\**" />
+    <None Remove="Pages\Notifications\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Seed\IdentitySeedExtensions.cs" />
   </ItemGroup>
 
@@ -16,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BLL\BLL.csproj" />
+    <ProjectReference Include="..\DAL\DAL.csproj" />
     <ProjectReference Include="..\WebCustomerBlazor\WebCustomerBlazor.csproj" />
   </ItemGroup>
 
@@ -23,7 +31,6 @@
 	  <Folder Include="Pages\Bills\" />
 	  <Folder Include="Pages\Audit\" />
 	  <Folder Include="Pages\Reports\" />
-	  <Folder Include="Pages\Notifications\" />
 	  <Folder Include="Pages\Utilities\" />
   </ItemGroup>
 

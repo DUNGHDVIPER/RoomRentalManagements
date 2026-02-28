@@ -49,3 +49,12 @@ public enum PaymentStatus
         Internet = 3,
         Maintenance = 4
     }
+public enum SourceType
+{
+    Manual = 0,
+    Billing = 1,
+    Contract = 2,
+    Maintenance = 3,
+    System = 4
+}
+

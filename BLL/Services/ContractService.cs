@@ -61,4 +61,14 @@ public class ContractService : IContractService
     {
         throw new NotImplementedException();
     }
+
+    // XONG CHUC NANG CONTRACT THI THEM VAO
+//    await _notificationService.BroadcastAsync(
+//    new BroadcastNotificationDto
+//    {
+//        Title = "Hợp đồng sắp hết hạn",
+//        Content = "Hợp đồng của bạn sẽ hết hạn trong 7 ngày.",
+//        ContractId = contract.Id,
+//        SourceType = SourceType.Contract
+//});
 }

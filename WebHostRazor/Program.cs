@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using WebCustomer.Blazor.Seed;
 using WebHostRazor;
 using DAL.Data;
+using WebHostRazor.Hubs;
+using BLL.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,6 +66,8 @@ builder.Services.ConfigureApplicationCookie(opt =>
     opt.LoginPath = "/Auth/Login";
     opt.AccessDeniedPath = "/Auth/AccessDenied";
 });
+// SIGNalR
+builder.Services.AddSignalR();
 
 // FE mock store
 
@@ -75,7 +79,7 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.MapHub<NotificationHub>("/notificationHub");
 // seed roles/users
 await app.SeedIdentityAsync();
 
