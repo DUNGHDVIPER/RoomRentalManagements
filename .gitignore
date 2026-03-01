@@ -1,0 +1,19 @@
+# Build folders
+**/bin/
+**/obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Nuget / Cache
+*.cache
+*.log
+project.nuget.cache
+*.csproj.nuget.*
+
+# VSIX
+*.vsix
+
+ 

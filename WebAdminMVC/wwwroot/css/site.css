@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -20,3 +20,30 @@ html {
 body {
   margin-bottom: 60px;
 }
+/* ===== Reports table: force align header + numbers ===== */
+.table.report-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+    .table.report-table th,
+    .table.report-table td {
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    /* Header cột số canh phải (bị .table thead th {text-align:left} đè nên cần !important) */
+    .table.report-table thead th.th-right {
+        text-align: right !important;
+    }
+
+    /* Body + tfoot cột số canh phải */
+    .table.report-table tbody td.td-right,
+    .table.report-table tfoot th.th-right {
+        text-align: right !important;
+    }
+
+    /* Số đều cột */
+    .table.report-table .num {
+        font-variant-numeric: tabular-nums;
+    }
