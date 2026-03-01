@@ -1,10 +1,12 @@
 ﻿using DAL.Data;
 using DAL.Entities.Maintenance;
 using DAL.Entities.Common;
+using BLL.DTOs.Notification;
+using BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-
+namespace WebHostRazor.Pages.Host.Tickets;
 public class IndexModel : PageModel
 {
     private readonly AppDbContext _context;

@@ -15,6 +15,6 @@ public class BroadcastNotificationDto
 
     public int? BlockId { get; set; }
     public int? FloorId { get; set; }
-
+    public bool SendToHost { get; set; } = false;
     public SourceType SourceType { get; set; } = SourceType.Manual;
 }

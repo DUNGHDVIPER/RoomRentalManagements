@@ -1,6 +1,8 @@
 ﻿using DAL.Entities.Common;
 using DAL.Entities.Tenanting;
 using DAL.Entities.Contracts;
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DAL.Entities.System;
 
@@ -14,7 +16,12 @@ public class Notification : AuditableEntity<long>
 
     public SourceType SourceType { get; set; }
 
-    // 🔥 chỉ cần Contract
     public int? ContractId { get; set; }
     public Contract? Contract { get; set; }
+
+    public string? ReceiverUserId { get; set; }
+
+
+    [ForeignKey("ReceiverUserId")]
+    public IdentityUser? ReceiverUser { get; set; }
 }

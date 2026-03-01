@@ -1,15 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DAL.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using BLL.Services.Interfaces;
+using BLL.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Fake auth (Session)
-builder.Services.AddSession(opt =>
+builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
+
+// ✅ ADD IDENTITY
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
 {
-    opt.IdleTimeout = TimeSpan.FromHours(8);
-    opt.Cookie.HttpOnly = true;
-    opt.Cookie.IsEssential = true;
+    options.LoginPath = "/Auth/Login";
+    options.AccessDeniedPath = "/Auth/AccessDenied";
 });
 
 var app = builder.Build();
@@ -25,11 +38,30 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();
+// ❌ BỎ Session fake auth
+// app.UseSession();
 
-// Routing thuần MVC
+// ✅ BẮT BUỘC
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
+
+
+// ✅ Seed Role
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    string[] roles = { "Admin", "Host", "Tenant" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+    }
+}
 
 app.Run();

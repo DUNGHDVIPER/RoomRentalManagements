@@ -6,12 +6,20 @@ using BLL.Services.Interfaces;
 using DAL.Data;
 using DAL.Entities.Common;
 using DAL.Entities.Contracts;
+using DAL.Entities.Tenanting;
 using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Services;
 
 public class ContractService : IContractService
 {
+
+    private readonly AppDbContext _context;
+
+    public ContractService(AppDbContext context)
+    {
+        _context = context;
+    }
     public Task AddAttachmentStubAsync(int contractId, string fileName, string url, CancellationToken ct = default)
     {
         throw new NotImplementedException();
@@ -63,12 +71,22 @@ public class ContractService : IContractService
     }
 
     // XONG CHUC NANG CONTRACT THI THEM VAO
-//    await _notificationService.BroadcastAsync(
-//    new BroadcastNotificationDto
-//    {
-//        Title = "Hợp đồng sắp hết hạn",
-//        Content = "Hợp đồng của bạn sẽ hết hạn trong 7 ngày.",
-//        ContractId = contract.Id,
-//        SourceType = SourceType.Contract
-//});
+    //    await _notificationService.BroadcastAsync(
+    //    new BroadcastNotificationDto
+    //    {
+    //        Title = "Hợp đồng sắp hết hạn",
+    //        Content = "Hợp đồng của bạn sẽ hết hạn trong 7 ngày.",
+    //        ContractId = contract.Id,
+    //        SourceType = SourceType.Contract
+    //});
+
+    public async Task<int?> GetActiveContractIdByUserIdAsync(string userId)
+    {
+        return await _context.Contracts
+            .Include(c => c.Tenant)
+            .Where(c => c.Tenant.UserId == userId && c.IsActive)
+            .Select(c => (int?)c.Id)
+            .FirstOrDefaultAsync();
+    }
+
 }

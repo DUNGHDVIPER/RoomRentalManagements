@@ -21,4 +21,5 @@ public interface IContractService
 
     // Export stubs
     Task<byte[]> ExportPdfStubAsync(int contractId, CancellationToken ct = default);
+    Task<int?> GetActiveContractIdByUserIdAsync(string userId);
 }

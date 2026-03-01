@@ -1,5 +1,9 @@
-﻿@{
-    var email = Context.Session.GetString("ADMIN_EMAIL") ?? "Admin User";
+﻿@using System.Security.Claims
+
+@{
+    var email = User.Identity?.IsAuthenticated == true
+        ? User.Identity.Name
+        : "Admin User";
 }
 <div class="topbar-left">
     <!-- removed sim badge -->

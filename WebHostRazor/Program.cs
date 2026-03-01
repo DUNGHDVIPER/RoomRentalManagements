@@ -8,7 +8,6 @@ using WebCustomer.Blazor.Seed;
 using WebHostRazor;
 using DAL.Data;
 using WebHostRazor.Hubs;
-using BLL.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +33,9 @@ builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 // Rooms
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
+
+// noti
+builder.Services.AddScoped<INotificationService, NotificationService>();
 // EF InMemory + Identity (FE-only)
 //builder.Services.AddDbContext<AuthDbContext>(opt =>
 //    opt.UseInMemoryDatabase("HostPortalAuth"));

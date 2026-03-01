@@ -580,3 +580,70 @@ body {
         opacity: 1;
     }
 }
+/* =========================
+   Shared Form Controls
+========================= */
+
+.form-section {
+    padding: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--muted);
+}
+
+.form-control {
+    min-height: 44px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    background: #fff;
+    font-size: 14px;
+    transition: .15s ease;
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: #bfdbfe;
+        box-shadow: 0 0 0 4px rgba(59,130,246,.08);
+    }
+
+    .form-control[multiple] {
+        min-height: 180px;
+    }
+
+/* Primary button style (non-gradient) */
+.btn-primary {
+    background: var(--blue);
+    color: #fff;
+    border: 0;
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: .15s ease;
+}
+
+    .btn-primary:hover {
+        filter: brightness(.95);
+        transform: translateY(-1px);
+    }
+
+/* Success alert */
+.alert-success {
+    background: var(--greenSoft);
+    color: var(--green);
+    border: 1px solid #bbf7d0;
+    padding: 12px 14px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+}
