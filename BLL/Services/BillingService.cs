@@ -54,7 +54,7 @@ public class BillingService : IBillingService
         {
             var s = NormalizeUiStatus(status);
 
-            // ✅ 1 nguồn sự thật: filter theo Status
+             
             query = s switch
             {
                 "Paid" => query.Where(b => b.Status == BillStatus.Paid),
