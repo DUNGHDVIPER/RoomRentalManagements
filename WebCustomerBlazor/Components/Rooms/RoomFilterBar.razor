@@ -21,7 +21,7 @@
 
 @code {
     [Parameter] public FilterRoomDto Filter { get; set; } = new();
-    [Parameter] public PagedRequestDto Page { get; set; } = new();
+    [Parameter] public PagedRequestDto Page { get; set; } = new(1, 10); // Provide default values for required parameters
 
     [Parameter] public EventCallback OnApply { get; set; }
     [Parameter] public EventCallback OnOpenDrawer { get; set; }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Net.NetworkInformation;
+﻿using System.ComponentModel.DataAnnotations;
 using DAL.Entities.Common;
 using DAL.Entities.Property;
 using DAL.Entities.Tenanting;
@@ -9,21 +7,29 @@ namespace DAL.Entities.Maintenance;
 
 public class Ticket : AuditableEntity<int>
 {
+    [Required, MaxLength(200)]
+    public string Title { get; set; } = null!;
+
+    [Required, MaxLength(255)]
+    public string Description { get; set; } = null!;
+
+    [Required, MaxLength(50)]
+    public string Category { get; set; } = "Other";
+
+    // ✅ đổi int -> TicketStatus
+    public TicketStatus Status { get; set; } = TicketStatus.Open;
+
     public int RoomId { get; set; }
     public int? TenantId { get; set; }
 
-    [Required]
-    [MaxLength(100)]
-    public string Title { get; set; } = null!;
-    [Required]
-    [MaxLength(255)]
-    public string? Description { get; set; }
-    public TicketStatus Status { get; set; } = TicketStatus.Open;
-
-    public Room Room { get; set; } = null!;
+    public Room? Room { get; set; }
     public Tenant? Tenant { get; set; }
+<<<<<<< HEAD
 
     [Required]
     public TicketCategory? Category { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
+=======
+}
+>>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574

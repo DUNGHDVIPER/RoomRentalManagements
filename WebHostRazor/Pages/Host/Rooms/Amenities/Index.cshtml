@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "/Host/Rooms/{id:int}/Amenities"
 @model WebHostRazor.Pages.Host.Rooms.Amenities.IndexModel
 @{
     ViewData["Title"] = "Room Amenities";
@@ -32,10 +32,18 @@ else
                     <form method="post" asp-page-handler="Remove" style="display:inline;">
                         <input type="hidden" name="id" value="@Model.Room.Id" />
                         <input type="hidden" name="name" value="@a" />
-                        <button class="btn-ghost" type="submit" style="padding:6px 10px;">x</button>
+                        <button class="btn-ghost" type="submit" style="padding:6px 10px;" onclick="return confirm('Remove @a?');">×</button>
                     </form>
                 </div>
             }
         </div>
+
+        @if (Model.Room.Amenities.Count == 0)
+        {
+            <div class="text-center muted" style="padding:40px;">
+                <p>No amenities added yet.</p>
+                <p>Use the form above to add your first amenity.</p>
+            </div>
+        }
     </div>
 }

@@ -1,11 +1,11 @@
 ﻿@{
-    Layout = "_Layout";
     ViewData["Title"] = "Access Denied";
+    Layout = "_Layout";
 }
-<div class="center">
-    <div class="ui-card auth-card">
-        <h1 class="h1">Access Denied</h1>
-        <p class="muted">You don't have permission.</p>
-        <a class="btn btn-primary" href="/Dashboard/Index">Back</a>
-    </div>
+
+<div class="alert alert-warning">
+    <h4 class="mb-2">Access Denied</h4>
+    <div>You do not have permission to access this page.</div>
 </div>
+
+<a class="btn btn-outline-primary" asp-controller="Account" asp-action="Login">Go to Login</a>

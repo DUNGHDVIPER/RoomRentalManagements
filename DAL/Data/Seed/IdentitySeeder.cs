@@ -4,7 +4,7 @@ namespace DAL.Seed;
 
 public static class IdentitySeeder
 {
-    public static readonly string[] Roles = ["Admin", "Host", "Customer"];
+    public static readonly string[] Roles = ["Admin", "Host", "Customer", "User"];
 
     public static async Task SeedAsync(
         RoleManager<IdentityRole> roleManager,
@@ -16,14 +16,20 @@ public static class IdentitySeeder
         {
             if (!await roleManager.RoleExistsAsync(role))
             {
-                await roleManager.CreateAsync(new IdentityRole(role));
+                var created = await roleManager.CreateAsync(new IdentityRole(role));
+                if (!created.Succeeded)
+                {
+                    var msg = string.Join("; ", created.Errors.Select(e => $"{e.Code}:{e.Description}"));
+                    throw new InvalidOperationException($"Create role '{role}' failed: {msg}");
+                }
             }
         }
 
-        // 2) Users
-        await EnsureUserAsync(userManager, "admin@demo.com", "Admin@12345!", "Admin", ct);
-        await EnsureUserAsync(userManager, "host@demo.com", "Host@12345!", "Host", ct);
-        await EnsureUserAsync(userManager, "customer@demo.com", "Customer@12345!", "Customer", ct);
+        // 2) Users (demo accounts)
+        await EnsureUserAsync(userManager, "admin@demo.com", "Admin@123!", "Admin", ct);
+        await EnsureUserAsync(userManager, "host@demo.com", "Host@123!", "Host", ct);
+        await EnsureUserAsync(userManager, "customer@demo.com", "Customer@123!", "Customer", ct);
+        await EnsureUserAsync(userManager, "user@demo.com", "User@123!", "User", ct);
     }
 
     private static async Task EnsureUserAsync(
@@ -34,6 +40,7 @@ public static class IdentitySeeder
         CancellationToken ct)
     {
         var user = await userManager.FindByEmailAsync(email);
+
         if (user == null)
         {
             user = new IdentityUser
@@ -50,8 +57,21 @@ public static class IdentitySeeder
                 throw new InvalidOperationException($"Create user '{email}' failed: {msg}");
             }
         }
+        else
+        {
+            // ✅ DEV ONLY: luôn reset password cho đúng demo password (tránh seed lệch giữa các project)
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var reset = await userManager.ResetPasswordAsync(user, token, password);
+            if (!reset.Succeeded)
+            {
+                var msg = string.Join("; ", reset.Errors.Select(e => $"{e.Code}:{e.Description}"));
+                throw new InvalidOperationException($"Reset password '{email}' failed: {msg}");
+            }
+        }
 
-        if (!await userManager.IsInRoleAsync(user, role))
+        // Add role if missing
+        var userRoles = await userManager.GetRolesAsync(user);
+        if (!userRoles.Contains(role))
         {
             var addRole = await userManager.AddToRoleAsync(user, role);
             if (!addRole.Succeeded)

@@ -1,5 +1,18 @@
-.vs/ 
-.vs/ 
-obj/ 
-*.user 
-*.suo 
+
+
+# Visual Studio
+.vs/
+bin/
+obj/
+
+# User specific
+*.user
+*.suo
+
+# Logs
+*.log
+
+# Rider / VSCode
+.idea/
+.vscode/
+

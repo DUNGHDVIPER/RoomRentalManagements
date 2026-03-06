@@ -1,0 +1,23 @@
+﻿@page
+@model WebHostRazor.Pages.Host.Contracts.ReminderScanModel
+@{
+    ViewData["Title"] = "Run Expiry Reminder Scan";
+}
+
+<h2>Run Expiry Reminder Scan</h2>
+
+@if (TempData["Ok"] != null)
+{
+    <div class="alert alert-success">@TempData["Ok"]</div>
+}
+@if (TempData["Err"] != null)
+{
+    <div class="alert alert-danger">@TempData["Err"]</div>
+}
+
+<form method="post" class="d-flex gap-2">
+    <input type="number" class="form-control" style="max-width:200px"
+           asp-for="DaysBeforeEnd" min="0" />
+    <button class="btn btn-primary" type="submit">Run scan now</button>
+    <a class="btn btn-secondary" asp-page="./Index">Back</a>
+</form>

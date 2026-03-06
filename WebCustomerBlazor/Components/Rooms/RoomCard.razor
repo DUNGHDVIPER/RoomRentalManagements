@@ -29,5 +29,10 @@
 </div>
 
 @code {
-    [Parameter] public RoomPublicDto Room { get; set; } = new();
+    [Parameter] public RoomPublicDto Room { get; set; } = new() 
+    { 
+        Name = "", 
+        City = "", 
+        District = "" 
+    };
 }

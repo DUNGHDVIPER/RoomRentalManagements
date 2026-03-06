@@ -1,0 +1,73 @@
+﻿@page
+@model WebHostRazor.Pages.Auth.RegisterModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Register</title>
+    <link rel="stylesheet" href="~/css/theme.css" />
+</head>
+<body class="bg-grad">
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div class="card p-18" style="max-width: 500px; width: 100%;">
+            <h1 style="text-align: center; margin-bottom: 20px;">Create Host Account</h1>
+
+            @if (!string.IsNullOrEmpty(Model.Error))
+            {
+                <div style="background: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                    @Model.Error
+                </div>
+            }
+
+            <form method="post">
+                @Html.AntiForgeryToken()
+
+                <div style="margin-bottom: 16px;">
+                    <label>Full Name *</label>
+                    <input class="input" asp-for="Form.FullName" />
+                    <span asp-validation-for="Form.FullName" style="color: red; font-size: 12px;"></span>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label>Email *</label>
+                    <input class="input" asp-for="Form.Email" type="email" />
+                    <span asp-validation-for="Form.Email" style="color: red; font-size: 12px;"></span>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label>Phone Number</label>
+                    <input class="input" asp-for="Form.PhoneNumber" />
+                    <span asp-validation-for="Form.PhoneNumber" style="color: red; font-size: 12px;"></span>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label>Password *</label>
+                    <input class="input" asp-for="Form.Password" type="password" />
+                    <span asp-validation-for="Form.Password" style="color: red; font-size: 12px;"></span>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label>Confirm Password *</label>
+                    <input class="input" asp-for="Form.ConfirmPassword" type="password" />
+                    <span asp-validation-for="Form.ConfirmPassword" style="color: red; font-size: 12px;"></span>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label>
+                        <input type="checkbox" asp-for="Form.AcceptTerms" />
+                        I accept the Terms and Conditions *
+                    </label>
+                    <span asp-validation-for="Form.AcceptTerms" style="color: red; font-size: 12px;"></span>
+                </div>
+
+                <button type="submit" class="btn-grad" style="width: 100%;">Create Account</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 16px;">
+                <a href="/Auth/Login">Already have an account? Sign In</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

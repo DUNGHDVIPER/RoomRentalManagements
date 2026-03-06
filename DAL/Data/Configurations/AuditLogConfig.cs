@@ -11,13 +11,12 @@ public class AuditLogConfig : IEntityTypeConfiguration<AuditLog>
         b.ToTable("AuditLogs");
         b.HasKey(x => x.Id);
 
-        b.Property(x => x.UserId).HasMaxLength(450);
+        b.Property(x => x.ActorUserId).HasMaxLength(450);
         b.Property(x => x.Action).HasMaxLength(50).IsRequired();
-        b.Property(x => x.EntityName).HasMaxLength(80).IsRequired();
-        b.Property(x => x.EntityKey).HasMaxLength(120);
-        b.Property(x => x.IpAddress).HasMaxLength(45); // IPv6 safe
-        b.Property(x => x.Description).HasMaxLength(2000);
+        b.Property(x => x.EntityType).HasMaxLength(80).IsRequired();
+        b.Property(x => x.EntityId).HasMaxLength(120);
+        b.Property(x => x.Note).HasMaxLength(2000);
 
-        b.HasIndex(x => new { x.UserId, x.Action, x.CreatedAt });
+        b.HasIndex(x => new { x.ActorUserId, x.Action, x.CreatedAt });
     }
 }
