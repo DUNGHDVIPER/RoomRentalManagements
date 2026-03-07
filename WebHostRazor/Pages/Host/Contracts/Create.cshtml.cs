@@ -23,12 +23,13 @@ public class CreateModel : PageModel
         if (Vm.StartDate == default) Vm.StartDate = DateTime.Today;
         if (Vm.EndDate == default) Vm.EndDate = DateTime.Today.AddMonths(6);
         Vm.ActivateNow = true;
+
     }
 
     public async Task<IActionResult> OnPostAsync(CancellationToken ct)
     {
         if (!ModelState.IsValid) return Page();
-
+        
         try
         {
             var dto = new CreateContractDto

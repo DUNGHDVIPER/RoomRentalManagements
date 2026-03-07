@@ -7,24 +7,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebHostRazor.Pages.Auth;
 
-public class LoginModel : PageModel
+public class LoginModel(
+    IAuthService authService,
+    UserManager<IdentityUser> userManager,
+    IConfiguration configuration,
+    ILogger<LoginModel> logger) : PageModel
 {
-    private readonly IAuthService _authService;
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<LoginModel> _logger;
-
-    public LoginModel(
-        IAuthService authService,
-        UserManager<IdentityUser> userManager,
-        IConfiguration configuration,
-        ILogger<LoginModel> logger)
-    {
-        _authService = authService;
-        _userManager = userManager;
-        _configuration = configuration;
-        _logger = logger;
-    }
+    private readonly IAuthService _authService = authService;
+    private readonly UserManager<IdentityUser> _userManager = userManager;
+    private readonly IConfiguration _configuration = configuration;
+    private readonly ILogger<LoginModel> _logger = logger;
 
     // Properties for the view to bind to
     [BindProperty]
@@ -75,23 +67,45 @@ public class LoginModel : PageModel
                 if (user != null)
                 {
                     var roles = await _userManager.GetRolesAsync(user);
+                    _logger.LogInformation("User {Email} logged in with roles: {Roles}", Email, string.Join(",", roles));
 
                     // Redirect admin to WebAdminMVC
                     if (roles.Contains("Admin") || roles.Contains("SuperAdmin"))
                     {
-                        var adminUrl = _configuration["AdminUrl"] ?? "https://localhost:7282";
+                        var adminUrl = _configuration["AdminUrl"] ?? "https://localhost:5220";
                         var token = GenerateSimpleToken(user.Email!, roles);
+                        _logger.LogInformation("Redirecting admin to: {AdminUrl}", adminUrl);
                         return Redirect($"{adminUrl}/Auth/AdminLogin?token={token}");
+                    }
+
+                    // Redirect users to WebCustomerBlazor (User homepage)
+                    if (roles.Contains("User") || roles.Contains("Customer"))
+                    {
+                        var customerUrl = _configuration["CustomerUrl"] ?? "https://localhost:5000";
+                        _logger.LogInformation("Redirecting user to customer portal: {CustomerUrl}", customerUrl);
+                        return Redirect($"{customerUrl}");
+                    }
+
+                    // Redirect hosts to Host dashboard
+                    if (roles.Contains("Host"))
+                    {
+                        _logger.LogInformation("Redirecting host to dashboard");
+                        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                        {
+                            return LocalRedirect(returnUrl);
+                        }
+                        return RedirectToPage("/Host/Profile/Index");
                     }
                 }
 
-                // Normal user redirect
+                // Default fallback redirect
+                _logger.LogWarning("No specific role redirect found for user {Email}, using default", Email);
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
                     return LocalRedirect(returnUrl);
                 }
 
-                return RedirectToPage("/Host/Profile/Index");
+                return RedirectToPage("/Index"); // Default home page
             }
 
             Error = result.Error ?? "Invalid login attempt.";

@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 namespace WebHostRazor.Pages.Host.Contracts.Wizard;
 public class Step1Model : PageModel
 {
-    private readonly MotelManagementDbContext _db;
-    public Step1Model(MotelManagementDbContext db) => _db = db;
+    private readonly AppDbContext _db;
+    public Step1Model(AppDbContext db) => _db = db;
 
     public List<(int RoomId, string RoomCode)> Rooms { get; set; } = [];
     public List<(int TenantId, string FullName)> Tenants { get; set; } = [];
@@ -18,13 +18,13 @@ public class Step1Model : PageModel
     public async Task OnGet()
     {
         Rooms = await _db.Rooms.AsNoTracking()
-            .OrderBy(r => r.RoomCode)
-            .Select(r => new ValueTuple<int, string>(r.RoomId, r.RoomCode))
+            .OrderBy(r => r.RoomNo)
+            .Select(r => new ValueTuple<int, string>(r.Id, r.RoomNo))
             .ToListAsync();
 
         Tenants = await _db.Tenants.AsNoTracking()
             .OrderBy(t => t.FullName)
-            .Select(t => new ValueTuple<int, string>(t.TenantId, t.FullName))
+            .Select(t => new ValueTuple<int, string>(t.Id, t.FullName))
             .ToListAsync();
     }
 

@@ -1,121 +1,41 @@
-<<<<<<< HEAD
-﻿using BLL.Services;
-using BLL.Services.Interfaces;
-using DAL.Data;
-=======
-<<<<<<< HEAD
-﻿using BLL;
 using BLL.Services;
 using BLL.Services.Interfaces;
 using DAL.Data;
-using DAL.Seed;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-=======
-﻿using BLL.Services.Interfaces;
-using BLL.Services;
 using DAL.Repositories;
-using Microsoft.AspNetCore.Authorization;
->>>>>>> origin/main
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using QuestPDF.Infrastructure;
-using WebCustomer.Blazor.Seed;
-<<<<<<< HEAD
-using WebHostRazor.BackgroundJobs;
 using Microsoft.Extensions.FileProviders;
-=======
-using WebHostRazor;
-using DAL.Data;
-
->>>>>>> origin/main
->>>>>>> origin/main
+using QuestPDF.Infrastructure;
+using DAL.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Logging
 builder.Logging.AddConsole();
-builder.Logging.SetMinimumLevel(LogLevel.Debug);
+builder.Logging.SetMinimumLevel(LogLevel.Information);
 
-builder.Services.AddDal(builder.Configuration);
-builder.Services.AddBll(builder.Configuration);
+// ✅ Razor Pages
+builder.Services.AddRazorPages();
 
-builder.Services.AddScoped<IEmailService, EmailService>();
-
-builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
-{
-});
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAdminMVC", policy =>
-    {
-        policy.WithOrigins(
-            "https://localhost:7282",
-            "http://localhost:5220",
-            "https://localhost:5220"
-        )
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials();
-    });
-});
-
+// Authorization
 builder.Services.AddAuthorization(o =>
 {
     o.AddPolicy("Host", p => p.RequireRole("Host"));
     o.AddPolicy("AdminOrHost", p => p.RequireRole("Admin", "Host", "SuperAdmin"));
 });
 
-builder.Services.AddRazorPages(options =>
-{
-    options.Conventions.AuthorizeFolder("/Host", "AdminOrHost");
-    options.Conventions.AllowAnonymousToFolder("/Auth");
-    options.Conventions.AllowAnonymousToFolder("/Debug");
-});
-
-<<<<<<< HEAD
-QuestPDF.Settings.License = LicenseType.Community;
-
-// ✅ Motel DB (DB thật) => dùng cho nghiệp vụ Contracts/Rooms/...
-builder.Services.AddDbContext<MotelManagementDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// ✅ Identity DB (FE-only) => InMemory (seed users/roles)
-builder.Services.AddDbContext<AuthDbContext>(opt =>
-    opt.UseInMemoryDatabase("HostPortalAuth"));
-=======
-<<<<<<< HEAD
-=======
-builder.Services.AddCascadingAuthenticationState();
-// Tenants
-builder.Services.AddScoped<ITenantService, TenantService>();
-builder.Services.AddScoped<ITenantRepository, TenantRepository>();
-
-// Rooms
-builder.Services.AddScoped<IRoomService, RoomService>();
-builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
-// EF InMemory + Identity (FE-only)
-//builder.Services.AddDbContext<AuthDbContext>(opt =>
-//    opt.UseInMemoryDatabase("HostPortalAuth"));
-
-//builder.Services
-//    .AddIdentity<IdentityUser, IdentityRole>(opt =>
-//    {
-//        opt.Password.RequireNonAlphanumeric = false;
-//        opt.Password.RequiredLength = 6;
-//    })
-//    .AddEntityFrameworkStores<AuthDbContext>()
-//    .AddDefaultTokenProviders();
-
-//builder.Services.AddDbContext<AppDbContext>(opt =>
-//    opt.UseInMemoryDatabase("HostPortalApp"));
+// DbContext with retry logic for transient failures
+var cs = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
->>>>>>> origin/main
+    opt.UseSqlServer(cs, sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
+    }));
 
-// ✅ Identity (RoleManager/UserManager)
+// Identity
 builder.Services
     .AddIdentity<IdentityUser, IdentityRole>(opt =>
     {
@@ -127,12 +47,7 @@ builder.Services
     })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
-<<<<<<< HEAD
 
-// Cookie paths
-=======
->>>>>>> origin/main
->>>>>>> origin/main
 builder.Services.ConfigureApplicationCookie(opt =>
 {
     opt.LoginPath = "/Auth/Login";
@@ -141,27 +56,76 @@ builder.Services.ConfigureApplicationCookie(opt =>
     opt.SlidingExpiration = true;
 });
 
-<<<<<<< HEAD
-// ✅ BLL services
-builder.Services.Configure<HostOptions>(o =>
-{
-    o.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
-});
-
+// BLL + Repo
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITenantService, TenantService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
+builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 
-// ✅ HostedService
-builder.Services.AddHostedService<ContractExpiryReminderHostedService>();
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAdminMVC", policy =>
+    {
+        policy.WithOrigins("https://localhost:7282", "http://localhost:5220", "https://localhost:5220")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 
-=======
->>>>>>> origin/main
+QuestPDF.Settings.License = LicenseType.Community;
+
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// Database migration and seeding with proper error handling
+try
 {
-    app.UseDeveloperExceptionPage();
+    await using (var scope = app.Services.CreateAsyncScope())
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        logger.LogInformation("Checking database connection...");
+
+        if (!await db.Database.CanConnectAsync())
+        {
+            logger.LogInformation("Database not accessible, creating database...");
+            await db.Database.EnsureCreatedAsync();
+        }
+
+        logger.LogInformation("Starting database migration...");
+        await db.Database.MigrateAsync();
+        logger.LogInformation("Database migration completed successfully.");
+
+        var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+        logger.LogInformation("Starting identity seeding...");
+        await IdentitySeeder.SeedAsync(roleMgr, userMgr);
+        logger.LogInformation("Identity seeding completed successfully.");
+    }
 }
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred during database migration or seeding");
+
+    if (app.Environment.IsDevelopment())
+    {
+        Console.WriteLine($"Database Error: {ex.Message}");
+        Console.WriteLine("Make sure your SQL Server is running and the connection string is correct.");
+        throw;
+    }
+}
+
+
+if (app.Environment.IsDevelopment())
+    app.UseDeveloperExceptionPage();
 else
 {
     app.UseExceptionHandler("/Error");
@@ -170,34 +134,25 @@ else
 
 app.UseHttpsRedirection();
 
+// Static files
 app.UseStaticFiles();
-<<<<<<< HEAD
+
+// SharedUploads -> /uploads
 var sharedUploadsPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
 Directory.CreateDirectory(sharedUploadsPath);
-
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(sharedUploadsPath),
     RequestPath = "/uploads"
 });
-=======
->>>>>>> origin/main
 
 app.UseRouting();
-
 app.UseCors("AllowAdminMVC");
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
-<<<<<<< HEAD
-// ✅ seed roles/users (Identity chạy trên AuthDbContext InMemory)
-await app.SeedIdentityAsync();
-
-app.MapRazorPages();
-=======
+// ✅ Razor Pages endpoints
 app.MapRazorPages();
 
->>>>>>> origin/main
 app.Run();

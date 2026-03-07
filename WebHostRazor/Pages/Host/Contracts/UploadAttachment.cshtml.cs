@@ -4,20 +4,15 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace WebHostRazor.Pages.Host.Contracts;
 
-public class UploadAttachmentModel : PageModel
+public class UploadAttachmentModel(IContractService service, IWebHostEnvironment env) : PageModel
 {
-    private readonly IContractService _service;
-    private readonly IWebHostEnvironment _env;
+    private readonly IContractService _service = service;
+    private readonly IWebHostEnvironment _env = env;
 
-    public UploadAttachmentModel(IContractService service, IWebHostEnvironment env)
-    {
-        _service = service;
-        _env = env;
-    }
+    [BindProperty]
+    public new IFormFile? File { get; set; }
 
-    [BindProperty] public IFormFile? File { get; set; }
-
-    public IActionResult OnGet(long id) => Page();
+    public IActionResult OnGet() => Page();
 
     public async Task<IActionResult> OnPost(long id)
     {
@@ -41,10 +36,8 @@ public class UploadAttachmentModel : PageModel
         var storedName = $"{Guid.NewGuid():N}_{safeFileName}";
         var fullPath = Path.Combine(sharedContractsDir, storedName);
 
-        await using (var stream = System.IO.File.Create(fullPath))
-        {
-            await File.CopyToAsync(stream);
-        }
+        await using var stream = System.IO.File.Create(fullPath);
+        await File.CopyToAsync(stream);
 
         var url = $"/uploads/contracts/{storedName}"; // ✅ URL chung
         await _service.AddAttachmentStubAsync((int)id, safeFileName, url);
