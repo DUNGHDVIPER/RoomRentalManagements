@@ -13,7 +13,7 @@ using FloorEntity = DAL.Entities.Property.Floor;
 using RoomAmenityEntity = DAL.Entities.Property.RoomAmenity;
 using RoomEntity = DAL.Entities.Property.Room;
 using RoomImageEntity = DAL.Entities.Property.RoomImage;
-using RoomPricingHistoryEntity = DAL.Entities.Property.RoomPriceHistory;
+using RoomPricingHistoryEntity = DAL.Entities.Property.RoomPricingHistory;
 
 namespace DAL.Data;
 
@@ -66,10 +66,7 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
             .HasKey(x => new { x.RoomId, x.AmenityId });
 
         // Scan config đúng folder
-        modelBuilder.ApplyConfigurationsFromAssembly(
-            typeof(AppDbContext).Assembly,
-            t => t.Namespace != null && t.Namespace == "DAL.Data.Configurations"
-        );
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         // ✅ FIX: Room map đúng table
         modelBuilder.Entity<DAL.Entities.Property.Room>()

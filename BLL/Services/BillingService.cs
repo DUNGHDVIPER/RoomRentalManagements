@@ -24,7 +24,7 @@ public class BillingService : IBillingService
         => throw new NotImplementedException();
 
     public Task UpdateBillStatusAsync(int billId, int status, CancellationToken ct = default)
-        => throw new NotImplementedException();
+         => throw new NotImplementedException();
 
     public Task<BillDto> PreviewBillStubAsync(int contractId, int period, CancellationToken ct = default)
         => throw new NotImplementedException();

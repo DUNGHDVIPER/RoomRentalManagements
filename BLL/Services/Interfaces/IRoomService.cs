@@ -1,6 +1,7 @@
 ﻿using BLL.Common;
 using BLL.DTOs.Room;
-using BLL.Dtos;
+using BLL.DTOs;
+using BLL.DTOs.Property;
 
 
 namespace BLL.Services.Interfaces;

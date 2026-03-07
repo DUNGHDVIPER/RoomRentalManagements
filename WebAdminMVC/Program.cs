@@ -1,6 +1,8 @@
 using BLL.Services;
 using BLL.Services.Interfaces;
+
 using DAL.Data;
+using DAL.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -24,9 +26,13 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 // =====================
 // 3) BLL services
 // =====================
+builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
-
+builder.Services.AddScoped<IBlockService, BlockService>();
+builder.Services.AddScoped<IBlockRepository, BlockRepository>();
+builder.Services.AddScoped<IFloorService, FloorService>();
+builder.Services.AddScoped<IFloorRepository, FloorRepository>();
 // (Nếu bạn có EmailService dùng trong WebAdminMVC thì mở dòng này)
 // builder.Services.AddScoped<IEmailService, EmailService>();
 

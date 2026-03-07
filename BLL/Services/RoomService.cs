@@ -1,161 +1,141 @@
-﻿using BLL.ApiClients;
-using BLL.Common;
-using BLL.Dtos;
+﻿using BLL.Common;
+using BLL.DTOs;
+using BLL.DTOs.Property;
 using BLL.DTOs.Room;
 using BLL.Services.Interfaces;
 using DAL.Data;
+using DAL.Entities.Property;
 using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Services;
 
 public class RoomService : IRoomService
 {
-    //private readonly MockApiClient _api;
-
-    //public RoomService(MockApiClient api)
-    //{
-    //    _api = api;
-    //}
     private readonly AppDbContext _context;
 
     public RoomService(AppDbContext context)
     {
         _context = context;
     }
-    public Task AddRoomImagesAsync(int roomId, string[] imageUrls, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
 
-    public Task AddRoomPriceHistoryAsync(int roomId, RoomPriceHistoryDto dto, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
+    // ================== ROOMS ==================
 
-    public Task<BlockDto> CreateBlockAsync(BlockDto dto, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<RoomDto> CreateRoomAsync(CreateRoomDto dto, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task DeleteBlockAsync(int id, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task DeleteRoomAsync(int roomId, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    //public async Task<IReadOnlyList<RoomDto>> GetAllAsync(CancellationToken ct = default)
-    //{
-    //    var rooms = await _api.GetAsync<List<RoomDto>>("/rooms", ct);
-    //    return rooms ?? [];
-    //}
-
-    //public Task<string?> GetAllAsync()
-    //{
-    //    throw new NotImplementedException();
-    //}
-
-    public Task<List<AmenityDto>> GetAmenitiesAsync(CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<BlockDto>> GetBlocksAsync(CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    //public async Task<RoomDto?> GetByIdAsync(Guid id, CancellationToken ct = default)
-    //{
-    //    return await _api.GetAsync<RoomDto>($"/rooms/{id}", ct);
-    //}
     public async Task<List<RoomDto>> GetAllAsync(CancellationToken ct = default)
     {
         return await _context.Rooms
-            .Select(r => new RoomDto
-            {
-                Id = r.Id,
-                RoomNo = r.RoomNo,
-                Name = r.Name,
-                Price = r.BasePrice,              // sửa
-                Status = r.Status.ToString()      // enum → string
-            })
+            .AsNoTracking()
+            .Select(r => MapToDto(r))
             .ToListAsync(ct);
-    }
-
-    public async Task<RoomDto?> GetByIdAsync(int id, CancellationToken ct = default)
-    {
-        return await _context.Rooms
-            .Where(r => r.Id == id)
-            .Select(r => new RoomDto
-            {
-                Id = r.Id,
-                RoomNo = r.RoomNo,
-                Name = r.Name,
-                Price = r.BasePrice,
-                Status = r.Status.ToString()
-            })
-            .FirstOrDefaultAsync(ct);
     }
 
     public async Task<RoomDto> GetRoomDetailAsync(int roomId, CancellationToken ct = default)
     {
         var room = await _context.Rooms
-            .FirstOrDefaultAsync(r => r.Id == roomId, ct);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.RoomId == roomId, ct);
 
         if (room == null)
             throw new Exception("Room not found");
 
-        return new RoomDto
+        return MapToDto(room);
+    }
+
+    public async Task<RoomDto> CreateRoomAsync(CreateRoomDto dto, CancellationToken ct = default)
+    {
+        var room = new Room
         {
-            Id = room.Id,
-            RoomNo = room.RoomNo,
-            Name = room.Name,
-            Price = room.BasePrice,
-            Status = room.Status.ToString()
+            FloorId = dto.FloorId,
+            RoomCode = dto.RoomCode,
+            RoomName = dto.RoomName,
+            AreaM2 = dto.AreaM2,
+            MaxOccupants = dto.MaxOccupants,
+            Status = dto.Status,
+            CurrentBasePrice = dto.CurrentBasePrice,
+            Description = dto.Description
         };
+
+        _context.Rooms.Add(room);
+        await _context.SaveChangesAsync(ct);
+
+        return MapToDto(room);
     }
 
-    public Task<List<FloorDto>> GetFloorsByBlockAsync(int blockId, CancellationToken ct = default)
+    public async Task<RoomDto> UpdateRoomAsync(int roomId, UpdateRoomDto dto, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var room = await _context.Rooms.FirstOrDefaultAsync(r => r.RoomId == roomId, ct);
+        if (room == null)
+            throw new Exception("Room not found");
+
+        room.RoomName = dto.RoomName;
+        room.AreaM2 = dto.AreaM2;
+        room.MaxOccupants = dto.MaxOccupants;
+        room.Status = dto.Status;
+        room.CurrentBasePrice = dto.CurrentBasePrice;
+        room.Description = dto.Description;
+
+        await _context.SaveChangesAsync(ct);
+        return MapToDto(room);
     }
 
-    public Task<List<RoomPriceHistoryDto>> GetRoomPriceHistoryAsync(int roomId, CancellationToken ct = default)
+    public async Task DeleteRoomAsync(int roomId, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var room = await _context.Rooms.FirstOrDefaultAsync(r => r.RoomId == roomId, ct);
+        if (room == null) return;
+
+        _context.Rooms.Remove(room);
+        await _context.SaveChangesAsync(ct);
     }
 
-    public Task<PagedResultDto<RoomDto>> GetRoomsAsync(FilterRoomDto filter, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
+    // ================== NOT IMPLEMENTED YET ==================
 
-    public Task RemoveRoomImageAsync(int imageId, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
+    public Task<List<BlockDto>> GetBlocksAsync(CancellationToken ct = default)
+        => throw new NotImplementedException();
 
-    public Task SetRoomAmenitiesAsync(int roomId, int[] amenityIds, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
+    public Task<BlockDto> CreateBlockAsync(BlockDto dto, CancellationToken ct = default)
+        => throw new NotImplementedException();
 
     public Task<BlockDto> UpdateBlockAsync(int id, BlockDto dto, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 
-    public Task<RoomDto> UpdateRoomAsync(int roomId, UpdateRoomDto dto, CancellationToken ct = default)
+    public Task DeleteBlockAsync(int id, CancellationToken ct = default)
+        => throw new NotImplementedException();
+
+    public Task<List<FloorDto>> GetFloorsByBlockAsync(int blockId, CancellationToken ct = default)
+        => throw new NotImplementedException();
+
+    public Task<PagedResultDto<RoomDto>> GetRoomsAsync(FilterRoomDto filter, CancellationToken ct = default)
+        => throw new NotImplementedException();
+
+    public Task AddRoomImagesAsync(int roomId, string[] imageUrls, CancellationToken ct = default)
+        => throw new NotImplementedException();
+
+    public Task RemoveRoomImageAsync(int imageId, CancellationToken ct = default)
+        => throw new NotImplementedException();
+
+    public Task<List<AmenityDto>> GetAmenitiesAsync(CancellationToken ct = default)
+        => throw new NotImplementedException();
+
+    public Task SetRoomAmenitiesAsync(int roomId, int[] amenityIds, CancellationToken ct = default)
+        => throw new NotImplementedException();
+
+    public Task AddRoomPriceHistoryAsync(int roomId, RoomPriceHistoryDto dto, CancellationToken ct = default)
+        => throw new NotImplementedException();
+
+    public Task<List<RoomPriceHistoryDto>> GetRoomPriceHistoryAsync(int roomId, CancellationToken ct = default)
+        => throw new NotImplementedException();
+
+    // ================== MAPPER ==================
+
+    private static RoomDto MapToDto(Room r) => new()
     {
-        throw new NotImplementedException();
-    }
+        RoomId = r.RoomId,
+        FloorId = r.FloorId,
+        RoomCode = r.RoomCode,
+        RoomName = r.RoomName,
+        AreaM2 = r.AreaM2,
+        MaxOccupants = r.MaxOccupants,
+        Status = r.Status,
+        CurrentBasePrice = r.CurrentBasePrice,
+        Description = r.Description
+    };
 }
