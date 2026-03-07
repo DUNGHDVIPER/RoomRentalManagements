@@ -1,14 +1,12 @@
-﻿namespace BLL.DTOs.Room;
+﻿namespace WebAdmin.MVC.Models.Rooms;
 
-public class RoomPriceHistoryDto
+public class RoomPriceHistoryVm
 {
     public decimal OldPrice { get; set; }
 
     public decimal NewPrice { get; set; }
 
     public DateTime ChangedAt { get; set; }
-
-    public int? ChangedByUserId { get; set; }
 
     public string? Note { get; set; }
 }

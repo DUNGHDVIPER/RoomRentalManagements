@@ -21,12 +21,16 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    // System
+    // =========================
+    // SYSTEM
+    // =========================
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<NotificationRecipient> NotificationRecipients => Set<NotificationRecipient>();
 
-    // Property
+    // =========================
+    // PROPERTY
+    // =========================
     public DbSet<BlockEntity> Blocks => Set<BlockEntity>();
     public DbSet<FloorEntity> Floors => Set<FloorEntity>();
     public DbSet<RoomEntity> Rooms => Set<RoomEntity>();
@@ -35,13 +39,17 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
     public DbSet<RoomImageEntity> RoomImages => Set<RoomImageEntity>();
     public DbSet<RoomPricingHistoryEntity> RoomPricingHistories => Set<RoomPricingHistoryEntity>();
 
-    // Tenanting
+    // =========================
+    // TENANTING
+    // =========================
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<TenantIdDoc> TenantIdDocs => Set<TenantIdDoc>();
     public DbSet<StayHistory> StayHistories => Set<StayHistory>();
     public DbSet<RoomResident> RoomResidents => Set<RoomResident>();
 
-    // Contracts
+    // =========================
+    // CONTRACTS
+    // =========================
     public DbSet<Contract> Contracts => Set<Contract>();
     public DbSet<ContractAttachment> ContractAttachments => Set<ContractAttachment>();
     public DbSet<ContractVersion> ContractVersions => Set<ContractVersion>();
@@ -49,56 +57,63 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
     public DbSet<ContractReminder> ContractReminders => Set<ContractReminder>();
     public DbSet<ContractReminderLog> ContractReminderLogs => Set<ContractReminderLog>();
 
-    // Billing
+    // =========================
+    // BILLING
+    // =========================
     public DbSet<Bill> Bills => Set<Bill>();
     public DbSet<BillItem> BillItems => Set<BillItem>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<BillStatusHistory> BillStatusHistories => Set<BillStatusHistory>();
 
-    // Maintenance (Ticket) - nếu bạn có
+    // =========================
+    // MAINTENANCE
+    // =========================
     public DbSet<DAL.Entities.Maintenance.Ticket> Tickets => Set<DAL.Entities.Maintenance.Ticket>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
+        // Composite key RoomAmenity
         modelBuilder.Entity<RoomAmenityEntity>()
             .HasKey(x => new { x.RoomId, x.AmenityId });
 
-        // Scan config đúng folder
+        // Load entity configuration automatically
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
-        // ✅ FIX: Room map đúng table
-        modelBuilder.Entity<DAL.Entities.Property.Room>()
+        // Map Room -> table Rooms
+        modelBuilder.Entity<RoomEntity>()
             .ToTable("Rooms", "dbo");
 
-        // ✅ FIX: Contract -> PK identity ContractId, ignore base Id
-        modelBuilder.Entity<DAL.Entities.Contracts.Contract>(e =>
+        // =========================
+        // CONTRACT FIX
+        // =========================
+        modelBuilder.Entity<Contract>(e =>
         {
-            e.Ignore(x => x.Id);                 // bỏ Id từ AuditableEntity<long>
-            e.HasKey(x => x.ContractId);         // PK = ContractId
+            e.Ignore(x => x.Id);
+            e.HasKey(x => x.ContractId);
+
             e.Property(x => x.ContractId)
-                .ValueGeneratedOnAdd();          // Identity
+                .ValueGeneratedOnAdd();
         });
 
-        // ✅ FIX: ContractVersion -> PK identity VersionId, ignore base Id
-        modelBuilder.Entity<DAL.Entities.Contracts.ContractVersion>(e =>
+        modelBuilder.Entity<ContractVersion>(e =>
         {
-                        // nếu ContractVersion có Id từ AuditableEntity<long>
-            e.HasKey(x => x.VersionId);          // PK = VersionId
+            e.HasKey(x => x.VersionId);
+
             e.Property(x => x.VersionId)
-                .ValueGeneratedOnAdd();          // Identity
+                .ValueGeneratedOnAdd();
         });
-        modelBuilder.Entity<DAL.Entities.System.AuditLog>(e =>
+
+        // =========================
+        // AUDIT LOG FIX
+        // =========================
+        modelBuilder.Entity<AuditLog>(e =>
         {
-            // ✅ PK đúng là Id (identity)
             e.HasKey(x => x.Id);
             e.Property(x => x.Id).ValueGeneratedOnAdd();
-
-            // ✅ AuditLogId đang NOT NULL nhưng không identity -> xử lý ở bước 2 (DB default)
         });
 
-        // Audit json -> nvarchar(max)
         modelBuilder.Entity<AuditLog>()
             .Property(x => x.OldValueJson)
             .HasColumnType("nvarchar(max)");
@@ -107,6 +122,9 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
             .Property(x => x.NewValueJson)
             .HasColumnType("nvarchar(max)");
 
+        // =========================
+        // USER ROLE RELATION
+        // =========================
         modelBuilder.Entity<UserRole>()
             .HasKey(x => new { x.UserId, x.RoleId });
 
@@ -120,6 +138,9 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
             .WithMany(r => r.UserRoles)
             .HasForeignKey(x => x.RoleId);
 
+        // =========================
+        // UTILITY READING PRECISION
+        // =========================
         modelBuilder.Entity<UtilityReading>(e =>
         {
             e.Property(x => x.ElectricKwh).HasPrecision(18, 3);

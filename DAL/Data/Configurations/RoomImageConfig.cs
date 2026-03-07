@@ -10,8 +10,8 @@ public class RoomImageConfig : IEntityTypeConfiguration<RoomImage>
     {
         b.ToTable("RoomImages");
 
-        b.HasKey(x => x.Id);
-        b.Property(x => x.Id)
+        b.HasKey(x => x.ImageId);
+        b.Property(x => x.ImageId)
             .HasColumnName("ImageId");
 
         b.Property(x => x.RoomId)

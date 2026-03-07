@@ -26,6 +26,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 // =====================
 // 3) BLL services
 // =====================
+builder.Services.AddScoped<CloudinaryService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IAuditService, AuditService>();

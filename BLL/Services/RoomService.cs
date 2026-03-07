@@ -63,8 +63,24 @@ public class RoomService : IRoomService
     public async Task<RoomDto> UpdateRoomAsync(int roomId, UpdateRoomDto dto, CancellationToken ct = default)
     {
         var room = await _context.Rooms.FirstOrDefaultAsync(r => r.RoomId == roomId, ct);
+
         if (room == null)
             throw new Exception("Room not found");
+
+        // Detect price change
+        if (room.CurrentBasePrice != dto.CurrentBasePrice)
+        {
+            var history = new RoomPricingHistory
+            {
+                RoomId = roomId,
+                OldPrice = room.CurrentBasePrice,
+                NewPrice = dto.CurrentBasePrice,
+                ChangedAt = DateTime.UtcNow,
+                Note = "Price updated"
+            };
+
+            _context.RoomPricingHistories.Add(history);
+        }
 
         room.RoomName = dto.RoomName;
         room.AreaM2 = dto.AreaM2;
@@ -74,16 +90,55 @@ public class RoomService : IRoomService
         room.Description = dto.Description;
 
         await _context.SaveChangesAsync(ct);
+
         return MapToDto(room);
     }
 
     public async Task DeleteRoomAsync(int roomId, CancellationToken ct = default)
     {
         var room = await _context.Rooms.FirstOrDefaultAsync(r => r.RoomId == roomId, ct);
-        if (room == null) return;
+
+        if (room == null)
+            return;
 
         _context.Rooms.Remove(room);
+
         await _context.SaveChangesAsync(ct);
+    }
+
+    // ================== PRICE HISTORY ==================
+
+    public async Task AddRoomPriceHistoryAsync(int roomId, RoomPriceHistoryDto dto, CancellationToken ct = default)
+    {
+        var history = new RoomPricingHistory
+        {
+            RoomId = roomId,
+            OldPrice = dto.OldPrice,
+            NewPrice = dto.NewPrice,
+            ChangedAt = DateTime.UtcNow,
+            ChangedByUserId = dto.ChangedByUserId,
+            Note = dto.Note
+        };
+
+        _context.RoomPricingHistories.Add(history);
+
+        await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task<List<RoomPriceHistoryDto>> GetRoomPriceHistoryAsync(int roomId, CancellationToken ct = default)
+    {
+        return await _context.RoomPricingHistories
+            .Where(x => x.RoomId == roomId)
+            .OrderByDescending(x => x.ChangedAt)
+            .Select(x => new RoomPriceHistoryDto
+            {
+                OldPrice = x.OldPrice,
+                NewPrice = x.NewPrice,
+                ChangedAt = x.ChangedAt,
+                ChangedByUserId = x.ChangedByUserId,
+                Note = x.Note
+            })
+            .ToListAsync(ct);
     }
 
     // ================== NOT IMPLEMENTED YET ==================
@@ -116,12 +171,6 @@ public class RoomService : IRoomService
         => throw new NotImplementedException();
 
     public Task SetRoomAmenitiesAsync(int roomId, int[] amenityIds, CancellationToken ct = default)
-        => throw new NotImplementedException();
-
-    public Task AddRoomPriceHistoryAsync(int roomId, RoomPriceHistoryDto dto, CancellationToken ct = default)
-        => throw new NotImplementedException();
-
-    public Task<List<RoomPriceHistoryDto>> GetRoomPriceHistoryAsync(int roomId, CancellationToken ct = default)
         => throw new NotImplementedException();
 
     // ================== MAPPER ==================
