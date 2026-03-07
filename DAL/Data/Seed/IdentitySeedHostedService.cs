@@ -19,7 +19,7 @@ public class IdentitySeedHostedService : IHostedService
     {
         using var scope = _scopeFactory.CreateScope();
 
-        var db = scope.ServiceProvider.GetRequiredService<MotelManagementDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         await db.Database.MigrateAsync(cancellationToken);
 
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();

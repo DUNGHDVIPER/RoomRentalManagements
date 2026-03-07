@@ -4,9 +4,13 @@
     ViewData["Title"] = "Contract Versions";
 }
 
-@if (TempData["Err"] != null)
+@if (TempData["Err"] is string err && !string.IsNullOrWhiteSpace(err))
 {
-    <div class="alert alert-danger">@TempData["Err"]</div>
+    <div class="alert alert-danger">@err</div>
+}
+@if (TempData["Ok"] is string ok && !string.IsNullOrWhiteSpace(ok))
+{
+    <div class="alert alert-success">@ok</div>
 }
 
 <h2>Versions - Contract #@Model.ContractId</h2>
@@ -15,37 +19,42 @@
     <a class="btn btn-secondary" asp-page="./Details" asp-route-id="@Model.ContractId">Back</a>
 </p>
 
-@if (Model.Items.Count == 0)
+@if (Model.Versions == null || Model.Versions.Count == 0)
 {
     <div class="alert alert-info">No versions yet.</div>
 }
 else
 {
-    <div class="accordion" id="verAcc">
-        @for (int i = 0; i < Model.Items.Count; i++)
-        {
-            var v = Model.Items[i];
-            var collapseId = $"c{i}";
-            var headingId = $"h{i}";
-
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="@headingId">
-                    <button class="accordion-button collapsed" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#@collapseId">
-                        v@v.VersionNumber
-                        &nbsp;|&nbsp; @v.ChangedAt.ToString("yyyy-MM-dd HH:mm")
-                        &nbsp;|&nbsp; user: @(v.ChangedByUserId?.ToString() ?? "-")
-                        &nbsp;|&nbsp; @v.ChangeNote
-                    </button>
-                </h2>
-                <div id="@collapseId" class="accordion-collapse collapse" data-bs-parent="#verAcc">
-                    <div class="accordion-body">
-                        <pre class="bg-light p-3 rounded" style="max-height: 420px; overflow:auto;">
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th style="width:120px;">Version</th>
+                    <th style="width:180px;">ChangedAt</th>
+                    <th style="width:160px;">ChangedByUserId</th>
+                    <th>ChangeNote</th>
+                    <th style="width:220px;">Snapshot</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var v in Model.Versions)
+                {
+                    <tr>
+                        <td>@v.VersionNumber</td>
+                        <td>@v.ChangedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@(v.ChangedByUserId?.ToString() ?? "-")</td>
+                        <td>@(string.IsNullOrWhiteSpace(v.ChangeNote) ? "-" : v.ChangeNote)</td>
+                        <td>
+                            <details>
+                                <summary>View</summary>
+                                <pre class="bg-light p-2 rounded" style="max-height:420px; overflow:auto; white-space:pre-wrap;">
         @v.SnapshotJson
-                                </pre>
-                    </div>
-                </div>
-            </div>
-        }
+                                        </pre>
+                            </details>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 }

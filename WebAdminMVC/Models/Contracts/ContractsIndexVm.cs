@@ -15,6 +15,10 @@ public class ContractsIndexVm
     public int TotalPages => (int)Math.Ceiling(Total / (double)PageSize);
 
     public List<ContractRowVm> Items { get; set; } = new();
+    public int? RoomId { get; set; }
+    public int? TenantId { get; set; }
+    public DateTime? DateFrom { get; set; }
+    public DateTime? DateTo { get; set; }
 }
 
 public class ContractRowVm
@@ -35,4 +39,7 @@ public class ContractRowVm
     // nếu Status DB là string thì giữ string; nếu là int thì đổi sang int
     /*public string Status { get; set; } = "";*/
     public bool IsActive { get; set; }
+    public string? BlockName { get; set; }
+    public string? FloorName { get; set; }
+    public string? RoomNo { get; set; }
 }

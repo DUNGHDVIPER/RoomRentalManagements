@@ -1,13 +1,22 @@
-﻿using DAL.Entities.Common;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DAL.Entities.Contracts;
 
-public class ContractReminder : AuditableEntity<int>
+public class ContractReminder
 {
-    public int ContractId { get; set; }
+    [Key]
+    public int Id { get; set; }
+
+    public long ContractId { get; set; }
+
+    [MaxLength(30)]
+    public string Type { get; set; } = null!;
+
     public DateTime RemindAt { get; set; }
-    public string Type { get; set; } = "Expiry"; // Expiry/Payment/Other
+
     public bool IsSent { get; set; }
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public Contract Contract { get; set; } = null!;
 }

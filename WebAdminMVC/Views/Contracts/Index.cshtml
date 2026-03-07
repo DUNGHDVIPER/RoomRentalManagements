@@ -5,8 +5,15 @@
     Layout = "_Layout";
 }
 
-<h2 class="mb-3">Contracts</h2>
-
+<div class="d-flex align-items-center gap-2 mb-3">
+    <h2 class="m-0">Contracts</h2>
+    <span class="badge bg-danger">ADMIN MODE – System-wide</span>
+</div>
+@{
+    ViewData["Title"] = "Contracts";
+    Layout = "_Layout";
+    var today = DateTime.Today;
+}
 @if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
 {
     <div class="alert alert-danger">@err</div>
@@ -52,7 +59,10 @@
         Page <strong>@Model.Page</strong> / <strong>@(Model.TotalPages)</strong> —
         Total <strong>@Model.Total</strong> items
     </div>
-    <a class="btn btn-success" asp-action="Create">+ Create</a>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary" asp-action="ReminderScan">Reminder Scan</a>
+        <a class="btn btn-success" asp-action="Create">+ Create</a>
+    </div>
 </div>
 
 <div class="table-responsive">
@@ -122,6 +132,16 @@
                                 Details
                             </a>
                         </td>
+                        @if (c.Status == 1 && c.EndDate.Date < today)
+                        {
+                            <form asp-action="ForceExpire" asp-route-id="@c.ContractId" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-sm btn-outline-danger" type="submit"
+                                        onclick="return confirm('Force expire this contract?');">
+                                    Force Expire
+                                </button>
+                            </form>
+                        }
                     </tr>
                 }
             }

@@ -19,8 +19,8 @@ public static class DependencyInjectionMotelManagement
                  ?? configuration.GetConnectionString("DefaultConnection")
                  ?? throw new InvalidOperationException("Missing connection string: MotelManagementDB (or DefaultConnection)");
 
-        services.AddDbContext<MotelManagementDbContext>(opt =>
-            opt.UseSqlServer(cs, sql => sql.MigrationsAssembly(typeof(MotelManagementDbContext).Assembly.FullName)));
+        services.AddDbContext<AppDbContext>(opt =>
+            opt.UseSqlServer(cs, sql => sql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
         return services;
     }

@@ -16,11 +16,16 @@ public static class IdentitySeeder
         {
             if (!await roleManager.RoleExistsAsync(role))
             {
-                await roleManager.CreateAsync(new IdentityRole(role));
+                var created = await roleManager.CreateAsync(new IdentityRole(role));
+                if (!created.Succeeded)
+                {
+                    var msg = string.Join("; ", created.Errors.Select(e => $"{e.Code}:{e.Description}"));
+                    throw new InvalidOperationException($"Create role '{role}' failed: {msg}");
+                }
             }
         }
 
-        // 2) Users với password đơn giản hơn
+        // 2) Users (demo accounts)
         await EnsureUserAsync(userManager, "admin@demo.com", "Admin@123!", "Admin", ct);
         await EnsureUserAsync(userManager, "host@demo.com", "Host@123!", "Host", ct);
         await EnsureUserAsync(userManager, "customer@demo.com", "Customer@123!", "Customer", ct);
@@ -35,6 +40,7 @@ public static class IdentitySeeder
         CancellationToken ct)
     {
         var user = await userManager.FindByEmailAsync(email);
+
         if (user == null)
         {
             user = new IdentityUser
@@ -51,8 +57,19 @@ public static class IdentitySeeder
                 throw new InvalidOperationException($"Create user '{email}' failed: {msg}");
             }
         }
+        else
+        {
+            // ✅ DEV ONLY: luôn reset password cho đúng demo password (tránh seed lệch giữa các project)
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var reset = await userManager.ResetPasswordAsync(user, token, password);
+            if (!reset.Succeeded)
+            {
+                var msg = string.Join("; ", reset.Errors.Select(e => $"{e.Code}:{e.Description}"));
+                throw new InvalidOperationException($"Reset password '{email}' failed: {msg}");
+            }
+        }
 
-        // ✅ Kiểm tra user đã có role chưa trước khi thêm
+        // Add role if missing
         var userRoles = await userManager.GetRolesAsync(user);
         if (!userRoles.Contains(role))
         {

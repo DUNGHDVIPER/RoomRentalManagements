@@ -5,9 +5,9 @@ namespace DAL.Repositories
     public interface ITenantRepository
     {
         Task<List<Tenant>> GetAllAsync();
-        Task<Tenant?> GetByIdAsync(int id);
+        Task<Tenant?> GetByIdAsync(long id);
         Task AddAsync(Tenant tenant);
         Task UpdateAsync(Tenant tenant);
-        Task DeleteAsync(int id);
+        Task DeleteAsync(long id);
     }
 }

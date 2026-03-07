@@ -9,38 +9,45 @@ namespace WebAdmin.MVC.Controllers;
 
 public class AccountController : Controller
 {
+    private const string LoginViewPath = "~/Views/Auth/Login.cshtml";
+
     [HttpGet]
     [AllowAnonymous]
     public IActionResult Login(string? returnUrl = null)
     {
-        return View(new LoginVm { ReturnUrl = returnUrl });
+        ViewData["ReturnUrl"] = returnUrl;
+        return View(LoginViewPath, new LoginViewModel());
     }
 
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginVm vm)
+    public async Task<IActionResult> Login(LoginViewModel vm, string? returnUrl = null)
     {
+        ViewData["ReturnUrl"] = returnUrl;
+
         if (!ModelState.IsValid)
-            return View(vm);
+            return View(LoginViewPath, vm);
 
-        // ✅ Demo: hard-code user (bạn thay bằng check DB sau)
-        // role phải là Admin hoặc Host để vào ContractsController [Authorize(Roles="Admin,Host")]
-        var ok =
-            (vm.Username == "admin" && vm.Password == "123" && (vm.Role == "Admin" || vm.Role == "Host")) ||
-            (vm.Username == "host" && vm.Password == "123" && vm.Role == "Host");
+        // Demo accounts
+        string? role = null;
 
-        if (!ok)
+        if (vm.Email.Equals("admin@system.com", StringComparison.OrdinalIgnoreCase) && vm.Password == "Admin@123456")
+            role = "Admin";
+        else if (vm.Email.Equals("host@demo.com", StringComparison.OrdinalIgnoreCase) && vm.Password == "Host@123")
+            role = "Host";
+
+        if (role == null)
         {
-            ModelState.AddModelError(string.Empty, "Invalid username/password/role.");
-            return View(vm);
+            vm.ErrorMessage = "Invalid email or password.";
+            return View(LoginViewPath, vm);
         }
 
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, vm.Username),
-            new Claim(ClaimTypes.Name, vm.Username),
-            new Claim(ClaimTypes.Role, vm.Role) // VERY IMPORTANT cho [Authorize(Roles="...")]
+            new Claim(ClaimTypes.NameIdentifier, vm.Email),
+            new Claim(ClaimTypes.Name, vm.Email),
+            new Claim(ClaimTypes.Role, role)
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -49,14 +56,10 @@ public class AccountController : Controller
         await HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             principal,
-            new AuthenticationProperties
-            {
-                IsPersistent = vm.RememberMe,
-                RedirectUri = vm.ReturnUrl
-            });
+            new AuthenticationProperties { IsPersistent = vm.RememberMe });
 
-        if (!string.IsNullOrWhiteSpace(vm.ReturnUrl) && Url.IsLocalUrl(vm.ReturnUrl))
-            return Redirect(vm.ReturnUrl);
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            return Redirect(returnUrl);
 
         return RedirectToAction("Index", "Contracts");
     }
@@ -72,7 +75,5 @@ public class AccountController : Controller
     [HttpGet]
     [AllowAnonymous]
     public IActionResult AccessDenied()
-    {
-        return View();
-    }
+        => View("~/Views/Auth/AccessDenied.cshtml");
 }

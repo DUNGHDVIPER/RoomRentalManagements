@@ -1,30 +1,29 @@
 ﻿using System.Security.Claims;
-using BLL.DTOs.Common;
 using BLL.DTOs.Contract;
 using BLL.Services.Interfaces;
 using DAL.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAdmin.MVC.Models.Contracts;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebAdmin.MVC.Controllers;
 
-// tạm thời bỏ login
-[AllowAnonymous]
-// Nếu bật lại login sau này:
-// [Authorize(Roles = "Admin,Host")]
+[Authorize(Roles = "Admin")]
 [Route("Contracts")]
+[Route("Admin/Contracts")]
 public class ContractsController : Controller
 {
-    private readonly MotelManagementDbContext _db;
+    private readonly AppDbContext _db;
     private readonly IContractService _contractService;
     private readonly IWebHostEnvironment _env;
     private readonly ILogger<ContractsController> _logger;
 
     public ContractsController(
-        MotelManagementDbContext db,
+        AppDbContext db,
         IContractService contractService,
         IWebHostEnvironment env,
         ILogger<ContractsController> logger)
@@ -37,63 +36,129 @@ public class ContractsController : Controller
 
     private int? GetActorUserIdInt()
     {
-        var s = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var s = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("UserId");
         return int.TryParse(s, out var id) ? id : null;
     }
 
+    private void SetOk(string msg)
+    {
+        TempData["Ok"] = msg;
+        TempData["Success"] = msg; // compatible
+    }
+
+    private void SetErr(string msg)
+    {
+        TempData["Err"] = msg;
+        TempData["Error"] = msg; // compatible
+    }
+
     // =========================
-    // INDEX
-    // GET /Contracts  or /Contracts/Index
+    // INDEX (Admin system-wide)
+    // GET /Contracts  or /Admin/Contracts
     // =========================
     [HttpGet("")]
     [HttpGet("Index")]
-    public async Task<IActionResult> Index(string? q, int? status, int page = 1, int pageSize = 10, CancellationToken ct = default)
+    public async Task<IActionResult> Index(
+        string? q,
+        int? status,
+        int? roomId,
+        int? tenantId,
+        DateTime? dateFrom,
+        DateTime? dateTo,
+        int page = 1,
+        int pageSize = 10,
+        CancellationToken ct = default)
     {
         page = page < 1 ? 1 : page;
         pageSize = pageSize < 1 ? 10 : pageSize;
 
-        var req = new PagedRequestDto(page, pageSize)
+        var query = _db.Contracts.AsNoTracking()
+            .Include(c => c.Room)
+                .ThenInclude(r => r.Floor)
+                    .ThenInclude(f => f.Block)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(q))
         {
-            Keyword = q
-        };
+            var kw = q.Trim();
+            query = query.Where(c =>
+                (c.ContractCode ?? "").Contains(kw) ||
+                c.RoomId.ToString().Contains(kw) ||
+                c.TenantId.ToString().Contains(kw) ||
+                (c.Room.RoomNo ?? "").Contains(kw) ||
+                (c.Room.Name ?? "").Contains(kw) ||
+                (c.Room.Floor.Name ?? "").Contains(kw) ||
+                (c.Room.Floor.Block.Name ?? "").Contains(kw));
+        }
 
-        var result = await _contractService.GetContractsAsync(req, ct);
-
-        // filter status ở MVC (service hiện tại chưa filter)
-        var items = result.Items.AsEnumerable();
         if (status.HasValue)
-            items = items.Where(x => x.Status == status.Value);
-
-        var list = items.Select(c => new ContractRowVm
         {
-            ContractId = c.Id,
-            ContractCode = c.ContractCode,
-            RoomId = c.RoomId,
-            TenantId = c.TenantId,
-            StartDate = c.StartDate,
-            EndDate = c.EndDate,
-            Rent = c.Rent,
-            Deposit = c.Deposit,
-            Status = c.Status,
-            IsActive = c.IsActive
-        }).ToList();
+            var s = status.Value switch
+            {
+                0 => "PENDING",
+                1 => "ACTIVE",
+                2 => "EXPIRED",
+                3 => "TERMINATED",
+                4 => "RENEWED",
+                _ => null
+            };
+
+            if (s != null)
+                query = query.Where(c => c.Status != null && c.Status.ToUpper() == s);
+        }
+
+        if (roomId.HasValue) query = query.Where(c => c.RoomId == roomId.Value);
+        if (tenantId.HasValue) query = query.Where(c => c.TenantId == tenantId.Value);
+        if (dateFrom.HasValue) query = query.Where(c => c.StartDate.Date >= dateFrom.Value.Date);
+        if (dateTo.HasValue) query = query.Where(c => c.EndDate.Date <= dateTo.Value.Date);
+
+        var total = await query.CountAsync(ct);
+
+        var rows = await query
+            .OrderByDescending(c => c.ContractId)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(c => new ContractRowVm
+            {
+                ContractId = c.ContractId,
+                ContractCode = c.ContractCode,
+                RoomId = c.RoomId,
+                TenantId = c.TenantId,
+                StartDate = c.StartDate,
+                EndDate = c.EndDate,
+                Rent = c.BaseRent,
+                Deposit = c.DepositAmount,
+                Status = c.Status != null && c.Status.ToUpper() == "PENDING" ? 0 :
+                         c.Status != null && c.Status.ToUpper() == "ACTIVE" ? 1 :
+                         c.Status != null && c.Status.ToUpper() == "EXPIRED" ? 2 :
+                         c.Status != null && c.Status.ToUpper() == "TERMINATED" ? 3 :
+                         c.Status != null && c.Status.ToUpper() == "RENEWED" ? 4 : 99,
+                IsActive = c.Status != null && c.Status.ToUpper() == "ACTIVE",
+                BlockName = c.Room.Floor.Block.Name,
+                FloorName = c.Room.Floor.Name,
+                RoomNo = c.Room.RoomNo
+            })
+            .ToListAsync(ct);
 
         var vm = new ContractsIndexVm
         {
             Query = q,
             Status = status,
-            Page = result.PageNumber,
-            PageSize = result.PageSize,
-            Total = status.HasValue ? list.Count : result.TotalCount,
-            Items = list
+            RoomId = roomId,
+            TenantId = tenantId,
+            DateFrom = dateFrom?.Date,
+            DateTo = dateTo?.Date,
+            Page = page,
+            PageSize = pageSize,
+            Total = total,
+            Items = rows
         };
 
         return View("Index", vm);
     }
+
     // =========================
     // CREATE
-    // GET /Contracts/Create
-    // POST /Contracts/Create
     // =========================
     [HttpGet("Create")]
     public IActionResult Create()
@@ -124,8 +189,14 @@ public class ContractsController : Controller
             };
 
             var created = await _contractService.CreateAsync(dto, actorUserId, ct);
-            TempData["Success"] = "Created successfully.";
+
+            SetOk("Created successfully.");
             return RedirectToAction(nameof(Details), new { id = created.Id });
+        }
+        catch (ValidationException ex)
+        {
+            ModelState.AddModelError("", ex.Message);
+            return View("Create", vm);
         }
         catch (InvalidOperationException ex)
         {
@@ -134,61 +205,42 @@ public class ContractsController : Controller
         }
     }
 
-
-[HttpPost("Activate/{id:int}")]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Activate(int id, CancellationToken ct = default)
-{
-    try
+    // =========================
+    // ACTIVATE
+    // =========================
+    [HttpPost("Activate/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Activate(int id, CancellationToken ct = default)
     {
-        var contract = await _db.Contracts.FirstOrDefaultAsync(x => x.ContractId == (long)id, ct);
-        if (contract == null)
+        try
         {
-            TempData["Error"] = "Contract not found.";
-            return RedirectToAction(nameof(Index));
-        }
+            var actorUserId = GetActorUserIdInt();
+            await _contractService.ActivateAsync(id, actorUserId: actorUserId, ct);
 
-        // Nếu đã Active thì thôi
-        if (string.Equals(contract.Status, "Active", StringComparison.OrdinalIgnoreCase))
-        {
-            TempData["Success"] = "This contract is already ACTIVE.";
+            SetOk("Activated successfully.");
             return RedirectToAction(nameof(Details), new { id });
         }
-
-        // ✅ Check trước: room đã có ACTIVE contract chưa?
-        var hasActive = await _db.Contracts.AsNoTracking()
-            .AnyAsync(c => c.RoomId == contract.RoomId
-                        && c.Status == "Active"
-                        && c.ContractId != contract.ContractId, ct);
-
-        if (hasActive)
+        catch (ValidationException ex)
         {
-            TempData["Error"] =
-                $"Cannot activate this contract because Room {contract.RoomId} already has an ACTIVE contract. " +
-                $"Please terminate/renew the current ACTIVE contract first (only one ACTIVE contract per room).";
+            SetErr(ex.Message);
             return RedirectToAction(nameof(Details), new { id });
         }
-
-        contract.Status = "Active";
-        await _db.SaveChangesAsync(ct);
-
-        TempData["Success"] = "Activated successfully.";
-        return RedirectToAction(nameof(Details), new { id });
+        catch (InvalidOperationException ex)
+        {
+            SetErr(ex.Message);
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        catch (DbUpdateException)
+        {
+            SetErr("Room already has an ACTIVE contract.");
+            return RedirectToAction(nameof(Details), new { id });
+        }
     }
-    catch (DbUpdateException)
-    {
-        // ✅ fallback nếu vẫn bị constraint (race condition)
-        TempData["Error"] =
-            "Cannot activate this contract because the room already has an ACTIVE contract (one active contract per room). " +
-            "Please terminate/renew the current ACTIVE contract first.";
-        return RedirectToAction(nameof(Details), new { id });
-    }
-}
-// =========================
-// DETAILS
-// GET /Contracts/Details/4
-// =========================
-[HttpGet("Details/{id:int}")]
+
+    // =========================
+    // DETAILS
+    // =========================
+    [HttpGet("Details/{id:int}")]
     public async Task<IActionResult> Details(int id, CancellationToken ct = default)
     {
         try
@@ -218,59 +270,112 @@ public async Task<IActionResult> Activate(int id, CancellationToken ct = default
         }
         catch (InvalidOperationException ex)
         {
-            TempData["Error"] = ex.Message;
+            SetErr(ex.Message);
             return RedirectToAction(nameof(Index));
         }
     }
 
     // =========================
+    // ADMIN-ONLY: FORCE EXPIRE
+    // =========================
+    [HttpPost("ForceExpire/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForceExpire(int id, CancellationToken ct = default)
+    {
+        try
+        {
+            var actorUserId = GetActorUserIdInt();
+            await _contractService.ForceExpireAsync(id, actorUserId, ct);
+
+            SetOk("Force-expired successfully.");
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        catch (Exception ex)
+        {
+            SetErr(ex.Message);
+            return RedirectToAction(nameof(Details), new { id });
+        }
+    }
+
+    // =========================
+    // DEPOSIT UPDATE (G1/G2)
+    // =========================
+    [HttpPost("UpdateDepositAmount/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateDepositAmount(int id, decimal newDeposit, CancellationToken ct = default)
+    {
+        try
+        {
+            var actorUserId = GetActorUserIdInt();
+            await _contractService.UpdateDepositAsync(id, newDeposit, actorUserId, ct);
+
+            SetOk("Deposit amount updated.");
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        catch (ValidationException ex)
+        {
+            SetErr(ex.Message);
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        catch (InvalidOperationException ex)
+        {
+            SetErr(ex.Message);
+            return RedirectToAction(nameof(Details), new { id });
+        }
+    }
+
+    [HttpPost("UpdateDepositStatus/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateDepositStatus(
+        int id,
+        decimal depositAmount,
+        string depositStatus,
+        decimal? paidAmount,
+        DateTime? paidAt,
+        string? note,
+        CancellationToken ct = default)
+    {
+        try
+        {
+            var actorUserId = GetActorUserIdInt();
+
+            var dto = new UpdateDepositDto
+            {
+                ContractId = id,
+                DepositAmount = depositAmount,
+                DepositStatus = depositStatus,
+                PaidAmount = paidAmount,
+                PaidAt = paidAt,
+                Note = note
+            };
+
+            await _contractService.UpdateDepositAsync(dto, actorUserId, ct);
+
+            SetOk("Deposit status updated.");
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        catch (ValidationException ex)
+        {
+            SetErr(ex.Message);
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        catch (InvalidOperationException ex)
+        {
+            SetErr(ex.Message);
+            return RedirectToAction(nameof(Details), new { id });
+        }
+    }
+
+    // =========================
     // RENEW
-    // GET /Contracts/Renew/4
-    // POST /Contracts/Renew/4
+    // GET + POST
     // =========================
     [HttpGet("Renew/{id:int}")]
     public async Task<IActionResult> Renew(int id, CancellationToken ct = default)
     {
-        try
-        {
-            var c = await _contractService.GetByIdAsync(id, ct);
-            /*if (!c.IsActive)
-            {
-                TempData["Error"] = "Không thể Renew vì hợp đồng chưa ACTIVE. Hãy bấm Activate trước.";
-                return RedirectToAction(nameof(Details), new { id });
-            }*/
-            if (c.Status == 0) // Pending
-            {
-                TempData["Error"] = "Contract is PENDING. Please Activate before renewing.";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-            if (c.Status == 4) // Renewed
-            {
-                TempData["Error"] = "Contract already renewed.";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-            var vm = new RenewVm
-            {
-                ContractId = c.Id,
-                CurrentStatus = c.Status,
-                CurrentStartDate = c.StartDate,
-                CurrentEndDate = c.EndDate,
-                CurrentRent = c.Rent,
-                CurrentDeposit = c.Deposit,
-
-                NewStartDate = c.EndDate.AddDays(1),
-                NewEndDate = c.EndDate.AddMonths(12),
-                NewRent = c.Rent,
-                NewDeposit = c.Deposit
-            };
-
-            return View("Renew", vm);
-        }
-        catch (InvalidOperationException ex)
-        {
-            TempData["Error"] = ex.Message;
-            return RedirectToAction(nameof(Details), new { id });
-        }
+        var vm = new RenewVm { ContractId = id };
+        await TryReloadRenewHeader(vm, ct);
+        return View("Renew", vm);
     }
 
     [HttpPost("Renew/{id:int}")]
@@ -305,13 +410,20 @@ public async Task<IActionResult> Activate(int id, CancellationToken ct = default
 
             var renewed = await _contractService.RenewAsync(dto, actorUserId, ct);
 
-            TempData["Success"] = "Renewed successfully.";
+            SetOk("Renewed successfully.");
             return RedirectToAction(nameof(Details), new { id = renewed.Id });
+        }
+        catch (ValidationException ex)
+        {
+            ModelState.AddModelError(nameof(vm.NewStartDate), ex.Message);
+            await TryReloadRenewHeader(vm, ct);
+            return View("Renew", vm);
         }
         catch (InvalidOperationException ex)
         {
-            TempData["Error"] = ex.Message;
-            return RedirectToAction(nameof(Details), new { id = vm.ContractId });
+            ModelState.AddModelError("", ex.Message);
+            await TryReloadRenewHeader(vm, ct);
+            return View("Renew", vm);
         }
     }
 
@@ -331,45 +443,14 @@ public async Task<IActionResult> Activate(int id, CancellationToken ct = default
 
     // =========================
     // TERMINATE
-    // GET /Contracts/Terminate/4
-    // POST /Contracts/Terminate/4
+    // GET + POST
     // =========================
     [HttpGet("Terminate/{id:int}")]
     public async Task<IActionResult> Terminate(int id, CancellationToken ct = default)
     {
-        try
-        {
-            var c = await _contractService.GetByIdAsync(id, ct);
-
-            if (!c.IsActive) // hoặc c.Status != 1
-            {
-                TempData["Error"] = "Contract is not ACTIVE. Please activate this contract before terminating.";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            var today = DateTime.Today;
-            var terminateDate = today < c.StartDate ? c.StartDate
-                              : today > c.EndDate ? c.EndDate
-                              : today;
-
-            var vm = new TerminateVm
-            {
-                ContractId = c.Id,
-                TerminateDate = terminateDate,
-                CurrentStatus = c.Status,
-                CurrentStartDate = c.StartDate,
-                CurrentEndDate = c.EndDate,
-                CurrentRent = c.Rent,
-                CurrentDeposit = c.Deposit
-            };
-
-            return View("Terminate", vm);
-        }
-        catch (InvalidOperationException ex)
-        {
-            TempData["Error"] = ex.Message;
-            return RedirectToAction(nameof(Details), new { id });
-        }
+        var vm = new TerminateVm { ContractId = id };
+        await TryReloadTerminateHeader(vm, ct);
+        return View("Terminate", vm);
     }
 
     [HttpPost("Terminate/{id:int}")]
@@ -397,8 +478,14 @@ public async Task<IActionResult> Activate(int id, CancellationToken ct = default
 
             await _contractService.TerminateAsync(dto, actorUserId, ct);
 
-            TempData["Success"] = "Terminated successfully.";
+            SetOk("Terminated successfully.");
             return RedirectToAction(nameof(Details), new { id = vm.ContractId });
+        }
+        catch (ValidationException ex)
+        {
+            ModelState.AddModelError(nameof(vm.TerminateDate), ex.Message);
+            await TryReloadTerminateHeader(vm, ct);
+            return View("Terminate", vm);
         }
         catch (InvalidOperationException ex)
         {
@@ -424,8 +511,6 @@ public async Task<IActionResult> Activate(int id, CancellationToken ct = default
 
     // =========================
     // UPLOAD ATTACHMENT
-    // GET /Contracts/UploadAttachment/4
-    // POST /Contracts/UploadAttachment/4
     // =========================
     [HttpGet("UploadAttachment/{id:int}")]
     public async Task<IActionResult> UploadAttachment(int id, CancellationToken ct = default)
@@ -467,12 +552,12 @@ public async Task<IActionResult> Activate(int id, CancellationToken ct = default
 
             await _contractService.AddAttachmentStubAsync(
                 contractId: id,
-                fileName: saved.StoredFileName,
+                fileName: saved.OriginalFileName,
                 url: saved.PublicUrl,
                 actorUserId: actorUserId,
                 ct: ct);
 
-            TempData["Success"] = "Uploaded successfully.";
+            SetOk("Uploaded successfully.");
             return RedirectToAction(nameof(Details), new { id });
         }
         catch (InvalidOperationException ex)
@@ -507,33 +592,35 @@ public async Task<IActionResult> Activate(int id, CancellationToken ct = default
 
     private async Task<SavedAttachment> SaveContractAttachmentAsync(int contractId, IFormFile file, CancellationToken ct)
     {
-        // shared folder: ../SharedUploads/contracts
-        var sharedContractsDir = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "..", "SharedUploads", "contracts"));
+        // Save into shared folder so HostRazor & AdminMVC can both serve /uploads
+        var sharedContractsDir = Path.GetFullPath(
+            Path.Combine(_env.ContentRootPath, "..", "SharedUploads", "contracts"));
         Directory.CreateDirectory(sharedContractsDir);
 
-        var ext = Path.GetExtension(file.FileName)?.ToLowerInvariant();
-        var uniqueName = $"{Guid.NewGuid():N}_{Path.GetFileName(file.FileName)}";
+        var safeFileName = Path.GetFileName(file.FileName);
+        var storedName = $"{Guid.NewGuid():N}_{safeFileName}";
+        var path = Path.Combine(sharedContractsDir, storedName);
 
-        var path = Path.Combine(sharedContractsDir, uniqueName);
         await using var stream = System.IO.File.Create(path);
         await file.CopyToAsync(stream, ct);
 
         return new SavedAttachment
         {
-            StoredFileName = uniqueName,
-            PublicUrl = $"/uploads/contracts/{uniqueName}" // ✅ URL chung
+            OriginalFileName = safeFileName,
+            StoredFileName = storedName,
+            PublicUrl = $"/uploads/contracts/{storedName}"
         };
     }
 
     private sealed class SavedAttachment
     {
+        public string OriginalFileName { get; init; } = "";
         public string StoredFileName { get; init; } = "";
         public string PublicUrl { get; init; } = "";
     }
 
     // =========================
     // EXPORT PDF
-    // GET /Contracts/ExportPdf/4
     // =========================
     [HttpGet("ExportPdf/{id:int}")]
     public async Task<IActionResult> ExportPdf(int id, CancellationToken ct = default)
@@ -546,14 +633,13 @@ public async Task<IActionResult> Activate(int id, CancellationToken ct = default
         }
         catch (InvalidOperationException ex)
         {
-            TempData["Error"] = ex.Message;
+            SetErr(ex.Message);
             return RedirectToAction(nameof(Details), new { id });
         }
     }
 
     // =========================
     // VERSIONS
-    // GET /Contracts/Versions/4
     // =========================
     [HttpGet("Versions/{id:int}")]
     public async Task<IActionResult> Versions(int id, CancellationToken ct = default)
@@ -580,8 +666,42 @@ public async Task<IActionResult> Activate(int id, CancellationToken ct = default
         }
         catch (InvalidOperationException ex)
         {
-            TempData["Error"] = ex.Message;
+            SetErr(ex.Message);
             return RedirectToAction(nameof(Details), new { id });
+        }
+    }
+
+    // =========================
+    // REMINDER SCAN
+    // =========================
+    [HttpGet("ReminderScan")]
+    public IActionResult ReminderScan(int daysBeforeEnd = 7)
+    {
+        ViewBag.DaysBeforeEnd = daysBeforeEnd;
+        return View("ReminderScan");
+    }
+
+    [HttpPost("ReminderScan")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReminderScanPost(int daysBeforeEnd, CancellationToken ct = default)
+    {
+        try
+        {
+            var actorUserId = GetActorUserIdInt();
+
+            var sent = await _contractService.ScanAndSendExpiryRemindersAsync(
+                daysBeforeEnd: daysBeforeEnd,
+                remindType: $"Expiry_{daysBeforeEnd}d",
+                actorUserId: actorUserId,
+                ct: ct);
+
+            SetOk($"Scan done. Sent {sent} reminder(s).");
+            return RedirectToAction(nameof(ReminderScan), new { daysBeforeEnd });
+        }
+        catch (Exception ex)
+        {
+            SetErr(ex.Message);
+            return RedirectToAction(nameof(ReminderScan), new { daysBeforeEnd });
         }
     }
 }
