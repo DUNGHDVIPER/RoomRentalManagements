@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using QuestPDF.Infrastructure;
 using DAL.Seed;
-using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
-// ✅ Razor Pages (KHÔNG Blazor Server)
+// ✅ Razor Pages
 builder.Services.AddRazorPages();
 
 // Authorization
@@ -25,9 +24,16 @@ builder.Services.AddAuthorization(o =>
     o.AddPolicy("AdminOrHost", p => p.RequireRole("Admin", "Host", "SuperAdmin"));
 });
 
-// DbContext
+// DbContext with retry logic for transient failures
 var cs = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(cs));
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseSqlServer(cs, sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
+    }));
 
 // Identity
 builder.Services
@@ -60,7 +66,7 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 
-// CORS (nếu WebAdminMVC gọi chéo)
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAdminMVC", policy =>
@@ -76,19 +82,47 @@ QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 
-await using (var scope = app.Services.CreateAsyncScope())
+// Database migration and seeding with proper error handling
+try
 {
-    var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    await using (var scope = app.Services.CreateAsyncScope())
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-    await IdentitySeeder.SeedAsync(roleMgr, userMgr);
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        logger.LogInformation("Checking database connection...");
+
+        if (!await db.Database.CanConnectAsync())
+        {
+            logger.LogInformation("Database not accessible, creating database...");
+            await db.Database.EnsureCreatedAsync();
+        }
+
+        logger.LogInformation("Starting database migration...");
+        await db.Database.MigrateAsync();
+        logger.LogInformation("Database migration completed successfully.");
+
+        var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+        logger.LogInformation("Starting identity seeding...");
+        await IdentitySeeder.SeedAsync(roleMgr, userMgr);
+        logger.LogInformation("Identity seeding completed successfully.");
+    }
 }
-// Auto migrate
-await using (var scope = app.Services.CreateAsyncScope())
+catch (Exception ex)
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred during database migration or seeding");
+
+    if (app.Environment.IsDevelopment())
+    {
+        Console.WriteLine($"Database Error: {ex.Message}");
+        Console.WriteLine("Make sure your SQL Server is running and the connection string is correct.");
+        throw;
+    }
 }
+
 
 if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
@@ -100,7 +134,7 @@ else
 
 app.UseHttpsRedirection();
 
-// static files
+// Static files
 app.UseStaticFiles();
 
 // SharedUploads -> /uploads
@@ -118,39 +152,7 @@ app.UseCors("AllowAdminMVC");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Seed roles/users
-await SeedIdentityAsync(app);
-
 // ✅ Razor Pages endpoints
 app.MapRazorPages();
 
 app.Run();
-
-static async Task SeedIdentityAsync(WebApplication app)
-{
-    using var scope = app.Services.CreateScope();
-    var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-
-    string[] roles = { "Admin", "Host", "SuperAdmin" };
-    foreach (var r in roles)
-        if (!await roleMgr.RoleExistsAsync(r))
-            await roleMgr.CreateAsync(new IdentityRole(r));
-
-    await EnsureUser(userMgr, "host@demo.com", "Host@123", "Host");
-    await EnsureUser(userMgr, "admin@demo.com", "Admin@123", "Admin");
-}
-
-static async Task EnsureUser(UserManager<IdentityUser> userMgr, string email, string password, string role)
-{
-    var user = await userMgr.FindByEmailAsync(email);
-    if (user == null)
-    {
-        user = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true };
-        var created = await userMgr.CreateAsync(user, password);
-        if (!created.Succeeded) return;
-    }
-
-    if (!await userMgr.IsInRoleAsync(user, role))
-        await userMgr.AddToRoleAsync(user, role);
-}

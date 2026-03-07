@@ -29,7 +29,7 @@ public class CreateModel : PageModel
     public async Task<IActionResult> OnPostAsync(CancellationToken ct)
     {
         if (!ModelState.IsValid) return Page();
-
+        
         try
         {
             var dto = new CreateContractDto

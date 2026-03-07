@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Host Login - Room Rental Management</title>
+    <title>Login - Room Rental Management</title>
     <link rel="stylesheet" href="~/css/theme.css" />
     <style>
         .success-message {
@@ -56,11 +56,21 @@
 
             <hr class="hr" />
 
+            <!-- Success message từ Register -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="success-message">
+                    <i class="success-icon">✓</i>
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
             <form method="post" style="display:grid;gap:12px;">
                 @Html.AntiForgeryToken()
                 <input name="ReturnUrl" type="hidden" value="@(Model.ReturnUrl ?? "")" />
 
-                <input class="input" asp-for="Email" placeholder="Email" />
+                <input class="input" asp-for="Email" placeholder="Email"
+                       value="@TempData["UserEmail"]" />
                 <span asp-validation-for="Email" class="text-danger"></span>
 
                 <input class="input" asp-for="Password" type="password" placeholder="Password" />
@@ -90,16 +100,5 @@
             </div>
         </div>
     </div>
-
-    <!-- ❌ Remove this duplicate section -->
-    <!--
-    <div class="row mb-3">
-        <div class="col d-flex justify-content-end">
-            <a href="/auth/forgot-password" class="text-decoration-none text-muted">
-                Forgot your password?
-            </a>
-        </div>
-    </div>
-    -->
 </body>
 </html>
