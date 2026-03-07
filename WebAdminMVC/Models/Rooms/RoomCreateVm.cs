@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace WebAdmin.MVC.Models.Rooms;
 
@@ -23,4 +24,9 @@ public class RoomCreateVm
     public string Status { get; set; } = "Available";
 
     public string? Description { get; set; }
+
+    // ===== AMENITIES =====
+    public List<int> AmenityIds { get; set; } = new();
+
+    public List<SelectListItem> Amenities { get; set; } = new();
 }

@@ -34,6 +34,7 @@ builder.Services.AddScoped<IBlockService, BlockService>();
 builder.Services.AddScoped<IBlockRepository, BlockRepository>();
 builder.Services.AddScoped<IFloorService, FloorService>();
 builder.Services.AddScoped<IFloorRepository, FloorRepository>();
+builder.Services.AddScoped<IAmenityService, AmenityService>();
 // (Nếu bạn có EmailService dùng trong WebAdminMVC thì mở dòng này)
 // builder.Services.AddScoped<IEmailService, EmailService>();
 

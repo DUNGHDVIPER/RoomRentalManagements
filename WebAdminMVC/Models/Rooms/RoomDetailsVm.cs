@@ -17,5 +17,6 @@
         public string Status { get; set; }
 
         public List<RoomImageVm> Images { get; set; } = new();
+        public List<string> Amenities { get; set; } = new();
     }
 }

@@ -4,6 +4,7 @@ using DAL.Data;
 using DAL.Entities.Common;
 using DAL.Entities.Property;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using WebAdmin.MVC.Models.Rooms;
 
 namespace WebAdmin.MVC.Controllers;
@@ -75,7 +76,18 @@ public class RoomsController : Controller
     [HttpGet]
     public IActionResult Create()
     {
-        return View(new RoomCreateVm());
+        var amenities = _context.Amenities.ToList();
+
+        var vm = new RoomCreateVm
+        {
+            Amenities = amenities.Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = a.AmenityName
+            }).ToList()
+        };
+
+        return View(vm);
     }
 
     [HttpPost]
@@ -83,7 +95,15 @@ public class RoomsController : Controller
     public async Task<IActionResult> Create(RoomCreateVm vm)
     {
         if (!ModelState.IsValid)
+        {
+            vm.Amenities = _context.Amenities.Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = a.AmenityName
+            }).ToList();
+
             return View(vm);
+        }
 
         var dto = new CreateRoomDto
         {
@@ -95,7 +115,7 @@ public class RoomsController : Controller
             CurrentBasePrice = vm.Price,
             Status = Enum.Parse<RoomStatus>(vm.Status),
             Description = vm.Description,
-            AmenityIds = Array.Empty<int>()
+            AmenityIds = vm.AmenityIds?.ToArray() ?? Array.Empty<int>()
         };
 
         await _roomService.CreateRoomAsync(dto);
@@ -113,6 +133,8 @@ public class RoomsController : Controller
         if (room == null)
             return NotFound();
 
+        var amenities = _context.Amenities.ToList();
+
         var vm = new RoomEditVm
         {
             Id = room.RoomId,
@@ -122,7 +144,16 @@ public class RoomsController : Controller
             MaxOccupants = room.MaxOccupants,
             CurrentBasePrice = room.CurrentBasePrice,
             Status = room.Status,
-            Description = room.Description
+            Description = room.Description,
+
+            AmenityIds = room.AmenityIds?.ToList() ?? new List<int>(),
+
+            Amenities = amenities.Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = a.AmenityName,
+                Selected = room.AmenityIds != null && room.AmenityIds.Contains(a.Id)
+            }).ToList()
         };
 
         return View(vm);
@@ -133,7 +164,15 @@ public class RoomsController : Controller
     public async Task<IActionResult> Edit(RoomEditVm vm)
     {
         if (!ModelState.IsValid)
+        {
+            vm.Amenities = _context.Amenities.Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = a.AmenityName
+            }).ToList();
+
             return View(vm);
+        }
 
         var dto = new UpdateRoomDto
         {
@@ -144,7 +183,7 @@ public class RoomsController : Controller
             CurrentBasePrice = vm.CurrentBasePrice,
             Status = vm.Status,
             Description = vm.Description,
-            AmenityIds = Array.Empty<int>()
+            AmenityIds = vm.AmenityIds?.ToArray() ?? Array.Empty<int>()
         };
 
         await _roomService.UpdateRoomAsync(vm.Id, dto);
@@ -165,6 +204,17 @@ public class RoomsController : Controller
             .Where(x => x.RoomId == id)
             .ToList();
 
+        // ===== GET AMENITY NAMES =====
+        var amenities = new List<string>();
+
+        if (room.AmenityIds != null && room.AmenityIds.Any())
+        {
+            amenities = _context.Amenities
+                .Where(a => room.AmenityIds.Contains(a.Id))
+                .Select(a => a.AmenityName)
+                .ToList();
+        }
+
         var vm = new RoomDetailsVm
         {
             Id = room.RoomId,
@@ -173,40 +223,35 @@ public class RoomsController : Controller
             Price = room.CurrentBasePrice,
             Status = room.Status.ToString(),
 
+            // ===== ADD AMENITIES =====
+            Amenities = amenities,
+
             Images = images
-        .Select(i => new RoomImageVm
-        {
-            ImageId = i.ImageId,
-            ImageUrl = i.ImageUrl,
-            IsPrimary = i.IsPrimary
-        })
-        .ToList()
+                .Select(i => new RoomImageVm
+                {
+                    ImageId = i.ImageId,
+                    ImageUrl = i.ImageUrl,
+                    IsPrimary = i.IsPrimary
+                })
+                .ToList()
         };
 
         return View(vm);
     }
 
     // ===================== UPLOAD IMAGE =====================
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UploadImage(int roomId, IFormFile file)
     {
         if (file == null || file.Length == 0)
-        {
-            Console.WriteLine("FILE NULL");
             return RedirectToAction("Details", new { id = roomId });
-        }
 
         var imageUrl = await _cloudinaryService.UploadImageAsync(file);
 
-        Console.WriteLine("IMAGE URL: " + imageUrl);
-
-        // ❗ Quan trọng: nếu upload lỗi thì không lưu DB
         if (string.IsNullOrEmpty(imageUrl))
-        {
-            Console.WriteLine("UPLOAD FAILED");
             return RedirectToAction("Details", new { id = roomId });
-        }
 
         var image = new RoomImage
         {
@@ -221,6 +266,7 @@ public class RoomsController : Controller
 
         return RedirectToAction("Details", new { id = roomId });
     }
+
     // ===================== DELETE IMAGE =====================
 
     [HttpPost]
@@ -248,6 +294,7 @@ public class RoomsController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
     // ===================== PRICE HISTORY =====================
 
     public async Task<IActionResult> PriceHistory(int id)

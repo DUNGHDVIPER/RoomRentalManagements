@@ -19,4 +19,7 @@ public class RoomDto
 
     public int? FloorNumber { get; set; }
     public string? BlockName { get; set; }
+
+    // ===== ADD THIS =====
+    public List<int> AmenityIds { get; set; } = new();
 }

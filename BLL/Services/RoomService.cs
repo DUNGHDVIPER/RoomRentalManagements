@@ -23,6 +23,7 @@ public class RoomService : IRoomService
     public async Task<List<RoomDto>> GetAllAsync(CancellationToken ct = default)
     {
         return await _context.Rooms
+            .Include(r => r.RoomAmenities)
             .AsNoTracking()
             .Select(r => MapToDto(r))
             .ToListAsync(ct);
@@ -31,6 +32,7 @@ public class RoomService : IRoomService
     public async Task<RoomDto> GetRoomDetailAsync(int roomId, CancellationToken ct = default)
     {
         var room = await _context.Rooms
+            .Include(r => r.RoomAmenities)
             .AsNoTracking()
             .FirstOrDefaultAsync(r => r.RoomId == roomId, ct);
 
@@ -57,12 +59,20 @@ public class RoomService : IRoomService
         _context.Rooms.Add(room);
         await _context.SaveChangesAsync(ct);
 
+        // set amenities nếu có
+        if (dto.AmenityIds?.Any() == true)
+        {
+            await SetRoomAmenitiesAsync(room.RoomId, dto.AmenityIds.ToArray(), ct);
+        }
+
         return MapToDto(room);
     }
 
     public async Task<RoomDto> UpdateRoomAsync(int roomId, UpdateRoomDto dto, CancellationToken ct = default)
     {
-        var room = await _context.Rooms.FirstOrDefaultAsync(r => r.RoomId == roomId, ct);
+        var room = await _context.Rooms
+            .Include(r => r.RoomAmenities)
+            .FirstOrDefaultAsync(r => r.RoomId == roomId, ct);
 
         if (room == null)
             throw new Exception("Room not found");
@@ -91,6 +101,12 @@ public class RoomService : IRoomService
 
         await _context.SaveChangesAsync(ct);
 
+        // update amenities
+        if (dto.AmenityIds != null)
+        {
+            await SetRoomAmenitiesAsync(roomId, dto.AmenityIds.ToArray(), ct);
+        }
+
         return MapToDto(room);
     }
 
@@ -102,6 +118,39 @@ public class RoomService : IRoomService
             return;
 
         _context.Rooms.Remove(room);
+
+        await _context.SaveChangesAsync(ct);
+    }
+
+    // ================== AMENITIES ==================
+
+    public async Task<List<AmenityDto>> GetAmenitiesAsync(CancellationToken ct = default)
+    {
+        return await _context.Amenities
+            .AsNoTracking()
+            .Select(a => new AmenityDto
+            {
+                AmenityId = a.Id,
+                AmenityName = a.AmenityName
+            })
+            .ToListAsync(ct);
+    }
+
+    public async Task SetRoomAmenitiesAsync(int roomId, int[] amenityIds, CancellationToken ct = default)
+    {
+        var existing = await _context.RoomAmenities
+            .Where(x => x.RoomId == roomId)
+            .ToListAsync(ct);
+
+        _context.RoomAmenities.RemoveRange(existing);
+
+        var newAmenities = amenityIds.Select(id => new RoomAmenity
+        {
+            RoomId = roomId,
+            AmenityId = id
+        });
+
+        await _context.RoomAmenities.AddRangeAsync(newAmenities, ct);
 
         await _context.SaveChangesAsync(ct);
     }
@@ -141,7 +190,7 @@ public class RoomService : IRoomService
             .ToListAsync(ct);
     }
 
-    // ================== NOT IMPLEMENTED YET ==================
+    // ================== NOT IMPLEMENTED ==================
 
     public Task<List<BlockDto>> GetBlocksAsync(CancellationToken ct = default)
         => throw new NotImplementedException();
@@ -167,12 +216,6 @@ public class RoomService : IRoomService
     public Task RemoveRoomImageAsync(int imageId, CancellationToken ct = default)
         => throw new NotImplementedException();
 
-    public Task<List<AmenityDto>> GetAmenitiesAsync(CancellationToken ct = default)
-        => throw new NotImplementedException();
-
-    public Task SetRoomAmenitiesAsync(int roomId, int[] amenityIds, CancellationToken ct = default)
-        => throw new NotImplementedException();
-
     // ================== MAPPER ==================
 
     private static RoomDto MapToDto(Room r) => new()
@@ -185,6 +228,10 @@ public class RoomService : IRoomService
         MaxOccupants = r.MaxOccupants,
         Status = r.Status,
         CurrentBasePrice = r.CurrentBasePrice,
-        Description = r.Description
+        Description = r.Description,
+
+        AmenityIds = r.RoomAmenities
+            .Select(x => x.AmenityId)
+            .ToList()
     };
 }

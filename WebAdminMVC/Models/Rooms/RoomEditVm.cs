@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DAL.Entities.Common;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace WebAdmin.MVC.Models.Rooms;
 
@@ -30,4 +31,9 @@ public class RoomEditVm
     public RoomStatus Status { get; set; } = RoomStatus.Available;
 
     public string? Description { get; set; }
+
+    // ===== AMENITIES =====
+    public List<int> AmenityIds { get; set; } = new();
+
+    public List<SelectListItem> Amenities { get; set; } = new();
 }

@@ -146,5 +146,28 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
             e.Property(x => x.ElectricKwh).HasPrecision(18, 3);
             e.Property(x => x.WaterM3).HasPrecision(18, 3);
         });
+        // =========================
+        // ROOM AMENITY RELATION
+        // =========================
+        modelBuilder.Entity<RoomAmenityEntity>(entity =>
+        {
+            // Composite Primary Key
+            entity.HasKey(x => new { x.RoomId, x.AmenityId });
+
+            // Room -> RoomAmenities (1 - N)
+            entity.HasOne(x => x.Room)
+                .WithMany(r => r.RoomAmenities)
+                .HasForeignKey(x => x.RoomId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Amenity -> RoomAmenities (1 - N)
+            entity.HasOne(x => x.Amenity)
+                .WithMany(a => a.RoomAmenities)
+                .HasForeignKey(x => x.AmenityId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Table name
+            entity.ToTable("RoomAmenities");
+        });
     }
 }
