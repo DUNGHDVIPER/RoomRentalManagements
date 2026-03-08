@@ -21,7 +21,10 @@ public static class ServiceCollectionExtensions
             opt.UseSqlServer(conn, sql =>
             {
                 // đảm bảo migrations nằm trong DAL/Migrations
+
                 sql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+
+                
             });
         });
 

@@ -1,0 +1,60 @@
+﻿@page "{id:int}"
+@model WebHostRazor.Pages.Host.Contracts.VersionsModel
+@{
+    ViewData["Title"] = "Contract Versions";
+}
+
+@if (TempData["Err"] is string err && !string.IsNullOrWhiteSpace(err))
+{
+    <div class="alert alert-danger">@err</div>
+}
+@if (TempData["Ok"] is string ok && !string.IsNullOrWhiteSpace(ok))
+{
+    <div class="alert alert-success">@ok</div>
+}
+
+<h2>Versions - Contract #@Model.ContractId</h2>
+
+<p>
+    <a class="btn btn-secondary" asp-page="./Details" asp-route-id="@Model.ContractId">Back</a>
+</p>
+
+@if (Model.Versions == null || Model.Versions.Count == 0)
+{
+    <div class="alert alert-info">No versions yet.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th style="width:120px;">Version</th>
+                    <th style="width:180px;">ChangedAt</th>
+                    <th style="width:160px;">ChangedByUserId</th>
+                    <th>ChangeNote</th>
+                    <th style="width:220px;">Snapshot</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var v in Model.Versions)
+                {
+                    <tr>
+                        <td>@v.VersionNumber</td>
+                        <td>@v.ChangedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@(v.ChangedByUserId?.ToString() ?? "-")</td>
+                        <td>@(string.IsNullOrWhiteSpace(v.ChangeNote) ? "-" : v.ChangeNote)</td>
+                        <td>
+                            <details>
+                                <summary>View</summary>
+                                <pre class="bg-light p-2 rounded" style="max-height:420px; overflow:auto; white-space:pre-wrap;">
+        @v.SnapshotJson
+                                        </pre>
+                            </details>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

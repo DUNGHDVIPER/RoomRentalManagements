@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace BLL.DTOs.Contract;
 
-namespace BLL.DTOs.Contract
+public class ContractVersionItemDto
 {
-    internal class ContractVersionDto
-    {
-    }
+    public long VersionId { get; set; }
+    public int VersionNumber { get; set; }
+    public DateTime ChangedAt { get; set; }
+    public int? ChangedByUserId { get; set; }
+    public string? ChangeNote { get; set; }
+    public string SnapshotJson { get; set; } = "";
 }

@@ -1,0 +1,24 @@
+﻿@page "{id:int}"
+@model WebHostRazor.Pages.Host.Contracts.UploadAttachmentModel
+@{
+    ViewData["Title"] = "Upload Attachment";
+}
+
+<h2>Upload Attachment</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <input class="form-control" asp-for="File" type="file" />
+        <span class="text-danger" asp-validation-for="File"></span>
+    </div>
+
+    <button class="btn btn-info" type="submit">Upload</button>
+    <a class="btn btn-secondary" asp-page="/Contracts/Details" asp-route-id="@RouteData.Values["id"]">Cancel</a>
+
+    <div class="text-danger mt-2">
+        @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <div>@err.ErrorMessage</div>
+        }
+    </div>
+</form>

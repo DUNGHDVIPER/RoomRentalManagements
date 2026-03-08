@@ -1,54 +1,97 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 
 namespace WebHostRazor.Pages.Host.Rooms.Amenities
 {
     public class IndexModel : PageModel
     {
-        public RoomModel Room { get; set; }
+        // Add missing Room property that the Razor view expects
+        public RoomAmenityViewModel? Room { get; set; }
+
+        [BindProperty]
+        public RoomFormModel Form { get; set; } = new()
+        {
+            Name = string.Empty,
+            City = string.Empty,
+            District = string.Empty,
+            Status = "Available"
+        };
 
         public void OnGet(int id)
         {
-            // Example data retrieval logic
+            // Load room data
             Room = GetRoomById(id);
         }
 
-        public void OnPost(int id, string name)
+        public IActionResult OnPost(int id, string name)
         {
-            // Example logic to add an amenity
-            var room = GetRoomById(id);
-            if (room != null && !string.IsNullOrWhiteSpace(name))
+            if (!string.IsNullOrWhiteSpace(name))
             {
-                room.Amenities.Add(name);
+                var room = GetRoomById(id);
+                if (room != null && !room.Amenities.Contains(name))
+                {
+                    room.Amenities.Add(name);
+                    Room = room;
+                    // TODO: Save to database
+                }
             }
+            return Page();
         }
 
-        public void OnPostRemove(int id, string name)
+        public IActionResult OnPostRemove(int id, string name)
         {
-            // Example logic to remove an amenity
             var room = GetRoomById(id);
-            if (room != null)
+            if (room != null && room.Amenities.Contains(name))
             {
                 room.Amenities.Remove(name);
+                Room = room;
+                // TODO: Save to database
             }
+            return Page();
         }
 
-        private RoomModel GetRoomById(int id)
+        private RoomAmenityViewModel? GetRoomById(int id)
         {
-            // Replace with actual data retrieval logic
-            return new RoomModel
+            // TODO: Replace with actual database query
+            return new RoomAmenityViewModel
             {
                 Id = id,
                 Name = "Sample Room",
-                Amenities = new List<string> { "WiFi", "AC" }
+                Amenities = new List<string> { "WiFi", "Air Conditioning", "TV", "Parking" }
             };
         }
     }
 
-    public class RoomModel
+    public class RoomAmenityViewModel
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; } = string.Empty;
         public List<string> Amenities { get; set; } = new List<string>();
+    }
+
+    public class RoomFormModel
+    {
+        [Required]
+        [StringLength(100)]
+        public required string Name { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(50)]
+        public required string City { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(50)]
+        public required string District { get; set; } = string.Empty;
+
+        [Range(1, 10000)]
+        public double Area { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal Price { get; set; }
+
+        [Required]
+        public required string Status { get; set; } = "Available";
     }
 }

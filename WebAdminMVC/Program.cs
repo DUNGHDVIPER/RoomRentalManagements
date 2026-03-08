@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ﻿using BLL.Services;
+=======
+using BLL.Services;
+>>>>>>> origin/main
 using BLL.Services.Interfaces;
 using DAL.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -15,6 +19,7 @@ builder.Services.AddControllersWithViews();
 // =====================
 // 2) DbContext (DAL)
 // =====================
+<<<<<<< HEAD
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -30,10 +35,54 @@ builder.Services.AddScoped<IReportService, ReportService>();
 // =====================
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(opt =>
+=======
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+/*builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));*/
+
+// =====================
+// 3) BLL services
+// =====================
+builder.Services.AddScoped<IContractService, ContractService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
+
+// (Nếu bạn có EmailService dùng trong WebAdminMVC thì mở dòng này)
+// builder.Services.AddScoped<IEmailService, EmailService>();
+
+// =====================
+// 4) Session
+// =====================
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+>>>>>>> origin/main
 {
-    opt.IdleTimeout = TimeSpan.FromHours(8);
-    opt.Cookie.HttpOnly = true;
-    opt.Cookie.IsEssential = true;
+    options.IdleTimeout = TimeSpan.FromHours(8);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// =====================
+// 5) Cookie Authentication (tự viết)
+// =====================
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(opt =>
+    {
+        opt.LoginPath = "/Account/Login";
+        opt.AccessDeniedPath = "/Account/AccessDenied";
+        opt.SlidingExpiration = true;
+        // opt.ExpireTimeSpan = TimeSpan.FromHours(8);
+        // opt.Cookie.Name = "WebAdmin.Auth";
+    });
+
+// =====================
+// 6) Authorization
+// =====================
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("Host", p => p.RequireRole("Host", "Admin"));
 });
 
 // =====================
@@ -74,9 +123,14 @@ app.UseHttpsRedirection();
 // wwwroot static files
 app.UseStaticFiles();
 
+<<<<<<< HEAD
 // Optional: serve SharedUploads as /uploads (giống nhóm)
 var sharedUploadsPath = Path.GetFullPath(
     Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
+=======
+// Optional: serve SharedUploads as /uploads
+var sharedUploadsPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
+>>>>>>> origin/main
 Directory.CreateDirectory(sharedUploadsPath);
 
 app.UseStaticFiles(new StaticFileOptions
@@ -99,4 +153,8 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
+<<<<<<< HEAD
 app.Run();   
+=======
+app.Run();
+>>>>>>> origin/main

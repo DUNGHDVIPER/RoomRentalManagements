@@ -1,13 +1,10 @@
-﻿namespace WebAdmin.MVC.Models.Contracts;
+﻿using System.Collections.Generic;
+using BLL.DTOs.Contract; // chỉnh namespace nếu ContractDto ở namespace khác
+
+namespace WebAdmin.MVC.Models.Contracts;
 
 public class ContractDetailsVm
 {
-    public int Id { get; set; }
-    public string RoomName { get; set; } = null!;
-    public string TenantName { get; set; } = null!;
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-    public decimal Deposit { get; set; }
-    public string Status { get; set; } = null!;
-    public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow.AddDays(-30);
+    public ContractDto Contract { get; set; } = default!;
+    public List<AttachmentRowVm> Attachments { get; set; } = new();
 }

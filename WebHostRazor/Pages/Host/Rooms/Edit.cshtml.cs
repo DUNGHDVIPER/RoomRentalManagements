@@ -6,9 +6,15 @@ namespace WebHostRazor.Pages.Host.Rooms
     public class EditModel : PageModel
     {
         [BindProperty]
-        public Room Form { get; set; }
+        public Room Form { get; set; } = new()
+        {
+            Name = string.Empty,
+            City = string.Empty,
+            District = string.Empty,
+            Status = "Available"
+        };
 
-        public Room Room { get; private set; }
+        public Room? Room { get; private set; }
 
         public IActionResult OnGet(int id)
         {
@@ -47,7 +53,7 @@ namespace WebHostRazor.Pages.Host.Rooms
             return RedirectToPage("/Host/Rooms");
         }
 
-        private Room GetRoomById(int id)
+        private Room? GetRoomById(int id)
         {
             // Replace with actual data fetching logic
             return new Room
@@ -71,11 +77,11 @@ namespace WebHostRazor.Pages.Host.Rooms
     public class Room
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string City { get; set; }
-        public string District { get; set; }
+        public required string Name { get; set; } = string.Empty;
+        public required string City { get; set; } = string.Empty;
+        public required string District { get; set; } = string.Empty;
         public double Area { get; set; }
         public decimal Price { get; set; }
-        public string Status { get; set; }
+        public required string Status { get; set; } = string.Empty;
     }
 }

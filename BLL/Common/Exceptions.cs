@@ -1,37 +1,100 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+
 namespace BLL.Common
 {
-    internal class Exceptions
+    public static class Exceptions
     {
-        [Serializable]
-        internal class BusinessException : Exception
+        // =========================
+        // Error Code Enum
+        // =========================
+        public enum ErrorCode
         {
-            public BusinessException()
+            Unknown = 0,
+            NotFound = 1,
+            Duplicate = 2,
+            Validation = 3,
+            BusinessRule = 4
+        }
+
+        // =========================
+        // Base Exception
+        // =========================
+        [Serializable]
+        public abstract class AppException : Exception
+        {
+            public ErrorCode Code { get; }
+
+            protected AppException(ErrorCode code, string message)
+                : base(message)
             {
+                Code = code;
             }
 
-            public BusinessException(string? message) : base(message)
+            protected AppException(ErrorCode code, string message, Exception innerException)
+                : base(message, innerException)
             {
+                Code = code;
             }
 
-            public BusinessException(string? message, Exception? innerException) : base(message, innerException)
+            protected AppException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
             {
             }
         }
 
+        // =========================
+        // Business Exception
+        // =========================
         [Serializable]
-        internal class NotFoundException : Exception
+        public class BusinessException : AppException
         {
-            public NotFoundException()
+            public BusinessException(string message)
+                : base(ErrorCode.BusinessRule, message)
             {
             }
+        }
 
-            public NotFoundException(string? message) : base(message)
+        // =========================
+        // Not Found Exception
+        // =========================
+        [Serializable]
+        public class NotFoundException : AppException
+        {
+            public NotFoundException(string message)
+                : base(ErrorCode.NotFound, message)
             {
             }
+        }
 
-            public NotFoundException(string? message, Exception? innerException) : base(message, innerException)
+        // =========================
+        // Duplicate Exception
+        // =========================
+        [Serializable]
+        public class DuplicateException : AppException
+        {
+            public string FieldName { get; }
+
+            public DuplicateException(string fieldName, string message)
+                : base(ErrorCode.Duplicate, message)
             {
+                FieldName = fieldName;
+            }
+        }
+
+        // =========================
+        // Validation Exception
+        // =========================
+        [Serializable]
+        public class ValidationException : AppException
+        {
+            public Dictionary<string, string[]> Errors { get; }
+
+            public ValidationException(Dictionary<string, string[]> errors)
+                : base(ErrorCode.Validation, "One or more validation errors occurred.")
+            {
+                Errors = errors;
             }
         }
     }

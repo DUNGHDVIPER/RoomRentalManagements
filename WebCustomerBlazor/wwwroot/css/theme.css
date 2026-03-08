@@ -448,3 +448,53 @@ a {
     font-weight: 800;
     font-size: 13px;
 }
+/* Ticket Specific Styles */
+.td-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+.td-stat {
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+    .td-stat:hover {
+        transform: translateY(-3px);
+    }
+
+.td-ticket-card {
+    transition: all 0.2s ease;
+}
+
+    .td-ticket-card:hover {
+        border-color: var(--blue);
+        background: #fff;
+    }
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: 6px;
+}
+
+    .status-dot.info {
+        background: var(--blue);
+        box-shadow: 0 0 10px rgba(37,99,235,0.3);
+    }
+
+    .status-dot.danger {
+        background: #f59e0b;
+        box-shadow: 0 0 10px rgba(245,158,11,0.3);
+    }
+
+    .status-dot.success {
+        background: var(--green);
+        box-shadow: 0 0 10px rgba(22,163,74,0.3);
+    }
+
+    .status-dot.muted {
+        background: var(--muted);
+    }
