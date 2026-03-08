@@ -21,11 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-<<<<<<< HEAD
-		<PackageReference Include="ClosedXML" Version="0.105.0" />
-=======
 	  <Folder Include="Common\Exceptions\" />
->>>>>>> origin/main
 	</ItemGroup>
 
 </Project>

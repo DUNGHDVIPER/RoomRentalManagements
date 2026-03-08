@@ -8,6 +8,4 @@ public class BillDetailsVm
     public decimal Total { get; set; }
     public string Status { get; set; } = null!;
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow.AddDays(-10);
-    public List<PaymentHistoryItemVm> Payments { get; set; } = new();
-    public List<BillItemLineVm> Items { get; set; } = new();
 }
