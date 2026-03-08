@@ -1,16 +1,18 @@
 ﻿@{
     var items = new (string Text, string Url, string Key)[]
-    {
-        ("Dashboard", "/Dashboard/Index", "Dashboard"),
-        ("Users", "/Users/Index", "Users"),
-        ("Roles", "/Roles/Index", "Roles"),
-        ("Audit Logs", "/Audit/Index", "Audit"),
-        ("Rooms", "/Rooms/Index", "Rooms"),
-        ("Contracts", "/Contracts/Index", "Contracts"),
-        ("Bills", "/Bills/Index", "Bills"),
-        ("Reports", "/Reports/Index", "Reports"),
-    
-    };
+ {
+    ("Dashboard", "/Dashboard/Index", "Dashboard"),
+    ("Users", "/Users/Index", "Users"),
+    ("Roles", "/Roles/Index", "Roles"),
+    ("Audit Logs", "/Audit/Index", "Audit"),
+    ("Rooms", "/Rooms/Index", "Rooms"),
+    ("Contracts", "/Contracts/Index", "Contracts"),
+    ("Utility Prices", "/UtilityPrices/Index", "UtilityPrices"),
+    ("Utility Readings", "/UtilityReadings/Bulk", "UtilityReadings"),
+    ("Bills", "/Bills/Index", "Bills"),
+    ("Extra Fees", "/ExtraFees/Index", "ExtraFees"),
+    ("Reports", "/Reports/Index", "Reports"),
+ };
 
     var active = (string)(ViewData["Title"] ?? "");
 }
