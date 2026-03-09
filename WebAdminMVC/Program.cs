@@ -1,34 +1,7 @@
-<<<<<<< HEAD
-﻿using DAL.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using BLL.Services.Interfaces;
-using BLL.Services;
-
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<INotificationService, NotificationService>();
-
-
-// ✅ ADD IDENTITY
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
-
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.LoginPath = "/Auth/Login";
-    options.AccessDeniedPath = "/Auth/AccessDenied";
-=======
 using BLL.Services;
 using BLL.Services.Interfaces;
 using DAL.Data;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
@@ -40,27 +13,37 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // =====================
-// 2) DbContext (DAL)
+// 2) DbContext
 // =====================
-builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-/*builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));*/
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // =====================
-// 3) BLL services
+// 3) Identity
+// =====================
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Auth/Login";
+    options.AccessDeniedPath = "/Auth/AccessDenied";
+});
+
+// =====================
+// 4) BLL Services
 // =====================
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
-
-// (Nếu bạn có EmailService dùng trong WebAdminMVC thì mở dòng này)
-// builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // =====================
-// 4) Session
+// 5) Session
 // =====================
 builder.Services.AddDistributedMemoryCache();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(8);
@@ -68,33 +51,28 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// =====================
-// 5) Cookie Authentication (tự viết)
-// =====================
-builder.Services
-    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(opt =>
-    {
-        opt.LoginPath = "/Account/Login";
-        opt.AccessDeniedPath = "/Account/AccessDenied";
-        opt.SlidingExpiration = true;
-        // opt.ExpireTimeSpan = TimeSpan.FromHours(8);
-        // opt.Cookie.Name = "WebAdmin.Auth";
-    });
-
-// =====================
-// 6) Authorization
-// =====================
-builder.Services.AddAuthorization(opt =>
-{
-    opt.AddPolicy("Host", p => p.RequireRole("Host", "Admin"));
->>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574
-});
-
 var app = builder.Build();
 
+
 // =====================
-// 7) Middleware pipeline
+// RESET ADMIN PASSWORD
+// =====================
+using (var scope = app.Services.CreateScope())
+{
+    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+    var user = await userMgr.FindByEmailAsync("admin@demo.com");
+
+    if (user != null)
+    {
+        var token = await userMgr.GeneratePasswordResetTokenAsync(user);
+        await userMgr.ResetPasswordAsync(user, token, "Admin@12345!");
+    }
+}
+
+
+// =====================
+// Middleware
 // =====================
 if (!app.Environment.IsDevelopment())
 {
@@ -104,11 +82,11 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// wwwroot static files
 app.UseStaticFiles();
 
-// Optional: serve SharedUploads as /uploads
-var sharedUploadsPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
+var sharedUploadsPath = Path.GetFullPath(
+    Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
+
 Directory.CreateDirectory(sharedUploadsPath);
 
 app.UseStaticFiles(new StaticFileOptions
@@ -119,32 +97,27 @@ app.UseStaticFiles(new StaticFileOptions
 
 app.UseRouting();
 
-// ❌ BỎ Session fake auth
-// app.UseSession();
+app.UseSession();
 
-// ✅ BẮT BUỘC
 app.UseAuthentication();
 app.UseAuthorization();
 
-<<<<<<< HEAD
-=======
-app.UseAuthentication();
-app.UseAuthorization();
 
 // =====================
-// 8) Routing
+// Routing
 // =====================
->>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
-<<<<<<< HEAD
 
-// ✅ Seed Role
+// =====================
+// Seed Roles
+// =====================
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roleManager = scope.ServiceProvider
+        .GetRequiredService<RoleManager<IdentityRole>>();
 
     string[] roles = { "Admin", "Host", "Tenant" };
 
@@ -155,6 +128,4 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-=======
->>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574
 app.Run();

@@ -62,6 +62,7 @@ public class IndexModel : PageModel
         }
 
         // 🎯 CATEGORY ENUM
+        // 🎯 CATEGORY ENUM
         if (Category.HasValue)
         {
             query = query.Where(t => t.Category == Category.Value);

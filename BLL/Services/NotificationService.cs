@@ -201,8 +201,8 @@ public class NotificationService : INotificationService
     public async Task<int?> GetActiveContractIdByUserIdAsync(string userId)
     {
         return await _context.Contracts
-            .Where(c => c.Tenant.UserId == userId && c.IsActive)
-            .Select(c => c.Id)
+            .Where(c => c.Tenant.UserId == userId && c.Status == "Active")
+            .Select(c => (int?)c.ContractId)
             .FirstOrDefaultAsync();
     }
 }

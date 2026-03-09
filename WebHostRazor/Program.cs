@@ -4,18 +4,9 @@ using DAL.Data;
 using DAL.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-<<<<<<< HEAD
-using WebCustomer.Blazor.Seed;
-using WebHostRazor;
-using DAL.Data;
-using WebHostRazor.Hubs;
-
-=======
 using Microsoft.Extensions.FileProviders;
 using QuestPDF.Infrastructure;
-using DAL.Seed;
-using Microsoft.AspNetCore.Identity;
->>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574
+using WebHostRazor.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,8 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
-// ✅ Razor Pages (KHÔNG Blazor Server)
-builder.Services.AddRazorPages();
+// Razor Pages
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeFolder("/Host", "Host");
+    options.Conventions.AllowAnonymousToFolder("/Auth");
+});
 
 // Authorization
 builder.Services.AddAuthorization(o =>
@@ -33,48 +28,9 @@ builder.Services.AddAuthorization(o =>
     o.AddPolicy("AdminOrHost", p => p.RequireRole("Admin", "Host", "SuperAdmin"));
 });
 
-<<<<<<< HEAD
-// Razor Pages
-builder.Services.AddRazorPages(options =>
-{
-    options.Conventions.AuthorizeFolder("/Host", "Host");
-    options.Conventions.AllowAnonymousToFolder("/Auth");
-});
-
-builder.Services.AddCascadingAuthenticationState();
-// Tenants
-builder.Services.AddScoped<ITenantService, TenantService>();
-builder.Services.AddScoped<ITenantRepository, TenantRepository>();
-
-// Rooms
-builder.Services.AddScoped<IRoomService, RoomService>();
-builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
-
-// noti
-builder.Services.AddScoped<INotificationService, NotificationService>();
-// EF InMemory + Identity (FE-only)
-//builder.Services.AddDbContext<AuthDbContext>(opt =>
-//    opt.UseInMemoryDatabase("HostPortalAuth"));
-
-//builder.Services
-//    .AddIdentity<IdentityUser, IdentityRole>(opt =>
-//    {
-//        opt.Password.RequireNonAlphanumeric = false;
-//        opt.Password.RequiredLength = 6;
-//    })
-//    .AddEntityFrameworkStores<AuthDbContext>()
-//    .AddDefaultTokenProviders();
-
-//builder.Services.AddDbContext<AppDbContext>(opt =>
-//    opt.UseInMemoryDatabase("HostPortalApp"));
-builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
-=======
 // DbContext
 var cs = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(cs));
->>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574
 
 // Identity
 builder.Services
@@ -96,10 +52,11 @@ builder.Services.ConfigureApplicationCookie(opt =>
     opt.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     opt.SlidingExpiration = true;
 });
-// SIGNalR
+
+// SignalR
 builder.Services.AddSignalR();
 
-// BLL + Repo
+// BLL + Repository
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
@@ -108,8 +65,9 @@ builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
-// CORS (nếu WebAdminMVC gọi chéo)
+// CORS (cho WebAdminMVC)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAdminMVC", policy =>
@@ -121,18 +79,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+// QuestPDF
 QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 
-await using (var scope = app.Services.CreateAsyncScope())
-{
-    var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-
-    await IdentitySeeder.SeedAsync(roleMgr, userMgr);
-}
-// Auto migrate
+// Auto migrate database
 await using (var scope = app.Services.CreateAsyncScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -149,12 +101,15 @@ else
 
 app.UseHttpsRedirection();
 
-// static files
+// Static files
 app.UseStaticFiles();
 
 // SharedUploads -> /uploads
-var sharedUploadsPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
+var sharedUploadsPath = Path.GetFullPath(
+    Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
+
 Directory.CreateDirectory(sharedUploadsPath);
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(sharedUploadsPath),
@@ -162,22 +117,20 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseRouting();
+
 app.UseCors("AllowAdminMVC");
 
 app.UseAuthentication();
 app.UseAuthorization();
-<<<<<<< HEAD
+
+// SignalR hub
 app.MapHub<NotificationHub>("/notificationHub");
-// seed roles/users
-await app.SeedIdentityAsync();
-=======
 
-// Seed roles/users
-await SeedIdentityAsync(app);
->>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574
-
-// ✅ Razor Pages endpoints
+// Razor Pages
 app.MapRazorPages();
+
+// Seed roles + demo users
+await SeedIdentityAsync(app);
 
 app.Run();
 
@@ -188,6 +141,7 @@ static async Task SeedIdentityAsync(WebApplication app)
     var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
     string[] roles = { "Admin", "Host", "SuperAdmin" };
+
     foreach (var r in roles)
         if (!await roleMgr.RoleExistsAsync(r))
             await roleMgr.CreateAsync(new IdentityRole(r));
@@ -199,9 +153,16 @@ static async Task SeedIdentityAsync(WebApplication app)
 static async Task EnsureUser(UserManager<IdentityUser> userMgr, string email, string password, string role)
 {
     var user = await userMgr.FindByEmailAsync(email);
+
     if (user == null)
     {
-        user = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true };
+        user = new IdentityUser
+        {
+            UserName = email,
+            Email = email,
+            EmailConfirmed = true
+        };
+
         var created = await userMgr.CreateAsync(user, password);
         if (!created.Succeeded) return;
     }

@@ -6,25 +6,46 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateStaticWebAssetsManifest>false</GenerateStaticWebAssetsManifest>
 		<StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
-		<UseAppHost>true</UseAppHost>
+		<NoWarn>CS0168;CS8602</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\BLL\BLL.csproj" />
+		<Compile Remove="Pages\Notifications\**" />
+		<Content Remove="Pages\Notifications\**" />
+		<EmbeddedResource Remove="Pages\Notifications\**" />
+		<None Remove="Pages\Notifications\**" />
 	</ItemGroup>
 
-<<<<<<< HEAD
-=======
+	<ItemGroup>
+		<Compile Remove="Seed\IdentitySeedExtensions.cs" />
+	</ItemGroup>
 
->>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574
-  <ItemGroup>
-    <ProjectReference Include="..\BLL\BLL.csproj" />
-    <ProjectReference Include="..\DAL\DAL.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Remove="Pages\Host\Shared\TMP.cshtml" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="QuestPDF" Version="2026.2.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\BLL\BLL.csproj" />
+		<ProjectReference Include="..\DAL\DAL.csproj" />
+		<ProjectReference Include="..\WebCustomerBlazor\WebCustomerBlazor.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Pages\Bills\" />
+		<Folder Include="Pages\Audit\" />
+		<Folder Include="Pages\Reports\" />
+		<Folder Include="Pages\Utilities\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="Pages\Host\Shared\TMP.cshtml" />
+		<None Include="Seed\IdentitySeedExtensions.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.23" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.23" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+	</ItemGroup>
 
 </Project>
-

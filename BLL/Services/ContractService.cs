@@ -4,42 +4,27 @@ using BLL.DTOs.Contract;
 using BLL.Services.Interfaces;
 using DAL.Data;
 using DAL.Entities.Contracts;
-<<<<<<< HEAD
 using DAL.Entities.Tenanting;
-=======
 using DAL.Entities.System;
 using Humanizer;
->>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Text.Json;
 
-
 namespace BLL.Services;
 
 public class ContractService : IContractService
 {
-<<<<<<< HEAD
-
-    private readonly AppDbContext _context;
-
-    public ContractService(AppDbContext context)
-    {
-        _context = context;
-    }
-    public Task AddAttachmentStubAsync(int contractId, string fileName, string url, CancellationToken ct = default)
-=======
     private readonly AppDbContext _db;
     private readonly IAuditService _audit;
-    private readonly string? actorUserId;
 
     public ContractService(AppDbContext db, IAuditService audit)
->>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574
     {
         _db = db;
         _audit = audit;
     }
+
     private const string OneActivePerRoomIndexName = "UX_Contracts_Room_ActiveOnly";
 
     private static bool IsOneActivePerRoomViolation(DbUpdateException ex)
@@ -47,6 +32,7 @@ public class ContractService : IContractService
         var msg = ex.InnerException?.Message ?? ex.Message;
         return msg.Contains(OneActivePerRoomIndexName, StringComparison.OrdinalIgnoreCase);
     }
+
 
     // =========================
     // Centralized status constants + compare helper
@@ -82,7 +68,7 @@ public class ContractService : IContractService
     }
 
     // Validate Room exists
-  
+
     private async Task EnsureRoomExistsAsync(int roomId, CancellationToken ct)
     {
 
@@ -94,7 +80,7 @@ public class ContractService : IContractService
             throw new InvalidOperationException("Room not found.");
         var conn = _db.Database.GetDbConnection().ConnectionString;
         Console.WriteLine("DB = " + conn);
-        
+
     }
 
     // Validate Tenant exists
@@ -479,7 +465,8 @@ public class ContractService : IContractService
             await tx.CommitAsync(ct);
             return MapToDto(renewed);
         }
-        catch (DbUpdateException ex) when (ex.IsUniqueViolation() && IsOneActivePerRoomViolation(ex)) { 
+        catch (DbUpdateException ex) when (ex.IsUniqueViolation() && IsOneActivePerRoomViolation(ex))
+        {
             await tx.RollbackAsync(ct);
             throw new InvalidOperationException(
                 "Renew failed because the room already has another ACTIVE contract (DB constraint).");
@@ -665,10 +652,10 @@ public class ContractService : IContractService
         return new PagedResultDto<ContractDto>(items, total, page, pageSize);
     }
 
-/*    public async Task<ContractDto> GetByIdAsync(int id, CancellationToken ct = default)
-    {
-       
-    }*/
+    /*    public async Task<ContractDto> GetByIdAsync(int id, CancellationToken ct = default)
+        {
+
+        }*/
     public async Task<ContractDto> GetByIdAsync(int id, CancellationToken ct = default)
     {
         var contractId = (long)id;
@@ -887,7 +874,7 @@ public class ContractService : IContractService
     // ============================================================
     public async Task AddAttachmentStubAsync(int contractId, string fileName, string url, int? actorUserId = null, CancellationToken ct = default)
     {
-        var id = (long)contractId;
+        var id = (int)contractId;
 
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
 
@@ -932,7 +919,7 @@ public class ContractService : IContractService
     // 7) VERSIONING
     // ============================================================
     public Task CreateVersionSnapshotAsync(int contractId, string changedByUserId, CancellationToken ct = default)
-        => CreateVersionSnapshotInternalAsync((long)contractId, TryParseUserId(changedByUserId), "Manual snapshot", ct);
+        => CreateVersionSnapshotInternalAsync((int)contractId, TryParseUserId(changedByUserId), "Manual snapshot", ct);
 
     public async Task<List<ContractVersionItemDto>> GetVersionsAsync(int contractId, CancellationToken ct = default)
     {
@@ -956,7 +943,7 @@ public class ContractService : IContractService
             .ToListAsync(ct);
     }
 
-    private async Task CreateVersionSnapshotInternalAsync(long contractId, int? changedByUserId, string? changeNote, CancellationToken ct)
+    private async Task CreateVersionSnapshotInternalAsync(int contractId, int? changedByUserId, string? changeNote, CancellationToken ct)
     {
         var contract = await _db.Contracts.AsNoTracking()
             .Include(c => c.Attachments)
@@ -1032,24 +1019,14 @@ public class ContractService : IContractService
 
         var notif = new DAL.Entities.System.Notification
         {
-            CreatedByUserId = 0, // system
             Title = $"Contract reminder ({type})",
-            Message = $"Contract {contract.ContractCode} reminder at {remindAt:yyyy-MM-dd HH:mm}.",
-            Type = "Reminder",
-            CreatedAt = DateTime.UtcNow
+            Content = $"Contract {contract.ContractCode} reminder at {remindAt:yyyy-MM-dd HH:mm}.",
+            IsRead = false,
+            CreatedAt = DateTime.UtcNow,
+            ContractId = contract.ContractId
         };
 
         _db.Notifications.Add(notif);
-        await _db.SaveChangesAsync(ct);
-
-        // IsRead nằm ở NotificationRecipient, không nằm trong Notification
-        _db.NotificationRecipients.Add(new DAL.Entities.System.NotificationRecipient
-        {
-            NotificationId = notif.Id,  // notif.Id (Id từ AuditableEntity<long>)
-            TenantId = contract.TenantId,
-            IsRead = false
-        });
-
         await _db.SaveChangesAsync(ct);
     }
 
@@ -1057,30 +1034,30 @@ public class ContractService : IContractService
     // 9) EXPORT PDF
     // ============================================================
     public async Task<byte[]> ExportPdfStubAsync(int contractId, int? actorUserId = null, CancellationToken ct = default)
-        {
-            var id = (long)contractId;
+    {
+        var id = (long)contractId;
 
-            var c = await _db.Contracts.AsNoTracking()
-                .Include(x => x.Room)
-                .Include(x => x.Tenant)
-                .FirstOrDefaultAsync(x => x.ContractId == id, ct);
+        var c = await _db.Contracts.AsNoTracking()
+            .Include(x => x.Room)
+            .Include(x => x.Tenant)
+            .FirstOrDefaultAsync(x => x.ContractId == id, ct);
 
-            if (c == null) throw new InvalidOperationException("Contract not found.");
+        if (c == null) throw new InvalidOperationException("Contract not found.");
 
-            var bytes = BLL.Pdf.ContractPdfExporter.Export(c);
+        var bytes = BLL.Pdf.ContractPdfExporter.Export(c);
 
-            await _audit.LogAsync(
-                actorUserId,
-                action: "ExportContractPdf",
-                entityType: "Contract",
-                entityId: c.ContractId.ToString(),
-                note: c.ContractCode,
-                oldValue: null,
-                newValue: new { c.ContractId, c.ContractCode, SizeBytes = bytes.Length },
-                ct: ct);
+        await _audit.LogAsync(
+            actorUserId,
+            action: "ExportContractPdf",
+            entityType: "Contract",
+            entityId: c.ContractId.ToString(),
+            note: c.ContractCode,
+            oldValue: null,
+            newValue: new { c.ContractId, c.ContractCode, SizeBytes = bytes.Length },
+            ct: ct);
 
-            return bytes;
-        }
+        return bytes;
+    }
 
     // ============================================================
     // 10) EXPIRY JOB (demo)
@@ -1240,37 +1217,12 @@ VALUES (@nid, @tid, 0, NULL);
         public string LoginName { get; set; } = "";
     }
 
-<<<<<<< HEAD
-    public Task TerminateAsync(TerminateContractDto dto, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task UpdateDepositAsync(int contractId, decimal newDeposit, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    // XONG CHUC NANG CONTRACT THI THEM VAO
-    //    await _notificationService.BroadcastAsync(
-    //    new BroadcastNotificationDto
-    //    {
-    //        Title = "Hợp đồng sắp hết hạn",
-    //        Content = "Hợp đồng của bạn sẽ hết hạn trong 7 ngày.",
-    //        ContractId = contract.Id,
-    //        SourceType = SourceType.Contract
-    //});
-
     public async Task<int?> GetActiveContractIdByUserIdAsync(string userId)
     {
-        return await _context.Contracts
-            .Include(c => c.Tenant)
-            .Where(c => c.Tenant.UserId == userId && c.IsActive)
-            .Select(c => (int?)c.Id)
+        return await _db.Contracts
+            .Where(c => c.Tenant.UserId == userId && c.Status == "Active")
+            .Select(c => (int?)c.ContractId)
             .FirstOrDefaultAsync();
     }
 
 }
-=======
-}
->>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574

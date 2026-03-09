@@ -6,11 +6,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "dbo");
+
             migrationBuilder.CreateTable(
                 name: "Amenities",
                 columns: table => new
@@ -71,7 +74,6 @@ namespace DAL.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AuditLogId = table.Column<long>(type: "bigint", nullable: false),
                     ActorUserId = table.Column<int>(type: "int", maxLength: 450, nullable: true),
                     Action = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     EntityType = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
@@ -121,26 +123,7 @@ namespace DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Notifications",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
-                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
-                    IsRead = table.Column<bool>(type: "bit", nullable: false),
-                    ReadAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Notifications", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Roles",
+                name: "Role",
                 columns: table => new
                 {
                     RoleId = table.Column<int>(type: "int", nullable: false)
@@ -151,34 +134,11 @@ namespace DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Roles", x => x.RoleId);
+                    table.PrimaryKey("PK_Role", x => x.RoleId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Tenants",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
-                    CCCD = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IdentityUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tenants", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
+                name: "User",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "int", nullable: false)
@@ -197,7 +157,7 @@ namespace DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.PrimaryKey("PK_User", x => x.UserId);
                 });
 
             migrationBuilder.CreateTable(
@@ -324,6 +284,35 @@ namespace DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tenants",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    CCCD = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tenants", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tenants_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Floors",
                 columns: table => new
                 {
@@ -347,30 +336,26 @@ namespace DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "NotificationRecipients",
+                name: "UserRole",
                 columns: table => new
                 {
-                    RecipientId = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    NotificationId = table.Column<long>(type: "bigint", nullable: false),
-                    TenantId = table.Column<int>(type: "int", nullable: false),
-                    IsRead = table.Column<bool>(type: "bit", nullable: false),
-                    ReadAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NotificationRecipients", x => x.RecipientId);
+                    table.PrimaryKey("PK_UserRole", x => new { x.UserId, x.RoleId });
                     table.ForeignKey(
-                        name: "FK_NotificationRecipients_Notifications_NotificationId",
-                        column: x => x.NotificationId,
-                        principalTable: "Notifications",
-                        principalColumn: "Id",
+                        name: "FK_UserRole_Role_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Role",
+                        principalColumn: "RoleId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_NotificationRecipients_Tenants_TenantId",
-                        column: x => x.TenantId,
-                        principalTable: "Tenants",
-                        principalColumn: "Id",
+                        name: "FK_UserRole_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -401,31 +386,8 @@ namespace DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserRoles",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserRoles", x => new { x.UserId, x.RoleId });
-                    table.ForeignKey(
-                        name: "FK_UserRoles_Roles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "Roles",
-                        principalColumn: "RoleId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserRoles_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Rooms",
+                schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -453,15 +415,15 @@ namespace DAL.Migrations
                 name: "Contracts",
                 columns: table => new
                 {
-                    ContractId = table.Column<long>(type: "bigint", nullable: false)
+                    ContractId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoomId = table.Column<int>(type: "int", nullable: false),
                     TenantId = table.Column<int>(type: "int", nullable: false),
                     ContractCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    BaseRent = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    DepositAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    BaseRent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DepositAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PaymentCycle = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Note = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
@@ -469,7 +431,6 @@ namespace DAL.Migrations
                     DepositStatus = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     DepositPaidAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DepositPaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Id = table.Column<long>(type: "bigint", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -479,19 +440,20 @@ namespace DAL.Migrations
                     table.ForeignKey(
                         name: "FK_Contracts_Rooms_RoomId",
                         column: x => x.RoomId,
+                        principalSchema: "dbo",
                         principalTable: "Rooms",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Contracts_Tenants_TenantId",
                         column: x => x.TenantId,
                         principalTable: "Tenants",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Contracts_Users_CreatedByUserId",
+                        name: "FK_Contracts_User_CreatedByUserId",
                         column: x => x.CreatedByUserId,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "UserId");
                 });
 
@@ -514,6 +476,7 @@ namespace DAL.Migrations
                     table.ForeignKey(
                         name: "FK_RoomAmenities_Rooms_RoomId",
                         column: x => x.RoomId,
+                        principalSchema: "dbo",
                         principalTable: "Rooms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -538,6 +501,7 @@ namespace DAL.Migrations
                     table.ForeignKey(
                         name: "FK_RoomImages_Rooms_RoomId",
                         column: x => x.RoomId,
+                        principalSchema: "dbo",
                         principalTable: "Rooms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -562,6 +526,7 @@ namespace DAL.Migrations
                     table.ForeignKey(
                         name: "FK_RoomPriceHistories_Rooms_RoomId",
                         column: x => x.RoomId,
+                        principalSchema: "dbo",
                         principalTable: "Rooms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -585,6 +550,7 @@ namespace DAL.Migrations
                     table.ForeignKey(
                         name: "FK_RoomResidents_Rooms_RoomId",
                         column: x => x.RoomId,
+                        principalSchema: "dbo",
                         principalTable: "Rooms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -616,6 +582,7 @@ namespace DAL.Migrations
                     table.ForeignKey(
                         name: "FK_StayHistories_Rooms_RoomId",
                         column: x => x.RoomId,
+                        principalSchema: "dbo",
                         principalTable: "Rooms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -635,7 +602,7 @@ namespace DAL.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Category = table.Column<int>(type: "int", maxLength: 50, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     RoomId = table.Column<int>(type: "int", nullable: false),
                     TenantId = table.Column<int>(type: "int", nullable: true),
@@ -648,6 +615,7 @@ namespace DAL.Migrations
                     table.ForeignKey(
                         name: "FK_Tickets_Rooms_RoomId",
                         column: x => x.RoomId,
+                        principalSchema: "dbo",
                         principalTable: "Rooms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -667,8 +635,8 @@ namespace DAL.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoomId = table.Column<int>(type: "int", nullable: false),
                     Period = table.Column<int>(type: "int", nullable: false),
-                    ElectricKwh = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    WaterM3 = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ElectricKwh = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
+                    WaterM3 = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
                     RecordedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -679,6 +647,7 @@ namespace DAL.Migrations
                     table.ForeignKey(
                         name: "FK_UtilityReadings_Rooms_RoomId",
                         column: x => x.RoomId,
+                        principalSchema: "dbo",
                         principalTable: "Rooms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -690,7 +659,7 @@ namespace DAL.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ContractId = table.Column<long>(type: "bigint", nullable: false),
+                    ContractId = table.Column<int>(type: "int", nullable: false),
                     Period = table.Column<int>(type: "int", nullable: false),
                     IssuedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -716,7 +685,7 @@ namespace DAL.Migrations
                 {
                     AttachmentId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ContractId = table.Column<long>(type: "bigint", nullable: false),
+                    ContractId = table.Column<int>(type: "int", nullable: false),
                     FileUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     FileName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     UploadedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -739,7 +708,7 @@ namespace DAL.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ContractId = table.Column<long>(type: "bigint", nullable: false),
+                    ContractId = table.Column<int>(type: "int", nullable: false),
                     RemindType = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     RemindAtDate = table.Column<DateTime>(type: "date", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -761,7 +730,7 @@ namespace DAL.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ContractId = table.Column<long>(type: "bigint", nullable: false),
+                    ContractId = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     RemindAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsSent = table.Column<bool>(type: "bit", nullable: false),
@@ -784,7 +753,7 @@ namespace DAL.Migrations
                 {
                     VersionId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ContractId = table.Column<long>(type: "bigint", nullable: false),
+                    ContractId = table.Column<int>(type: "int", nullable: false),
                     VersionNumber = table.Column<int>(type: "int", nullable: false),
                     ChangedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ChangedByUserId = table.Column<int>(type: "int", nullable: true),
@@ -801,9 +770,9 @@ namespace DAL.Migrations
                         principalColumn: "ContractId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ContractVersions_Users_ChangedByUserId",
+                        name: "FK_ContractVersions_User_ChangedByUserId",
                         column: x => x.ChangedByUserId,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "UserId");
                 });
 
@@ -813,7 +782,7 @@ namespace DAL.Migrations
                 {
                     DepositId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ContractId = table.Column<long>(type: "bigint", nullable: false),
+                    ContractId = table.Column<int>(type: "int", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Note = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -828,6 +797,37 @@ namespace DAL.Migrations
                         principalTable: "Contracts",
                         principalColumn: "ContractId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    ReadAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    SourceType = table.Column<int>(type: "int", nullable: false),
+                    ContractId = table.Column<int>(type: "int", nullable: true),
+                    ReceiverUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_AspNetUsers_ReceiverUserId",
+                        column: x => x.ReceiverUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Contracts_ContractId",
+                        column: x => x.ContractId,
+                        principalTable: "Contracts",
+                        principalColumn: "ContractId");
                 });
 
             migrationBuilder.CreateTable(
@@ -907,6 +907,30 @@ namespace DAL.Migrations
                         name: "FK_Payments_Bills_BillId",
                         column: x => x.BillId,
                         principalTable: "Bills",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "NotificationRecipients",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NotificationId = table.Column<long>(type: "bigint", nullable: false),
+                    TenantId = table.Column<int>(type: "int", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    ReadAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NotificationRecipients", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_NotificationRecipients_Notifications_NotificationId",
+                        column: x => x.NotificationId,
+                        principalTable: "Notifications",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1046,14 +1070,14 @@ namespace DAL.Migrations
                 column: "NotificationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotificationRecipients_TenantId",
-                table: "NotificationRecipients",
-                column: "TenantId");
+                name: "IX_Notifications_ContractId",
+                table: "Notifications",
+                column: "ContractId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notifications_UserId_IsRead_CreatedAt",
+                name: "IX_Notifications_ReceiverUserId",
                 table: "Notifications",
-                columns: new[] { "UserId", "IsRead", "CreatedAt" });
+                column: "ReceiverUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_BillId_CreatedAt",
@@ -1087,6 +1111,7 @@ namespace DAL.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rooms_FloorId_RoomNo",
+                schema: "dbo",
                 table: "Rooms",
                 columns: new[] { "FloorId", "RoomNo" },
                 unique: true);
@@ -1109,7 +1134,7 @@ namespace DAL.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Tenants_IdentityUserId",
                 table: "Tenants",
-                column: "IdentityUserId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_RoomId",
@@ -1122,8 +1147,8 @@ namespace DAL.Migrations
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserRoles_RoleId",
-                table: "UserRoles",
+                name: "IX_UserRole_RoleId",
+                table: "UserRole",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
@@ -1209,7 +1234,7 @@ namespace DAL.Migrations
                 name: "Tickets");
 
             migrationBuilder.DropTable(
-                name: "UserRoles");
+                name: "UserRole");
 
             migrationBuilder.DropTable(
                 name: "UtilityPrices");
@@ -1219,9 +1244,6 @@ namespace DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "ExtraFees");
@@ -1236,22 +1258,26 @@ namespace DAL.Migrations
                 name: "Amenities");
 
             migrationBuilder.DropTable(
-                name: "Roles");
+                name: "Role");
 
             migrationBuilder.DropTable(
                 name: "Contracts");
 
             migrationBuilder.DropTable(
-                name: "Rooms");
+                name: "Rooms",
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "Tenants");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "User");
 
             migrationBuilder.DropTable(
                 name: "Floors");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Blocks");

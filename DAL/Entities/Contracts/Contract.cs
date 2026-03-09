@@ -9,10 +9,10 @@ using DAL.Entities.Tenanting; // Tenant
 
 namespace DAL.Entities.Contracts;
 
-public class Contract : AuditableEntity<long>
+public class Contract : AuditableEntity<int>
 {
     [Key]
-    public long ContractId { get; set; }
+    public int ContractId { get; set; }
 
     public int RoomId { get; set; }
     public int TenantId { get; set; }

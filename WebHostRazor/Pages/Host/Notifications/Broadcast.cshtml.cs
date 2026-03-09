@@ -52,20 +52,20 @@ namespace WebHostRazor.Pages.Host.Notifications
 
             // 🔥 LOAD CONTRACT + TENANT + ROOM + FLOOR + BLOCK
             var contracts = _context.Contracts
-                .Include(c => c.Tenant)
-                .Include(c => c.Room)
-                    .ThenInclude(r => r.Floor)
-                        .ThenInclude(f => f.Block)
-                .Where(c => c.IsActive)
-                .Select(c => new
-                {
-                    id = c.Id,
-                    tenant = c.Tenant.FullName,
-                    room = c.Room.Name,
-                    blockId = c.Room.Floor.BlockId,
-                    floorId = c.Room.FloorId
-                })
-                .ToList();
+      .Include(c => c.Tenant)
+      .Include(c => c.Room)
+          .ThenInclude(r => r.Floor)
+              .ThenInclude(f => f.Block)
+      .Where(c => c.Status == "Active")
+      .Select(c => new
+      {
+          id = c.ContractId,
+          tenant = c.Tenant.FullName,
+          room = c.Room.Name,
+          blockId = c.Room.Floor.BlockId,
+          floorId = c.Room.FloorId
+      })
+      .ToList();
 
             var blocks = _context.Blocks
                 .Select(b => new { id = b.Id, name = b.Name })

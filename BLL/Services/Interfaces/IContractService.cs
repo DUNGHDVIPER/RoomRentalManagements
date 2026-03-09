@@ -26,12 +26,7 @@ public interface IContractService
 
     Task CreateReminderAsync(int contractId, DateTime remindAt, string type, CancellationToken ct = default);
 
-<<<<<<< HEAD
-    // Export stubs
-    Task<byte[]> ExportPdfStubAsync(int contractId, CancellationToken ct = default);
-    Task<int?> GetActiveContractIdByUserIdAsync(string userId);
-}
-=======
+
     Task<byte[]> ExportPdfStubAsync(int contractId, int? actorUserId = null, CancellationToken ct = default);
 
     Task<int> ScanAndSendExpiryRemindersAsync(
@@ -39,5 +34,7 @@ public interface IContractService
         string remindType = "Expiry_7d",
         int? actorUserId = null,
         CancellationToken ct = default);
+
+    Task<int?> GetActiveContractIdByUserIdAsync(string userId);
+
 }
->>>>>>> 600f8e0e5ea5cddd3d355e4e0373beb5ad375574
