@@ -1024,8 +1024,7 @@ namespace DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ResidentId"));
 
-                    b.Property<DateTime>("
-                        InDate")
+                    b.Property<DateTime>("InDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("CheckOutDate")

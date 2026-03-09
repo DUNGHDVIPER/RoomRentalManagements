@@ -1,18 +1,23 @@
 ﻿using BLL.DTOs.Billing;
-using BLL.Common;
-using BLL.DTOs.Common;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using DAL.Entities.Billing;
 
 namespace BLL.Services.Interfaces;
 
 public interface IBillingService
 {
-    Task GenerateBillsBatchAsync(GenerateBillsRequestDto req, CancellationToken ct = default); // tháng đã có bill không tạo trùng
-    Task<BillDto> GetBillDetailAsync(int billId, CancellationToken ct = default);
-    Task<PagedResultDto<BillDto>> GetBillsAsync(PagedRequestDto req, CancellationToken ct = default);
+    Task<List<BillDto>> GetBillsAsync(string? q, string? status, string? month, CancellationToken ct);
+    Task<BillDto?> GetBillAsync(int id, CancellationToken ct);
 
-    Task RecordPaymentAsync(RecordPaymentDto dto, CancellationToken ct = default);
-    Task UpdateBillStatusAsync(int billId, int status, CancellationToken ct = default);
+    Task<List<SelectListItem>> GetActiveRoomOptionsAsync(CancellationToken ct);
+    Task<List<ExtraFee>> GetActiveExtraFeesAsync(CancellationToken ct);
 
-    // Preview wizard stub
-    Task<BillDto> PreviewBillStubAsync(int contractId, int period, CancellationToken ct = default);
+    Task<(bool Ok, string? Error)> CreateBillAsync(string roomNo, string month, string uiStatus, decimal total, CancellationToken ct);
+    Task<(bool Ok, string? Error)> UpdateBillAsync(int id, string month, string uiStatus, decimal total, CancellationToken ct);
+
+    Task<(bool Ok, string? Error)> DeleteBillAsync(int id, CancellationToken ct);
+
+    Task<(bool Ok, string? Error)> RecordPaymentAsync(RecordPaymentDto dto, CancellationToken ct);
+
+    Task<(bool Ok, string? Error, int Created, int Skipped)> GenerateBillsAsync(GenerateBillsRequestDto req, List<int> extraFeeIds, bool includeRent, bool includeUtilities, CancellationToken ct);
 }

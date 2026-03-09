@@ -4,6 +4,7 @@ using DAL.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +17,7 @@ builder.Services.AddControllersWithViews();
 // 2) DbContext
 // =====================
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // =====================
 // 3) Identity
@@ -38,6 +38,9 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IBillingService, BillingService>();
+builder.Services.AddScoped<IUtilityService, UtilityService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 // =====================
 // 5) Session
@@ -51,8 +54,27 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-var app = builder.Build();
+// =====================
+// 6) Cookie Authentication
+// =====================
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(opt =>
+    {
+        opt.LoginPath = "/Account/Login";
+        opt.AccessDeniedPath = "/Account/AccessDenied";
+        opt.SlidingExpiration = true;
+    });
 
+// =====================
+// 7) Authorization
+// =====================
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("Host", p => p.RequireRole("Host", "Admin"));
+});
+
+var app = builder.Build();
 
 // =====================
 // RESET ADMIN PASSWORD
@@ -70,7 +92,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-
 // =====================
 // Middleware
 // =====================
@@ -81,9 +102,9 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 
+// serve SharedUploads as /uploads
 var sharedUploadsPath = Path.GetFullPath(
     Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
 
@@ -98,10 +119,8 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 
 app.UseSession();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 // =====================
 // Routing
@@ -110,14 +129,12 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
-
 // =====================
 // Seed Roles
 // =====================
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider
-        .GetRequiredService<RoleManager<IdentityRole>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
     string[] roles = { "Admin", "Host", "Tenant" };
 
