@@ -54,6 +54,10 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
     public DbSet<BillItem> BillItems => Set<BillItem>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<BillStatusHistory> BillStatusHistories => Set<BillStatusHistory>();
+    // Utility readings
+    public DbSet<UtilityPrice> UtilityPrices => Set<UtilityPrice>();
+    public DbSet<UtilityReading> UtilityReadings => Set<UtilityReading>();
+    public DbSet<ExtraFee> ExtraFees => Set<ExtraFee>();
 
     // Maintenance (Ticket) - nếu bạn có
     public DbSet<DAL.Entities.Maintenance.Ticket> Tickets => Set<DAL.Entities.Maintenance.Ticket>();
@@ -62,8 +66,8 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<RoomAmenityEntity>()
-            .HasKey(x => new { x.RoomId, x.AmenityId });
+        // Dùng chung schema dbo cho toàn bộ app
+        modelBuilder.HasDefaultSchema("dbo");
 
         // Scan config đúng folder
         modelBuilder.ApplyConfigurationsFromAssembly(
@@ -71,37 +75,64 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
             t => t.Namespace != null && t.Namespace == "DAL.Data.Configurations"
         );
 
-        // ✅ FIX: Room map đúng table
-        modelBuilder.Entity<DAL.Entities.Property.Room>()
-            .ToTable("Rooms", "dbo");
+        // Property / Room
+        modelBuilder.Entity<RoomEntity>(e =>
+        {
+            e.ToTable("Rooms", "dbo");
+        });
 
-        // ✅ FIX: Contract -> PK identity ContractId, ignore base Id
+        modelBuilder.Entity<AmenityEntity>(e =>
+        {
+            e.ToTable("Amenities", "dbo");
+        });
+
+        modelBuilder.Entity<RoomAmenityEntity>(e =>
+        {
+            e.ToTable("RoomAmenities", "dbo");
+            e.HasKey(x => new { x.RoomId, x.AmenityId });
+
+            e.HasOne(x => x.Room)
+                .WithMany(x => x.RoomAmenities)
+                .HasForeignKey(x => x.RoomId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(x => x.Amenity)
+                .WithMany(x => x.RoomAmenities)
+                .HasForeignKey(x => x.AmenityId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<RoomImageEntity>(e =>
+        {
+            e.ToTable("RoomImages", "dbo");
+        });
+
+        modelBuilder.Entity<RoomPricingHistoryEntity>(e =>
+        {
+            e.ToTable("RoomPriceHistories", "dbo");
+        });
+
+        // Contract -> PK identity ContractId, ignore base Id
         modelBuilder.Entity<DAL.Entities.Contracts.Contract>(e =>
         {
-            e.Ignore(x => x.Id);                 // bỏ Id từ AuditableEntity<long>
-            e.HasKey(x => x.ContractId);         // PK = ContractId
-            e.Property(x => x.ContractId)
-                .ValueGeneratedOnAdd();          // Identity
+            e.Ignore(x => x.Id);
+            e.HasKey(x => x.ContractId);
+            e.Property(x => x.ContractId).ValueGeneratedOnAdd();
         });
 
-        // ✅ FIX: ContractVersion -> PK identity VersionId, ignore base Id
+        // ContractVersion -> PK identity VersionId
         modelBuilder.Entity<DAL.Entities.Contracts.ContractVersion>(e =>
         {
-                        // nếu ContractVersion có Id từ AuditableEntity<long>
-            e.HasKey(x => x.VersionId);          // PK = VersionId
-            e.Property(x => x.VersionId)
-                .ValueGeneratedOnAdd();          // Identity
+            e.HasKey(x => x.VersionId);
+            e.Property(x => x.VersionId).ValueGeneratedOnAdd();
         });
+
         modelBuilder.Entity<DAL.Entities.System.AuditLog>(e =>
         {
-            // ✅ PK đúng là Id (identity)
             e.HasKey(x => x.Id);
             e.Property(x => x.Id).ValueGeneratedOnAdd();
-
-            // ✅ AuditLogId đang NOT NULL nhưng không identity -> xử lý ở bước 2 (DB default)
         });
 
-        // Audit json -> nvarchar(max)
         modelBuilder.Entity<AuditLog>()
             .Property(x => x.OldValueJson)
             .HasColumnType("nvarchar(max)");

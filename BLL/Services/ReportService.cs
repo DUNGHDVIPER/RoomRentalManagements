@@ -26,7 +26,7 @@ public class ReportService : IReportService
 
     var occupiedRooms = await _db.Contracts
         .AsNoTracking()
-        .Where(c => c.IsActive && (int)c.Status == 1)
+        .Where(c => c.Status == "Active")
         .Select(c => c.RoomId)
         .Distinct()
         .CountAsync(ct);

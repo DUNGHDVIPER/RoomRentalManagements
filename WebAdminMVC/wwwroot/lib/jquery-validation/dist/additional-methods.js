@@ -50,7 +50,10 @@
  * an ACH bill payment.
  */
 $.validator.addMethod( "abaRoutingNumber", function( value ) {
-	var checksum = 0;
+	var 
+	
+	
+sum = 0;
 	var tokens = value.split( "" );
 	var length = tokens.length;
 

@@ -12,9 +12,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebAdmin.MVC.Controllers;
 
-[Authorize(Roles = "Admin")]
+/*[Authorize(Roles = "Admin")]
 [Route("Contracts")]
-[Route("Admin/Contracts")]
+[Route("Admin/Contracts")]*/
 public class ContractsController : Controller
 {
     private readonly AppDbContext _db;

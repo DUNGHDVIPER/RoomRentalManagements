@@ -1,9 +1,11 @@
 ﻿@using System.Security.Claims
+
 @{
-    var email = User?.Identity?.Name
-                ?? User?.FindFirstValue(ClaimTypes.Email)
-                ?? "Admin User";
+    var email = User?.Identity?.IsAuthenticated == true
+        ? (User?.Identity?.Name ?? User?.FindFirstValue(ClaimTypes.Email) ?? "Admin User")
+        : "Admin User";
 }
+
 <div class="topbar-left"></div>
 
 <div class="topbar-right">

@@ -1,13 +1,10 @@
-<<<<<<< HEAD
-﻿using BLL.Services;
-=======
 using BLL.Services;
->>>>>>> origin/main
 using BLL.Services.Interfaces;
 using DAL.Data;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,46 +14,40 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // =====================
-// 2) DbContext (DAL)
+// 2) DbContext
 // =====================
-<<<<<<< HEAD
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // =====================
-// 3) BLL services (của bạn)
+// 3) Identity
 // =====================
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Auth/Login";
+    options.AccessDeniedPath = "/Auth/AccessDenied";
+});
+
+// =====================
+// 4) BLL Services
+// =====================
+builder.Services.AddScoped<IContractService, ContractService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 
 // =====================
-// 4) Session (giống nhóm: có cache + session)
+// 5) Session
 // =====================
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(opt =>
-=======
-builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-/*builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));*/
-
-// =====================
-// 3) BLL services
-// =====================
-builder.Services.AddScoped<IContractService, ContractService>();
-builder.Services.AddScoped<IAuditService, AuditService>();
-
-// (Nếu bạn có EmailService dùng trong WebAdminMVC thì mở dòng này)
-// builder.Services.AddScoped<IEmailService, EmailService>();
-
-// =====================
-// 4) Session
-// =====================
-builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
->>>>>>> origin/main
 {
     options.IdleTimeout = TimeSpan.FromHours(8);
     options.Cookie.HttpOnly = true;
@@ -64,7 +55,7 @@ builder.Services.AddSession(options =>
 });
 
 // =====================
-// 5) Cookie Authentication (tự viết)
+// 6) Cookie Authentication
 // =====================
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -73,34 +64,10 @@ builder.Services
         opt.LoginPath = "/Account/Login";
         opt.AccessDeniedPath = "/Account/AccessDenied";
         opt.SlidingExpiration = true;
-        // opt.ExpireTimeSpan = TimeSpan.FromHours(8);
-        // opt.Cookie.Name = "WebAdmin.Auth";
     });
 
 // =====================
-// 6) Authorization
-// =====================
-builder.Services.AddAuthorization(opt =>
-{
-    opt.AddPolicy("Host", p => p.RequireRole("Host", "Admin"));
-});
-
-// =====================
-// 5) Cookie Authentication (giống nhóm)
-// =====================
-builder.Services
-    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(opt =>
-    {
-        opt.LoginPath = "/Account/Login";
-        opt.AccessDeniedPath = "/Account/AccessDenied";
-        opt.SlidingExpiration = true;
-        // opt.ExpireTimeSpan = TimeSpan.FromHours(8);
-        // opt.Cookie.Name = "WebAdmin.Auth";
-    });
-
-// =====================
-// 6) Authorization Policy (giống nhóm)
+// 7) Authorization
 // =====================
 builder.Services.AddAuthorization(opt =>
 {
@@ -110,7 +77,23 @@ builder.Services.AddAuthorization(opt =>
 var app = builder.Build();
 
 // =====================
-// 7) Middleware pipeline
+// RESET ADMIN PASSWORD
+// =====================
+using (var scope = app.Services.CreateScope())
+{
+    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+    var user = await userMgr.FindByEmailAsync("admin@demo.com");
+
+    if (user != null)
+    {
+        var token = await userMgr.GeneratePasswordResetTokenAsync(user);
+        await userMgr.ResetPasswordAsync(user, token, "Admin@12345!");
+    }
+}
+
+// =====================
+// Middleware
 // =====================
 if (!app.Environment.IsDevelopment())
 {
@@ -119,18 +102,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// wwwroot static files
 app.UseStaticFiles();
 
-<<<<<<< HEAD
-// Optional: serve SharedUploads as /uploads (giống nhóm)
+// serve SharedUploads as /uploads
 var sharedUploadsPath = Path.GetFullPath(
     Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
-=======
-// Optional: serve SharedUploads as /uploads
-var sharedUploadsPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
->>>>>>> origin/main
+
 Directory.CreateDirectory(sharedUploadsPath);
 
 app.UseStaticFiles(new StaticFileOptions
@@ -142,19 +119,30 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 
 app.UseSession();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 // =====================
-// 8) Routing
+// Routing
 // =====================
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
-<<<<<<< HEAD
-app.Run();   
-=======
+// =====================
+// Seed Roles
+// =====================
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    string[] roles = { "Admin", "Host", "Tenant" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+    }
+}
+
 app.Run();
->>>>>>> origin/main

@@ -17,48 +17,11 @@ namespace DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("dbo")
                 .HasAnnotation("ProductVersion", "8.0.24")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ContractVersion", b =>
-                {
-                    b.Property<long>("VersionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("VersionId"));
-
-                    b.Property<string>("ChangeNote")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime>("ChangedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ChangedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("ContractId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("SnapshotJson")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("VersionNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("VersionId");
-
-                    b.HasIndex("ChangedByUserId");
-
-                    b.HasIndex("ContractId", "VersionNumber")
-                        .IsUnique();
-
-                    b.ToTable("ContractVersions", (string)null);
-                });
 
             modelBuilder.Entity("DAL.Entities.Billing.Bill", b =>
                 {
@@ -68,8 +31,8 @@ namespace DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<long>("ContractId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -97,7 +60,7 @@ namespace DAL.Migrations
                     b.HasIndex("ContractId", "Period")
                         .IsUnique();
 
-                    b.ToTable("Bills", (string)null);
+                    b.ToTable("Bills", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.BillItem", b =>
@@ -135,7 +98,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ExtraFeeId");
 
-                    b.ToTable("BillItems", (string)null);
+                    b.ToTable("BillItems", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.BillStatusHistory", b =>
@@ -171,7 +134,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("BillId");
 
-                    b.ToTable("BillStatusHistories");
+                    b.ToTable("BillStatusHistories", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.ExtraFee", b =>
@@ -205,7 +168,7 @@ namespace DAL.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("ExtraFees", (string)null);
+                    b.ToTable("ExtraFees", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.Payment", b =>
@@ -248,7 +211,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("BillId", "CreatedAt");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.UtilityPrice", b =>
@@ -281,7 +244,7 @@ namespace DAL.Migrations
                     b.HasIndex("EffectiveFrom")
                         .IsUnique();
 
-                    b.ToTable("UtilityPrices", (string)null);
+                    b.ToTable("UtilityPrices", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.UtilityReading", b =>
@@ -296,7 +259,8 @@ namespace DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("ElectricKwh")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
 
                     b.Property<int>("Period")
                         .HasColumnType("int");
@@ -311,26 +275,26 @@ namespace DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("WaterM3")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoomId", "Period")
                         .IsUnique();
 
-                    b.ToTable("UtilityReadings", (string)null);
+                    b.ToTable("UtilityReadings", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Contracts.Contract", b =>
                 {
-                    b.Property<long>("ContractId")
+                    b.Property<int>("ContractId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ContractId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ContractId"));
 
                     b.Property<decimal>("BaseRent")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ContractCode")
@@ -345,7 +309,6 @@ namespace DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("DepositAmount")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("DepositPaidAmount")
@@ -361,9 +324,6 @@ namespace DAL.Migrations
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<long>("Id")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("Note")
                         .HasMaxLength(500)
@@ -402,7 +362,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("TenantId", "StartDate");
 
-                    b.ToTable("Contracts", (string)null);
+                    b.ToTable("Contracts", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Contracts.ContractAttachment", b =>
@@ -413,8 +373,8 @@ namespace DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("AttachmentId"));
 
-                    b.Property<long>("ContractId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
 
                     b.Property<string>("FileName")
                         .HasMaxLength(200)
@@ -435,7 +395,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ContractId");
 
-                    b.ToTable("ContractAttachments");
+                    b.ToTable("ContractAttachments", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Contracts.ContractReminder", b =>
@@ -446,8 +406,8 @@ namespace DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<long>("ContractId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -467,7 +427,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ContractId", "RemindAt");
 
-                    b.ToTable("ContractReminders", (string)null);
+                    b.ToTable("ContractReminders", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Contracts.ContractReminderLog", b =>
@@ -478,8 +438,8 @@ namespace DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("ContractId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -496,7 +456,45 @@ namespace DAL.Migrations
 
                     b.HasIndex("ContractId");
 
-                    b.ToTable("ContractReminderLogs");
+                    b.ToTable("ContractReminderLogs", "dbo");
+                });
+
+            modelBuilder.Entity("DAL.Entities.Contracts.ContractVersion", b =>
+                {
+                    b.Property<long>("VersionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("VersionId"));
+
+                    b.Property<string>("ChangeNote")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ChangedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SnapshotJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VersionNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("VersionId");
+
+                    b.HasIndex("ChangedByUserId");
+
+                    b.HasIndex("ContractId", "VersionNumber")
+                        .IsUnique();
+
+                    b.ToTable("ContractVersions", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Contracts.Deposit", b =>
@@ -510,8 +508,8 @@ namespace DAL.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<long>("ContractId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -529,7 +527,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ContractId");
 
-                    b.ToTable("Deposits");
+                    b.ToTable("Deposits", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Maintenance.Ticket", b =>
@@ -540,10 +538,9 @@ namespace DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Category")
-                        .IsRequired()
+                    b.Property<int>("Category")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -576,7 +573,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("Tickets", (string)null);
+                    b.ToTable("Tickets", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Motel.Role", b =>
@@ -601,7 +598,7 @@ namespace DAL.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Role", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Motel.User", b =>
@@ -657,7 +654,7 @@ namespace DAL.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("User", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Motel.UserRole", b =>
@@ -672,7 +669,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles");
+                    b.ToTable("UserRole", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.Amenity", b =>
@@ -699,7 +696,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("AmenityName");
 
-                    b.ToTable("Amenities", (string)null);
+                    b.ToTable("Amenities", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.Block", b =>
@@ -727,7 +724,7 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Blocks", (string)null);
+                    b.ToTable("Blocks", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.Floor", b =>
@@ -760,7 +757,7 @@ namespace DAL.Migrations
                     b.HasIndex("BlockId", "Level")
                         .HasDatabaseName("IX_Floors_Block_Level");
 
-                    b.ToTable("Floors", (string)null);
+                    b.ToTable("Floors", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.Room", b =>
@@ -801,7 +798,7 @@ namespace DAL.Migrations
                     b.HasIndex("FloorId", "RoomNo")
                         .IsUnique();
 
-                    b.ToTable("Rooms", (string)null);
+                    b.ToTable("Rooms", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.RoomAmenity", b =>
@@ -816,7 +813,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("AmenityId");
 
-                    b.ToTable("RoomAmenities", (string)null);
+                    b.ToTable("RoomAmenities", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.RoomImage", b =>
@@ -851,7 +848,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoomId", "SortOrder");
 
-                    b.ToTable("RoomImages", (string)null);
+                    b.ToTable("RoomImages", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.RoomPriceHistory", b =>
@@ -885,7 +882,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoomId", "FromDate");
 
-                    b.ToTable("RoomPriceHistories", (string)null);
+                    b.ToTable("RoomPriceHistories", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.System.AuditLog", b =>
@@ -904,9 +901,6 @@ namespace DAL.Migrations
                     b.Property<int?>("ActorUserId")
                         .HasMaxLength(450)
                         .HasColumnType("int");
-
-                    b.Property<long>("AuditLogId")
-                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -938,7 +932,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ActorUserId", "Action", "CreatedAt");
 
-                    b.ToTable("AuditLogs", (string)null);
+                    b.ToTable("AuditLogs", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.System.Notification", b =>
@@ -951,8 +945,10 @@ namespace DAL.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ContractId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -963,32 +959,38 @@ namespace DAL.Migrations
                     b.Property<DateTime?>("ReadAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ReceiverUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("SourceType")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId", "IsRead", "CreatedAt");
+                    b.HasIndex("ContractId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.HasIndex("ReceiverUserId");
+
+                    b.ToTable("Notifications", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.System.NotificationRecipient", b =>
                 {
-                    b.Property<long>("RecipientId")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("RecipientId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
@@ -1002,13 +1004,14 @@ namespace DAL.Migrations
                     b.Property<int>("TenantId")
                         .HasColumnType("int");
 
-                    b.HasKey("RecipientId");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("NotificationId");
 
-                    b.HasIndex("TenantId");
-
-                    b.ToTable("NotificationRecipients");
+                    b.ToTable("NotificationRecipients", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Tenanting.RoomResident", b =>
@@ -1040,7 +1043,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("RoomResidents");
+                    b.ToTable("RoomResidents", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Tenanting.StayHistory", b =>
@@ -1078,7 +1081,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoomId", "CheckInAt");
 
-                    b.ToTable("StayHistories", (string)null);
+                    b.ToTable("StayHistories", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Tenanting.Tenant", b =>
@@ -1113,9 +1116,6 @@ namespace DAL.Migrations
                     b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("IdentityUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Phone")
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
@@ -1127,12 +1127,16 @@ namespace DAL.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("IdentityUserId")
+                    b.HasIndex("UserId")
                         .HasDatabaseName("IX_Tenants_IdentityUserId");
 
-                    b.ToTable("Tenants", (string)null);
+                    b.ToTable("Tenants", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Tenanting.TenantIdDoc", b =>
@@ -1177,7 +1181,7 @@ namespace DAL.Migrations
                     b.HasIndex("TenantId", "DocType", "DocNumber")
                         .HasDatabaseName("IX_TenantIdDocs_Tenant_Doc");
 
-                    b.ToTable("TenantIdDocs", (string)null);
+                    b.ToTable("TenantIdDocs", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1204,7 +1208,7 @@ namespace DAL.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("AspNetRoles", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1229,7 +1233,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("AspNetRoleClaims", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
@@ -1294,7 +1298,7 @@ namespace DAL.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("AspNetUsers", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -1319,7 +1323,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", (string)null);
+                    b.ToTable("AspNetUserClaims", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -1341,7 +1345,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", (string)null);
+                    b.ToTable("AspNetUserLogins", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -1356,7 +1360,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("AspNetUserRoles", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -1375,24 +1379,7 @@ namespace DAL.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("ContractVersion", b =>
-                {
-                    b.HasOne("DAL.Entities.Motel.User", "ChangedByUser")
-                        .WithMany()
-                        .HasForeignKey("ChangedByUserId");
-
-                    b.HasOne("DAL.Entities.Contracts.Contract", "Contract")
-                        .WithMany("Versions")
-                        .HasForeignKey("ContractId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ChangedByUser");
-
-                    b.Navigation("Contract");
+                    b.ToTable("AspNetUserTokens", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.Bill", b =>
@@ -1466,13 +1453,13 @@ namespace DAL.Migrations
                     b.HasOne("DAL.Entities.Property.Room", "Room")
                         .WithMany("Contracts")
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DAL.Entities.Tenanting.Tenant", "Tenant")
                         .WithMany("Contracts")
                         .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -1511,6 +1498,23 @@ namespace DAL.Migrations
                         .HasForeignKey("ContractId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Contract");
+                });
+
+            modelBuilder.Entity("DAL.Entities.Contracts.ContractVersion", b =>
+                {
+                    b.HasOne("DAL.Entities.Motel.User", "ChangedByUser")
+                        .WithMany()
+                        .HasForeignKey("ChangedByUserId");
+
+                    b.HasOne("DAL.Entities.Contracts.Contract", "Contract")
+                        .WithMany("Versions")
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChangedByUser");
 
                     b.Navigation("Contract");
                 });
@@ -1626,6 +1630,21 @@ namespace DAL.Migrations
                     b.Navigation("Room");
                 });
 
+            modelBuilder.Entity("DAL.Entities.System.Notification", b =>
+                {
+                    b.HasOne("DAL.Entities.Contracts.Contract", "Contract")
+                        .WithMany()
+                        .HasForeignKey("ContractId");
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "ReceiverUser")
+                        .WithMany()
+                        .HasForeignKey("ReceiverUserId");
+
+                    b.Navigation("Contract");
+
+                    b.Navigation("ReceiverUser");
+                });
+
             modelBuilder.Entity("DAL.Entities.System.NotificationRecipient", b =>
                 {
                     b.HasOne("DAL.Entities.System.Notification", "Notification")
@@ -1634,15 +1653,7 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DAL.Entities.Tenanting.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Notification");
-
-                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("DAL.Entities.Tenanting.RoomResident", b =>
@@ -1681,6 +1692,17 @@ namespace DAL.Migrations
                     b.Navigation("Room");
 
                     b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("DAL.Entities.Tenanting.Tenant", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DAL.Entities.Tenanting.TenantIdDoc", b =>

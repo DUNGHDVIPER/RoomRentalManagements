@@ -19,24 +19,20 @@ public class BillingService : IBillingService
         _utility = utility;
     }
 
-    // =========================
-    // LIST
-    // =========================
     public async Task<List<BillDto>> GetBillsAsync(string? q, string? status, string? month, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
 
-        // ✅ 0) Refresh Overdue (Issued + quá hạn => Overdue)
         await _db.Bills
             .Where(b => b.Status == BillStatus.Issued && b.DueDate < now)
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(b => b.Status, BillStatus.Overdue)
-                .SetProperty(b => b.UpdatedAt, now),
-                ct);
+                .SetProperty(b => b.UpdatedAt, now), ct);
 
         var query = _db.Bills
             .AsNoTracking()
-            .Include(b => b.Contract).ThenInclude(c => c.Room)
+            .Include(b => b.Contract)
+                .ThenInclude(c => c.Room)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(q))
@@ -53,13 +49,11 @@ public class BillingService : IBillingService
         if (!string.IsNullOrWhiteSpace(status))
         {
             var s = NormalizeUiStatus(status);
-
-             
             query = s switch
             {
                 "Paid" => query.Where(b => b.Status == BillStatus.Paid),
                 "Overdue" => query.Where(b => b.Status == BillStatus.Overdue),
-                _ => query.Where(b => b.Status == BillStatus.Issued) // Unpaid
+                _ => query.Where(b => b.Status == BillStatus.Issued)
             };
         }
 
@@ -69,7 +63,7 @@ public class BillingService : IBillingService
             .Select(b => new BillDto
             {
                 Id = b.Id,
-                ContractId = b.ContractId,
+                ContractId = (int)b.ContractId,
                 Period = b.Period,
                 IssuedAt = b.IssuedAt,
                 DueDate = b.DueDate,
@@ -82,21 +76,19 @@ public class BillingService : IBillingService
             .ToListAsync(ct);
     }
 
-    // =========================
-    // DETAILS
-    // =========================
     public async Task<BillDto?> GetBillAsync(int id, CancellationToken ct)
     {
         var b = await _db.Bills
             .AsNoTracking()
-            .Include(x => x.Contract).ThenInclude(c => c.Room)
+            .Include(x => x.Contract)
+                .ThenInclude(c => c.Room)
             .FirstOrDefaultAsync(x => x.Id == id, ct);
 
         if (b == null) return null;
 
         var items = await _db.BillItems
             .AsNoTracking()
-            .Where(i => i.BillId == id)
+.Where(i => i.BillId == id)
             .OrderBy(i => i.ExtraFeeId.HasValue)
             .ThenBy(i => i.Name)
             .Select(i => new BillItemDto
@@ -128,7 +120,7 @@ public class BillingService : IBillingService
         return new BillDto
         {
             Id = b.Id,
-            ContractId = b.ContractId,
+            ContractId = (int)b.ContractId,
             Period = b.Period,
             IssuedAt = b.IssuedAt,
             DueDate = b.DueDate,
@@ -140,14 +132,11 @@ public class BillingService : IBillingService
         };
     }
 
-    // =========================
-    // DROPDOWN Rooms
-    // =========================
     public async Task<List<SelectListItem>> GetActiveRoomOptionsAsync(CancellationToken ct)
     {
         var rooms = await _db.Contracts
             .AsNoTracking()
-            .Where(c => c.IsActive)
+            .Where(c => c.Status == "Active")
             .Include(c => c.Room)
             .Select(c => c.Room)
             .Distinct()
@@ -161,9 +150,6 @@ public class BillingService : IBillingService
         }).ToList();
     }
 
-    // =========================
-    // ExtraFee
-    // =========================
     public async Task<List<ExtraFee>> GetActiveExtraFeesAsync(CancellationToken ct)
     {
         return await _db.ExtraFees
@@ -173,9 +159,6 @@ public class BillingService : IBillingService
             .ToListAsync(ct);
     }
 
-    // =========================
-    // CREATE
-    // =========================
     public async Task<(bool Ok, string? Error)> CreateBillAsync(string roomNo, string month, string uiStatus, decimal total, CancellationToken ct)
     {
         if (!TryParseMonth(month, out var period))
@@ -191,16 +174,17 @@ public class BillingService : IBillingService
 
         var contract = await _db.Contracts
             .Include(c => c.Room)
-            .Where(c => c.IsActive)
-            .OrderByDescending(c => c.Id)
+            .Where(c => c.Status == "Active")
+            .OrderByDescending(c => c.ContractId)
             .FirstOrDefaultAsync(c =>
                 c.Room.RoomNo == roomKey ||
-                (c.Room.Name != null && c.Room.Name == roomKey), ct);
+(c.Room.Name != null && c.Room.Name == roomKey), ct);
 
         if (contract == null)
             return (false, "Không tìm thấy phòng hoặc chưa có hợp đồng active cho phòng này.");
 
-        var exists = await _db.Bills.AnyAsync(b => b.ContractId == contract.Id && b.Period == period, ct);
+        var exists = await _db.Bills
+            .AnyAsync(b => b.ContractId == contract.ContractId && b.Period == period, ct);
         if (exists)
             return (false, "Bill của phòng này trong tháng này đã tồn tại.");
 
@@ -208,7 +192,7 @@ public class BillingService : IBillingService
 
         var bill = new Bill
         {
-            ContractId = contract.Id,
+            ContractId = contract.ContractId,
             Period = period,
             IssuedAt = now,
             DueDate = now.AddDays(7),
@@ -224,9 +208,6 @@ public class BillingService : IBillingService
         return (true, null);
     }
 
-    // =========================
-    // UPDATE
-    // =========================
     public async Task<(bool Ok, string? Error)> UpdateBillAsync(int id, string month, string uiStatus, decimal total, CancellationToken ct)
     {
         if (!TryParseMonth(month, out var period))
@@ -247,15 +228,11 @@ public class BillingService : IBillingService
         return (true, null);
     }
 
-    // =========================
-    // DELETE (safe FK)
-    // =========================
     public async Task<(bool Ok, string? Error)> DeleteBillAsync(int id, CancellationToken ct)
     {
         var bill = await _db.Bills.FirstOrDefaultAsync(x => x.Id == id, ct);
         if (bill == null) return (false, "Bill không tồn tại.");
 
-        // safe: xóa con trước để khỏi lỗi FK
         _db.BillItems.RemoveRange(_db.BillItems.Where(x => x.BillId == id));
         _db.Payments.RemoveRange(_db.Payments.Where(x => x.BillId == id));
 
@@ -265,9 +242,6 @@ public class BillingService : IBillingService
         return (true, null);
     }
 
-    // =========================
-    // PAYMENT
-    // =========================
     public async Task<(bool Ok, string? Error)> RecordPaymentAsync(RecordPaymentDto dto, CancellationToken ct)
     {
         var bill = await _db.Bills.FirstOrDefaultAsync(b => b.Id == dto.BillId, ct);
@@ -291,24 +265,16 @@ public class BillingService : IBillingService
 
         _db.Payments.Add(payment);
         await _db.SaveChangesAsync(ct);
-
         var totalPaid = await _db.Payments
-       .Where(p => p.BillId == dto.BillId && p.Status == PaymentStatus.Completed)
-       .SumAsync(p => (decimal?)p.Amount, ct) ?? 0m;
+                    .Where(p => p.BillId == dto.BillId && p.Status == PaymentStatus.Completed)
+                    .SumAsync(p => (decimal?)p.Amount, ct) ?? 0m;
 
-        // ✅ Update BillStatus theo nghiệp vụ chuẩn
         if (totalPaid >= bill.TotalAmount)
-        {
             bill.Status = BillStatus.Paid;
-        }
         else if (bill.DueDate < now)
-        {
             bill.Status = BillStatus.Overdue;
-        }
         else
-        {
             bill.Status = BillStatus.Issued;
-        }
 
         bill.UpdatedAt = now;
         await _db.SaveChangesAsync(ct);
@@ -316,9 +282,6 @@ public class BillingService : IBillingService
         return (true, null);
     }
 
-    // =========================
-    // GENERATE BILLS
-    // =========================
     public async Task<(bool Ok, string? Error, int Created, int Skipped)> GenerateBillsAsync(
         GenerateBillsRequestDto req,
         List<int> extraFeeIds,
@@ -340,20 +303,42 @@ public class BillingService : IBillingService
         if (req.DueDate < firstDay || req.DueDate > lastDay)
             return (false, $"Due Date phải nằm trong tháng {y:D4}-{m:D2}.", 0, 0);
 
-        // Lấy contracts active (project nhẹ để tránh phụ thuộc vào tên property Rent/RoomId)
         var contractRows = await _db.Contracts
             .AsNoTracking()
-            .Where(c => c.IsActive)
+            .Where(c => c.Status == "Active")
             .Select(c => new
             {
-                c.Id,
-                RoomId = EF.Property<int>(c, "RoomId"),
-                Rent = EF.Property<decimal>(c, "Rent")
+                c.ContractId,
+                c.RoomId,
+                Rent = c.BaseRent
             })
             .ToListAsync(ct);
 
-        // Nếu bạn muốn filter block/floor:
-        // -> cần Room entity có BlockId/FloorId. Mình để comment vì chưa thấy Room.cs của bạn.
+        if (req.FloorId.HasValue)
+        {
+            var allowedRoomIds = await _db.Rooms
+                .AsNoTracking()
+                .Where(r => r.FloorId == req.FloorId.Value)
+                .Select(r => r.Id)
+                .ToListAsync(ct);
+
+            contractRows = contractRows
+                .Where(c => allowedRoomIds.Contains(c.RoomId))
+                .ToList();
+        }
+
+        if (req.BlockId.HasValue)
+        {
+            var allowedRoomIds = await _db.Rooms
+                .AsNoTracking()
+                .Where(r => r.Floor.BlockId == req.BlockId.Value)
+                .Select(r => r.Id)
+                .ToListAsync(ct);
+
+            contractRows = contractRows
+                .Where(c => allowedRoomIds.Contains(c.RoomId))
+                .ToList();
+        }
 
         var existingContractIds = (await _db.Bills
                 .AsNoTracking()
@@ -362,17 +347,19 @@ public class BillingService : IBillingService
                 .ToListAsync(ct))
             .ToHashSet();
 
-        var fees = (extraFeeIds != null && extraFeeIds.Count > 0)
-            ? await _db.ExtraFees.AsNoTracking()
+        var fees = extraFeeIds is { Count: > 0 }
+            ? await _db.ExtraFees
+                .AsNoTracking()
                 .Where(x => x.IsActive && extraFeeIds.Contains(x.Id))
                 .ToListAsync(ct)
             : new List<ExtraFee>();
-
-        int created = 0, skipped = 0;
+        var now = DateTime.UtcNow;
+        var created = 0;
+        var skipped = 0;
 
         foreach (var c in contractRows)
         {
-            if (existingContractIds.Contains(c.Id))
+            if (existingContractIds.Contains(c.ContractId))
             {
                 skipped++;
                 continue;
@@ -380,17 +367,18 @@ public class BillingService : IBillingService
 
             var bill = new Bill
             {
-                ContractId = c.Id,
+                ContractId = c.ContractId,
                 Period = period,
                 DueDate = req.DueDate,
                 Status = BillStatus.Issued,
-                IssuedAt = DateTime.UtcNow,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                IssuedAt = now,
+                CreatedAt = now,
+                UpdatedAt = now,
+                TotalAmount = 0m
             };
 
             _db.Bills.Add(bill);
-            await _db.SaveChangesAsync(ct); // lấy bill.Id
+            await _db.SaveChangesAsync(ct);
 
             if (includeRent)
             {
@@ -416,7 +404,6 @@ public class BillingService : IBillingService
                 }
                 catch
                 {
-                    // chưa có readings -> skip utilities
                 }
             }
 
@@ -446,7 +433,6 @@ public class BillingService : IBillingService
         return (true, null, created, skipped);
     }
 
-    // ================= Helpers =================
     private static bool TryParseMonth(string? month, out int period)
     {
         period = 0;
