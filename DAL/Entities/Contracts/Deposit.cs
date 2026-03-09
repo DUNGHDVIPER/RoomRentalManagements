@@ -8,7 +8,7 @@ public class Deposit
     [Key]
     public long DepositId { get; set; }
 
-    public long ContractId { get; set; }
+    public int ContractId { get; set; }
 
     [Column(TypeName = "decimal(18,2)")]
     public decimal Amount { get; set; }

@@ -7,7 +7,7 @@ public class ContractReminder
     [Key]
     public int Id { get; set; }
 
-    public long ContractId { get; set; }
+    public int ContractId { get; set; }
 
     [MaxLength(30)]
     public string Type { get; set; } = null!;

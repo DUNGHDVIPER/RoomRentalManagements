@@ -7,7 +7,7 @@ public class ContractAttachment
     [Key]
     public long AttachmentId { get; set; }
 
-    public long ContractId { get; set; }
+    public int ContractId { get; set; }
 
     [MaxLength(500)]
     public string FileUrl { get; set; } = null!;

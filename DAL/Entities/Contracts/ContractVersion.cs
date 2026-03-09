@@ -8,7 +8,7 @@ public class ContractVersion
     [Key]
     public long VersionId { get; set; } // DB: IDENTITY
 
-    public long ContractId { get; set; }
+    public int ContractId { get; set; }
     public int VersionNumber { get; set; }
     public DateTime ChangedAt { get; set; }
     public int? ChangedByUserId { get; set; }

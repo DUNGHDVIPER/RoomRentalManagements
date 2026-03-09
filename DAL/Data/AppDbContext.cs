@@ -54,6 +54,10 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
     public DbSet<BillItem> BillItems => Set<BillItem>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<BillStatusHistory> BillStatusHistories => Set<BillStatusHistory>();
+    // Utility readings
+    public DbSet<UtilityPrice> UtilityPrices => Set<UtilityPrice>();
+    public DbSet<UtilityReading> UtilityReadings => Set<UtilityReading>();
+    public DbSet<ExtraFee> ExtraFees => Set<ExtraFee>();
 
     // Maintenance (Ticket) - nếu bạn có
     public DbSet<DAL.Entities.Maintenance.Ticket> Tickets => Set<DAL.Entities.Maintenance.Ticket>();

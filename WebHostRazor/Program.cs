@@ -2,11 +2,12 @@ using BLL.Services;
 using BLL.Services.Interfaces;
 using DAL.Data;
 using DAL.Repositories;
+using DAL.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using QuestPDF.Infrastructure;
-using DAL.Seed;
+using WebHostRazor.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,8 +15,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
-// ✅ Razor Pages
-builder.Services.AddRazorPages();
+// Razor Pages
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeFolder("/Host", "Host");
+    options.Conventions.AllowAnonymousToFolder("/Auth");
+});
 
 // Authorization
 builder.Services.AddAuthorization(o =>
@@ -24,8 +29,9 @@ builder.Services.AddAuthorization(o =>
     o.AddPolicy("AdminOrHost", p => p.RequireRole("Admin", "Host", "SuperAdmin"));
 });
 
-// DbContext with retry logic for transient failures
+// DbContext
 var cs = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(cs, sqlOptions =>
     {
@@ -56,7 +62,10 @@ builder.Services.ConfigureApplicationCookie(opt =>
     opt.SlidingExpiration = true;
 });
 
-// BLL + Repo
+// SignalR
+builder.Services.AddSignalR();
+
+// Services + Repository
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
@@ -65,24 +74,29 @@ builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAdminMVC", policy =>
     {
-        policy.WithOrigins("https://localhost:7282", "http://localhost:5220", "https://localhost:5220")
+        policy.WithOrigins(
+                "https://localhost:7282",
+                "http://localhost:5220",
+                "https://localhost:5220")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
     });
 });
 
+// QuestPDF
 QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 
-// Database migration and seeding with proper error handling
+// Database migration + seeding
 try
 {
     await using (var scope = app.Services.CreateAsyncScope())
@@ -90,39 +104,23 @@ try
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        logger.LogInformation("Checking database connection...");
 
-        if (!await db.Database.CanConnectAsync())
-        {
-            logger.LogInformation("Database not accessible, creating database...");
-            await db.Database.EnsureCreatedAsync();
-        }
-
-        logger.LogInformation("Starting database migration...");
+        logger.LogInformation("Migrating database...");
         await db.Database.MigrateAsync();
-        logger.LogInformation("Database migration completed successfully.");
 
         var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-        logger.LogInformation("Starting identity seeding...");
         await IdentitySeeder.SeedAsync(roleMgr, userMgr);
-        logger.LogInformation("Identity seeding completed successfully.");
+
+        logger.LogInformation("Database ready.");
     }
 }
 catch (Exception ex)
 {
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occurred during database migration or seeding");
-
-    if (app.Environment.IsDevelopment())
-    {
-        Console.WriteLine($"Database Error: {ex.Message}");
-        Console.WriteLine("Make sure your SQL Server is running and the connection string is correct.");
-        throw;
-    }
+    logger.LogError(ex, "Database migration failed");
 }
-
 
 if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
@@ -138,8 +136,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 // SharedUploads -> /uploads
-var sharedUploadsPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
+var sharedUploadsPath = Path.GetFullPath(
+    Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
+
 Directory.CreateDirectory(sharedUploadsPath);
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(sharedUploadsPath),
@@ -147,12 +148,59 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseRouting();
+
 app.UseCors("AllowAdminMVC");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ✅ Razor Pages endpoints
+// SignalR Hub
+app.MapHub<NotificationHub>("/notificationHub");
+
+// Razor Pages
 app.MapRazorPages();
 
+// Demo users
+await SeedIdentityAsync(app);
+
 app.Run();
+
+static async Task SeedIdentityAsync(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+
+    var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+    string[] roles = { "Admin", "Host", "SuperAdmin" };
+
+    foreach (var r in roles)
+        if (!await roleMgr.RoleExistsAsync(r))
+            await roleMgr.CreateAsync(new IdentityRole(r));
+
+    await EnsureUser(userMgr, "host@demo.com", "Host@123", "Host");
+    await EnsureUser(userMgr, "admin@demo.com", "Admin@123", "Admin");
+}
+
+static async Task EnsureUser(UserManager<IdentityUser> userMgr, string email, string password, string role)
+{
+    var user = await userMgr.FindByEmailAsync(email);
+
+    if (user == null)
+    {
+        user = new IdentityUser
+        {
+            UserName = email,
+            Email = email,
+            EmailConfirmed = true
+        };
+
+        var created = await userMgr.CreateAsync(user, password);
+
+        if (!created.Succeeded)
+            return;
+    }
+
+    if (!await userMgr.IsInRoleAsync(user, role))
+        await userMgr.AddToRoleAsync(user, role);
+}

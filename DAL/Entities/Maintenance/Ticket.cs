@@ -14,9 +14,8 @@ public class Ticket : AuditableEntity<int>
     public string Description { get; set; } = null!;
 
     [Required, MaxLength(50)]
-    public string Category { get; set; } = "Other";
+    public TicketCategory Category { get; set; }
 
-    // ✅ đổi int -> TicketStatus
     public TicketStatus Status { get; set; } = TicketStatus.Open;
 
     public int RoomId { get; set; }
@@ -24,4 +23,4 @@ public class Ticket : AuditableEntity<int>
 
     public Room? Room { get; set; }
     public Tenant? Tenant { get; set; }
-}
+}   
