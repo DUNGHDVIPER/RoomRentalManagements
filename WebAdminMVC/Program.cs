@@ -58,7 +58,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddScoped<IReportService, ReportService>();
-
+builder.Services.AddScoped<IRoomService, RoomService>();
 // =====================
 // 5) Session
 // =====================

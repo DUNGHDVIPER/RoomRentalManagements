@@ -4,21 +4,38 @@
     ViewData["Title"] = "Upload Attachment";
 }
 
-<h2>Upload Attachment</h2>
+<div class="contract-page">
+    <partial name="/Pages/Host/Shared/_ToastPopup.cshtml" />
 
-<form method="post" enctype="multipart/form-data">
-    <div class="mb-3">
-        <input class="form-control" asp-for="File" type="file" />
-        <span class="text-danger" asp-validation-for="File"></span>
+    <div class="contract-hero">
+        <div>
+            <div class="contract-breadcrumb">Host / Contracts / Attachment</div>
+            <h1>Upload Attachment</h1>
+            <p>Upload file for this contract.</p>
+        </div>
+
+        <a class="btn btn-soft" asp-page="./Details" asp-route-id="@RouteData.Values["id"]">Back</a>
     </div>
 
-    <button class="btn btn-info" type="submit">Upload</button>
-    <a class="btn btn-secondary" asp-page="/Contracts/Details" asp-route-id="@RouteData.Values["id"]">Cancel</a>
+    <div class="contract-card">
+        <form method="post" enctype="multipart/form-data" class="contract-form">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Select File</label>
+                <input class="form-control" asp-for="File" type="file" />
+                <span class="text-danger" asp-validation-for="File"></span>
+            </div>
 
-    <div class="text-danger mt-2">
-        @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-        {
-            <div>@err.ErrorMessage</div>
-        }
+            <div class="d-flex gap-2">
+                <button class="btn btn-gradient-primary" type="submit">Upload</button>
+                <a class="btn btn-soft" asp-page="./Details" asp-route-id="@RouteData.Values["id"]">Cancel</a>
+            </div>
+
+            <div class="text-danger mt-3">
+                @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            </div>
+        </form>
     </div>
-</form>
+</div>

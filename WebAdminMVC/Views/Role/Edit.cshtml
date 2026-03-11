@@ -1,0 +1,28 @@
+﻿@model WebAdmin.MVC.Models.Roles.RoleEditVm
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Edit Role";
+}
+<div class="ui-card form-card">
+    <div class="toolbar">
+        <div>
+            <h1 class="h1">Edit Role</h1>
+            <div class="muted">FE-only</div>
+        </div>
+        <div class="toolbar-right">
+            <a class="btn btn-ghost" href="/Roles/Index">Back</a>
+        </div>
+    </div>
+
+    <form method="post" class="mt">
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <div class="label">Name</div>
+            <input class="input" asp-for="Name" />
+        </div>
+        <div class="row-end">
+            <a class="btn btn-ghost" href="/Roles/Index">Cancel</a>
+            <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+    </form>
+</div>
