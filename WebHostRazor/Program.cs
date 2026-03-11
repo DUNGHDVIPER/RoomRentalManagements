@@ -83,6 +83,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+// QuestPDF
 QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
@@ -134,6 +135,7 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseRouting();
+
 app.UseCors("AllowAdminMVC");
 app.UseAuthentication();
 app.UseAuthorization();
