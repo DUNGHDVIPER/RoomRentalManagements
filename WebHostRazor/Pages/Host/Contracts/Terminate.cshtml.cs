@@ -60,12 +60,14 @@ public class TerminateModel : PageModel
 
             await _service.TerminateAsync(dto, actorUserId: null, ct);
 
-            TempData["Success"] = "Terminated successfully.";
+            TempData["Ok"] = "Terminated successfully.";
+            TempData["Success"] = TempData["Ok"];
             return RedirectToPage("./Details", new { id = Vm.ContractId });
         }
         catch (InvalidOperationException ex)
         {
-            TempData["Error"] = ex.Message;
+            TempData["Err"] = ex.Message;
+            TempData["Error"] = TempData["Err"];
             return RedirectToPage("./Details", new { id = Vm.ContractId });
         }
     }

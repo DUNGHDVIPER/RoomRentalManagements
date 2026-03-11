@@ -1,7 +1,5 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebAdmin.MVC.Models.Auth;
 
@@ -10,6 +8,17 @@ namespace WebAdmin.MVC.Controllers;
 public class AccountController : Controller
 {
     private const string LoginViewPath = "~/Views/Auth/Login.cshtml";
+
+    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly UserManager<IdentityUser> _userManager;
+
+    public AccountController(
+        SignInManager<IdentityUser> signInManager,
+        UserManager<IdentityUser> userManager)
+    {
+        _signInManager = signInManager;
+        _userManager = userManager;
+    }
 
     [HttpGet]
     [AllowAnonymous]
@@ -29,34 +38,27 @@ public class AccountController : Controller
         if (!ModelState.IsValid)
             return View(LoginViewPath, vm);
 
-        // Demo accounts
-        string? role = null;
-
-        if (vm.Email.Equals("admin@system.com", StringComparison.OrdinalIgnoreCase) && vm.Password == "Admin@123456")
-            role = "Admin";
-        else if (vm.Email.Equals("host@demo.com", StringComparison.OrdinalIgnoreCase) && vm.Password == "Host@123")
-            role = "Host";
-
-        if (role == null)
+        var user = await _userManager.FindByEmailAsync(vm.Email);
+        if (user == null)
         {
             vm.ErrorMessage = "Invalid email or password.";
             return View(LoginViewPath, vm);
         }
 
-        var claims = new List<Claim>
+        var result = await _signInManager.PasswordSignInAsync(
+            user.UserName!,
+            vm.Password,
+            vm.RememberMe,
+            lockoutOnFailure: false);
+
+        if (!result.Succeeded)
         {
-            new Claim(ClaimTypes.NameIdentifier, vm.Email),
-            new Claim(ClaimTypes.Name, vm.Email),
-            new Claim(ClaimTypes.Role, role)
-        };
+            vm.ErrorMessage = result.IsLockedOut
+                ? "This account is locked."
+                : "Invalid email or password.";
 
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var principal = new ClaimsPrincipal(identity);
-
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            principal,
-            new AuthenticationProperties { IsPersistent = vm.RememberMe });
+            return View(LoginViewPath, vm);
+        }
 
         if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             return Redirect(returnUrl);
@@ -68,7 +70,7 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await _signInManager.SignOutAsync();
         return RedirectToAction(nameof(Login));
     }
 
