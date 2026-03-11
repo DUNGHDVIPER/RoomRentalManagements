@@ -17,6 +17,7 @@ namespace DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("dbo")
                 .HasAnnotation("ProductVersion", "8.0.24")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -59,7 +60,7 @@ namespace DAL.Migrations
                     b.HasIndex("ContractId", "Period")
                         .IsUnique();
 
-                    b.ToTable("Bills", (string)null);
+                    b.ToTable("Bills", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.BillItem", b =>
@@ -97,7 +98,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ExtraFeeId");
 
-                    b.ToTable("BillItems", (string)null);
+                    b.ToTable("BillItems", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.BillStatusHistory", b =>
@@ -133,7 +134,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("BillId");
 
-                    b.ToTable("BillStatusHistories");
+                    b.ToTable("BillStatusHistories", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.ExtraFee", b =>
@@ -167,7 +168,7 @@ namespace DAL.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("ExtraFees", (string)null);
+                    b.ToTable("ExtraFees", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.Payment", b =>
@@ -210,7 +211,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("BillId", "CreatedAt");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.UtilityPrice", b =>
@@ -243,7 +244,7 @@ namespace DAL.Migrations
                     b.HasIndex("EffectiveFrom")
                         .IsUnique();
 
-                    b.ToTable("UtilityPrices", (string)null);
+                    b.ToTable("UtilityPrices", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.UtilityReading", b =>
@@ -282,7 +283,7 @@ namespace DAL.Migrations
                     b.HasIndex("RoomId", "Period")
                         .IsUnique();
 
-                    b.ToTable("UtilityReadings", (string)null);
+                    b.ToTable("UtilityReadings", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Contracts.Contract", b =>
@@ -361,7 +362,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("TenantId", "StartDate");
 
-                    b.ToTable("Contracts", (string)null);
+                    b.ToTable("Contracts", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Contracts.ContractAttachment", b =>
@@ -394,7 +395,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ContractId");
 
-                    b.ToTable("ContractAttachments");
+                    b.ToTable("ContractAttachments", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Contracts.ContractReminder", b =>
@@ -426,7 +427,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ContractId", "RemindAt");
 
-                    b.ToTable("ContractReminders", (string)null);
+                    b.ToTable("ContractReminders", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Contracts.ContractReminderLog", b =>
@@ -455,7 +456,45 @@ namespace DAL.Migrations
 
                     b.HasIndex("ContractId");
 
-                    b.ToTable("ContractReminderLogs");
+                    b.ToTable("ContractReminderLogs", "dbo");
+                });
+
+            modelBuilder.Entity("DAL.Entities.Contracts.ContractVersion", b =>
+                {
+                    b.Property<long>("VersionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("VersionId"));
+
+                    b.Property<string>("ChangeNote")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ChangedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SnapshotJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VersionNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("VersionId");
+
+                    b.HasIndex("ChangedByUserId");
+
+                    b.HasIndex("ContractId", "VersionNumber")
+                        .IsUnique();
+
+                    b.ToTable("ContractVersions", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Contracts.ContractVersion", b =>
@@ -526,7 +565,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ContractId");
 
-                    b.ToTable("Deposits");
+                    b.ToTable("Deposits", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Maintenance.Ticket", b =>
@@ -572,7 +611,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("Tickets", (string)null);
+                    b.ToTable("Tickets", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Motel.Role", b =>
@@ -597,7 +636,7 @@ namespace DAL.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("Role");
+                    b.ToTable("Role", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Motel.User", b =>
@@ -653,7 +692,7 @@ namespace DAL.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("User");
+                    b.ToTable("User", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Motel.UserRole", b =>
@@ -668,7 +707,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRole");
+                    b.ToTable("UserRole", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.Amenity", b =>
@@ -695,7 +734,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("AmenityName");
 
-                    b.ToTable("Amenities", (string)null);
+                    b.ToTable("Amenities", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.Block", b =>
@@ -723,7 +762,7 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Blocks", (string)null);
+                    b.ToTable("Blocks", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.Floor", b =>
@@ -756,7 +795,7 @@ namespace DAL.Migrations
                     b.HasIndex("BlockId", "Level")
                         .HasDatabaseName("IX_Floors_Block_Level");
 
-                    b.ToTable("Floors", (string)null);
+                    b.ToTable("Floors", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.Room", b =>
@@ -812,7 +851,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("AmenityId");
 
-                    b.ToTable("RoomAmenities", (string)null);
+                    b.ToTable("RoomAmenities", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.RoomImage", b =>
@@ -847,7 +886,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoomId", "SortOrder");
 
-                    b.ToTable("RoomImages", (string)null);
+                    b.ToTable("RoomImages", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Property.RoomPriceHistory", b =>
@@ -881,7 +920,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoomId", "FromDate");
 
-                    b.ToTable("RoomPriceHistories", (string)null);
+                    b.ToTable("RoomPriceHistories", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.System.AuditLog", b =>
@@ -931,7 +970,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ActorUserId", "Action", "CreatedAt");
 
-                    b.ToTable("AuditLogs", (string)null);
+                    b.ToTable("AuditLogs", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.System.Notification", b =>
@@ -977,7 +1016,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("ReceiverUserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.System.NotificationRecipient", b =>
@@ -1010,7 +1049,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("NotificationId");
 
-                    b.ToTable("NotificationRecipients");
+                    b.ToTable("NotificationRecipients", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Tenanting.RoomResident", b =>
@@ -1042,7 +1081,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("RoomResidents");
+                    b.ToTable("RoomResidents", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Tenanting.StayHistory", b =>
@@ -1080,7 +1119,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoomId", "CheckInAt");
 
-                    b.ToTable("StayHistories", (string)null);
+                    b.ToTable("StayHistories", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Tenanting.Tenant", b =>
@@ -1135,7 +1174,7 @@ namespace DAL.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("IX_Tenants_IdentityUserId");
 
-                    b.ToTable("Tenants", (string)null);
+                    b.ToTable("Tenants", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Tenanting.TenantIdDoc", b =>
@@ -1180,7 +1219,7 @@ namespace DAL.Migrations
                     b.HasIndex("TenantId", "DocType", "DocNumber")
                         .HasDatabaseName("IX_TenantIdDocs_Tenant_Doc");
 
-                    b.ToTable("TenantIdDocs", (string)null);
+                    b.ToTable("TenantIdDocs", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1207,7 +1246,7 @@ namespace DAL.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("AspNetRoles", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1232,7 +1271,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("AspNetRoleClaims", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
@@ -1297,7 +1336,7 @@ namespace DAL.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("AspNetUsers", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -1322,7 +1361,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", (string)null);
+                    b.ToTable("AspNetUserClaims", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -1344,7 +1383,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", (string)null);
+                    b.ToTable("AspNetUserLogins", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -1359,7 +1398,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("AspNetUserRoles", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -1378,7 +1417,7 @@ namespace DAL.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
+                    b.ToTable("AspNetUserTokens", "dbo");
                 });
 
             modelBuilder.Entity("DAL.Entities.Billing.Bill", b =>

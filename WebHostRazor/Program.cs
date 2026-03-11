@@ -11,25 +11,21 @@ using WebHostRazor.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Logging
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
-// Razor Pages
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/Host", "Host");
     options.Conventions.AllowAnonymousToFolder("/Auth");
 });
 
-// Authorization
 builder.Services.AddAuthorization(o =>
 {
     o.AddPolicy("Host", p => p.RequireRole("Host"));
     o.AddPolicy("AdminOrHost", p => p.RequireRole("Admin", "Host", "SuperAdmin"));
 });
 
-// DbContext
 var cs = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
@@ -41,7 +37,6 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
             errorNumbersToAdd: null);
     }));
 
-// Identity
 builder.Services
     .AddIdentity<IdentityUser, IdentityRole>(opt =>
     {
@@ -62,10 +57,8 @@ builder.Services.ConfigureApplicationCookie(opt =>
     opt.SlidingExpiration = true;
 });
 
-// SignalR
 builder.Services.AddSignalR();
 
-// Services + Repository
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
@@ -76,7 +69,6 @@ builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAdminMVC", policy =>
@@ -96,30 +88,28 @@ QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 
-// Database migration + seeding
 try
 {
-    await using (var scope = app.Services.CreateAsyncScope())
-    {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    await using var scope = app.Services.CreateAsyncScope();
 
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-        logger.LogInformation("Migrating database...");
-        await db.Database.MigrateAsync();
+    logger.LogInformation("Migrating database...");
+    await db.Database.MigrateAsync();
 
-        var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    logger.LogInformation("Seeding identity...");
+    await IdentitySeeder.SeedAsync(roleMgr, userMgr);
 
-        await IdentitySeeder.SeedAsync(roleMgr, userMgr);
-
-        logger.LogInformation("Database ready.");
-    }
+    logger.LogInformation("Database ready.");
 }
 catch (Exception ex)
 {
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
     logger.LogError(ex, "Database migration failed");
+    throw;
 }
 
 if (app.Environment.IsDevelopment())
@@ -131,11 +121,8 @@ else
 }
 
 app.UseHttpsRedirection();
-
-// Static files
 app.UseStaticFiles();
 
-// SharedUploads -> /uploads
 var sharedUploadsPath = Path.GetFullPath(
     Path.Combine(app.Environment.ContentRootPath, "..", "SharedUploads"));
 
@@ -150,57 +137,10 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 
 app.UseCors("AllowAdminMVC");
-
 app.UseAuthentication();
 app.UseAuthorization();
 
-// SignalR Hub
 app.MapHub<NotificationHub>("/notificationHub");
-
-// Razor Pages
 app.MapRazorPages();
 
-// Demo users
-await SeedIdentityAsync(app);
-
 app.Run();
-
-static async Task SeedIdentityAsync(WebApplication app)
-{
-    using var scope = app.Services.CreateScope();
-
-    var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-
-    string[] roles = { "Admin", "Host", "SuperAdmin" };
-
-    foreach (var r in roles)
-        if (!await roleMgr.RoleExistsAsync(r))
-            await roleMgr.CreateAsync(new IdentityRole(r));
-
-    await EnsureUser(userMgr, "host@demo.com", "Host@123", "Host");
-    await EnsureUser(userMgr, "admin@demo.com", "Admin@123", "Admin");
-}
-
-static async Task EnsureUser(UserManager<IdentityUser> userMgr, string email, string password, string role)
-{
-    var user = await userMgr.FindByEmailAsync(email);
-
-    if (user == null)
-    {
-        user = new IdentityUser
-        {
-            UserName = email,
-            Email = email,
-            EmailConfirmed = true
-        };
-
-        var created = await userMgr.CreateAsync(user, password);
-
-        if (!created.Succeeded)
-            return;
-    }
-
-    if (!await userMgr.IsInRoleAsync(user, role))
-        await userMgr.AddToRoleAsync(user, role);
-}

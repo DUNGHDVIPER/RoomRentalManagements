@@ -83,7 +83,6 @@ namespace WebHostRazor.Pages.Host.Notifications
         {
             if (!ModelState.IsValid)
                 return Page();
-
             if (Input.ContractIds == null || !Input.ContractIds.Any())
             {
                 ModelState.AddModelError("", "Vui lòng chọn ít nhất 1 tenant.");
