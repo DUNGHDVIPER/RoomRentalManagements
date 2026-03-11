@@ -66,8 +66,8 @@ public class AuthService : IAuthService
             return new AuthResultDto { Succeeded = false, Error = errors };
         }
 
-        // role mặc định (tuỳ bạn: Host/Customer)
-        var roleResult = await _userManager.AddToRoleAsync(user, "Host");
+        
+        var roleResult = await _userManager.AddToRoleAsync(user, "Customer");
         if (!roleResult.Succeeded)
         {
             await _userManager.DeleteAsync(user);

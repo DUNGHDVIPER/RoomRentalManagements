@@ -1,13 +1,19 @@
-using BLL.Services;
+﻿using BLL.Services;
 using BLL.Services.Interfaces;
 using DAL.Data;
 using DAL.Repositories;
 using DAL.Seed;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using QuestPDF.Infrastructure;
+using System.Security.Claims;
+using System.Text;
 using WebHostRazor.Hubs;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,13 +23,19 @@ builder.Logging.SetMinimumLevel(LogLevel.Information);
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/Host", "Host");
+    options.Conventions.AuthorizeFolder("/Admin", "AdminOnly");
     options.Conventions.AllowAnonymousToFolder("/Auth");
 });
 
+// Authorization - SỬA CÁC POLICY CHO 4 ROLES MỚI
 builder.Services.AddAuthorization(o =>
 {
     o.AddPolicy("Host", p => p.RequireRole("Host"));
-    o.AddPolicy("AdminOrHost", p => p.RequireRole("Admin", "Host", "SuperAdmin"));
+    o.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
+    o.AddPolicy("AdminOrHost", p => p.RequireRole("Admin", "Host"));
+    o.AddPolicy("Customer", p => p.RequireRole("Customer"));
+    o.AddPolicy("Tenant", p => p.RequireRole("Tenant"));
+    o.AddPolicy("CustomerOrTenant", p => p.RequireRole("Customer", "Tenant"));
 });
 
 var cs = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -49,16 +61,127 @@ builder.Services
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+// JWT AUTHENTICATION & TOKEN SERVICE
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+// AUTHENTICATION CONFIGURATION
+var jwtKey = builder.Configuration["JWT:SecretKey"] ?? "your-super-secret-key-must-be-at-least-32-characters-long";
+
+builder.Services.AddAuthentication(options =>
+{
+    // Set default schemes for Identity
+    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+})
+.AddJwtBearer("JWT", options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"] ?? "WebHostRazor",
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:Audience"] ?? "RoomRentalUsers",
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+        RequireExpirationTime = true,
+        RequireSignedTokens = true
+    };
+
+    // Event handlers for JWT
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            logger.LogWarning("JWT Authentication failed: {Error}", context.Exception.Message);
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            var email = context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
+            logger.LogInformation("JWT Token validated for user: {Email}", email);
+            return Task.CompletedTask;
+        }
+    };
+})
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+    options.CallbackPath = "/signin-google";
+    options.SaveTokens = true;
+
+    // SCOPE configuration
+    options.Scope.Clear(); // Clear default scopes
+    options.Scope.Add("openid");
+    options.Scope.Add("profile");
+    options.Scope.Add("email");
+
+    // CLAIMS mapping
+    options.ClaimActions.Clear(); // Clear default mappings
+    options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
+    options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+    options.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "given_name");
+    options.ClaimActions.MapJsonKey(ClaimTypes.Surname, "family_name");
+    options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+    options.ClaimActions.MapJsonKey("email_verified", "email_verified");
+    options.ClaimActions.MapJsonKey("urn:google:picture", "picture", "url");
+    options.ClaimActions.MapJsonKey("urn:google:locale", "locale", "string");
+
+    // ERROR handling
+    options.Events.OnRemoteFailure = context =>
+    {
+        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+        logger.LogError("Google OAuth failed: {Error}", context.Failure?.Message);
+        context.Response.Redirect("/Auth/Login?error=" + Uri.EscapeDataString(context.Failure?.Message ?? "Google login failed"));
+        context.HandleResponse();
+        return Task.FromResult(0);
+    };
+});
+
+// DATA PROTECTION
+builder.Services.AddDataProtection();
+
+// SESSION configuration
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+});
+
+// COOKIE POLICY
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.CheckConsentNeeded = context => false;
+    options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+    options.Secure = CookieSecurePolicy.SameAsRequest;
+    options.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
+});
+
+// APPLICATION COOKIES
 builder.Services.ConfigureApplicationCookie(opt =>
 {
     opt.LoginPath = "/Auth/Login";
+    opt.LogoutPath = "/Auth/Logout";
     opt.AccessDeniedPath = "/Auth/AccessDenied";
-    opt.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    opt.ExpireTimeSpan = TimeSpan.FromHours(24);
     opt.SlidingExpiration = true;
+    opt.Cookie.SameSite = SameSiteMode.Lax;
+    opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    opt.Cookie.HttpOnly = true;
+    opt.ReturnUrlParameter = "returnUrl";
 });
 
 builder.Services.AddSignalR();
 
+// BUSINESS SERVICES
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
@@ -66,17 +189,33 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
-builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IBillingService, BillingService>();
+builder.Services.AddScoped<IUtilityService, UtilityService>();
 
+// REPOSITORIES
+builder.Services.AddScoped<ITenantRepository, TenantRepository>();
+
+// CORS configuration
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAdminMVC", policy =>
     {
         policy.WithOrigins(
                 "https://localhost:7282",
-                "http://localhost:5220",
-                "https://localhost:5220")
+                "https://localhost:5220",
+                "http://localhost:5220")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials()
+              .SetIsOriginAllowedToAllowWildcardSubdomains();
+    });
+
+    options.AddPolicy("AllowCustomerBlazor", policy =>
+    {
+        policy.WithOrigins(
+                "https://localhost:5000",
+                "http://localhost:5000")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -113,7 +252,9 @@ catch (Exception ex)
 }
 
 if (app.Environment.IsDevelopment())
+{
     app.UseDeveloperExceptionPage();
+}
 else
 {
     app.UseExceptionHandler("/Error");
@@ -131,16 +272,122 @@ Directory.CreateDirectory(sharedUploadsPath);
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(sharedUploadsPath),
-    RequestPath = "/uploads"
+    RequestPath = "/uploads",
+    OnPrepareResponse = ctx =>
+    {
+        // Set cache headers for uploaded files
+        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=3600");
+    }
 });
 
 app.UseRouting();
 
+// CORS must be after UseRouting
 app.UseCors("AllowAdminMVC");
+
+// SECURITY HEADERS
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Add("X-Frame-Options", "DENY");
+    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
+    await next();
+});
+
+// MIDDLEWARE ORDER IS IMPORTANT
+app.UseCookiePolicy();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHub<NotificationHub>("/notificationHub");
 app.MapRazorPages();
 
+// Demo users seeding
+await SeedIdentityAsync(app);
+
 app.Run();
+
+// SEED IDENTITY FUNCTION - SỬA CHỈ 4 ROLES
+static async Task SeedIdentityAsync(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+        string[] roles = { "Admin", "Host", "Customer", "Tenant" };
+
+        foreach (var role in roles)
+        {
+            if (!await roleMgr.RoleExistsAsync(role))
+            {
+                await roleMgr.CreateAsync(new IdentityRole(role));
+                logger.LogInformation("Created role: {Role}", role);
+            }
+        }
+
+        await EnsureUser(userMgr, logger, "admin@demo.com", "Admin@123!", "Admin");
+        await EnsureUser(userMgr, logger, "host@demo.com", "Host@123!", "Host");
+        await EnsureUser(userMgr, logger, "customer@demo.com", "Customer@123!", "Customer");
+        await EnsureUser(userMgr, logger, "tenant@demo.com", "Tenant@123!", "Tenant");
+
+        logger.LogInformation("Identity seeding completed successfully");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Error during identity seeding");
+    }
+}
+
+static async Task EnsureUser(UserManager<IdentityUser> userMgr, ILogger logger, string email, string password, string role)
+{
+    try
+    {
+        var user = await userMgr.FindByEmailAsync(email);
+
+        if (user == null)
+        {
+            user = new IdentityUser
+            {
+                UserName = email,
+                Email = email,
+                EmailConfirmed = true,
+                LockoutEnabled = false // Prevent demo accounts from being locked
+            };
+
+            var created = await userMgr.CreateAsync(user, password);
+            if (created.Succeeded)
+            {
+                logger.LogInformation("Created user: {Email}", email);
+            }
+            else
+            {
+                logger.LogError("Failed to create user {Email}: {Errors}",
+                    email, string.Join(", ", created.Errors.Select(e => e.Description)));
+                return;
+            }
+        }
+
+        if (!await userMgr.IsInRoleAsync(user, role))
+        {
+            var result = await userMgr.AddToRoleAsync(user, role);
+            if (result.Succeeded)
+            {
+                logger.LogInformation("Added role {Role} to user {Email}", role, email);
+            }
+            else
+            {
+                logger.LogError("Failed to add role {Role} to user {Email}: {Errors}",
+                    role, email, string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Error ensuring user {Email}", email);
+    }
+}

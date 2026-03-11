@@ -4,7 +4,7 @@ namespace DAL.Seed;
 
 public static class IdentitySeeder
 {
-    public static readonly string[] Roles = ["Admin", "Host", "Customer", "User"];
+    public static readonly string[] Roles = ["Admin", "Host", "Customer", "Tenant"];
 
     public static async Task SeedAsync(
         RoleManager<IdentityRole> roleManager,
@@ -25,11 +25,11 @@ public static class IdentitySeeder
             }
         }
 
-        // 2) Users (demo accounts)
+        // 2) Demo Users
         await EnsureUserAsync(userManager, "admin@demo.com", "Admin@123!", "Admin", ct);
         await EnsureUserAsync(userManager, "host@demo.com", "Host@123!", "Host", ct);
         await EnsureUserAsync(userManager, "customer@demo.com", "Customer@123!", "Customer", ct);
-        await EnsureUserAsync(userManager, "user@demo.com", "User@123!", "User", ct);
+        await EnsureUserAsync(userManager, "tenant@demo.com", "Tenant@123!", "Tenant", ct);
     }
 
     private static async Task EnsureUserAsync(
@@ -55,17 +55,6 @@ public static class IdentitySeeder
             {
                 var msg = string.Join("; ", create.Errors.Select(e => $"{e.Code}:{e.Description}"));
                 throw new InvalidOperationException($"Create user '{email}' failed: {msg}");
-            }
-        }
-        else
-        {
-            // ✅ DEV ONLY: luôn reset password cho đúng demo password (tránh seed lệch giữa các project)
-            var token = await userManager.GeneratePasswordResetTokenAsync(user);
-            var reset = await userManager.ResetPasswordAsync(user, token, password);
-            if (!reset.Succeeded)
-            {
-                var msg = string.Join("; ", reset.Errors.Select(e => $"{e.Code}:{e.Description}"));
-                throw new InvalidOperationException($"Reset password '{email}' failed: {msg}");
             }
         }
 

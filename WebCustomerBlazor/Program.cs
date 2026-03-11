@@ -1,10 +1,12 @@
 ﻿using DAL.Data;
 using DAL.Seed;
+using DAL.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebCustomerBlazor.Components;
 using BLL.Services;
 using BLL.Services.Interfaces;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +36,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 // Authorization
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 
 // =====================
@@ -48,6 +50,28 @@ builder.Services.AddRazorComponents()
 // =====================
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// CORE BUSINESS SERVICES
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IContractService, ContractService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITenantService, TenantService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IStayHistoryService, StayHistoryService>();
+builder.Services.AddScoped<IBillingService, BillingService>();
+builder.Services.AddScoped<IUtilityService, UtilityService>();
+
+// REPOSITORIES
+builder.Services.AddScoped<ITenantRepository, TenantRepository>();
+
+// OTHER SERVICES
+builder.Services.AddMemoryCache();
+
+// BLAZOR-SPECIFIC AUTHENTICATION
+builder.Services.AddScoped<TokenAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
+    provider.GetRequiredService<TokenAuthenticationStateProvider>());
 
 var app = builder.Build();
 
