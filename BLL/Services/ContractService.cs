@@ -120,7 +120,7 @@ public class ContractService : IContractService
 
         var exists = await _db.Rooms
             .AsNoTracking()
-            .AnyAsync(r => r.Id == roomId, ct); // ✅ Room PK là Id (dbo.Rooms.Id)
+            .AnyAsync(r => r.RoomId == roomId, ct); // ✅ Room PK là Id (dbo.Rooms.Id)
 
         if (!exists)
             throw new InvalidOperationException("Room not found.");
@@ -609,7 +609,7 @@ public class ContractService : IContractService
                 EndDate = c.EndDate,
                 Rent = c.BaseRent,
                 Deposit = c.DepositAmount,
-                Status = StatusToInt(c.Status),
+                Status = c.Status,
                 IsActive = c.Status == ContractStatus.Active,
                 ContractCode = c.ContractCode
             })
@@ -1100,7 +1100,7 @@ public class ContractService : IContractService
         EndDate = c.EndDate,
         Rent = c.BaseRent,
         Deposit = c.DepositAmount,
-        Status = StatusToInt(c.Status),
+        Status = c.Status,
         IsActive = c.Status == ContractStatus.Active,
 
         ContractCode = c.ContractCode,

@@ -1,6 +1,7 @@
 ﻿using BLL.Common;
 using BLL.DTOs.Room;
-using BLL.Dtos;
+using BLL.DTOs;
+using BLL.DTOs.Property;
 
 
 namespace BLL.Services.Interfaces;
@@ -32,6 +33,7 @@ public interface IRoomService
     Task SetRoomAmenitiesAsync(int roomId, int[] amenityIds, CancellationToken ct = default);
 
     // Pricing history
+
     Task AddRoomPriceHistoryAsync(int roomId, RoomPriceHistoryDto dto, CancellationToken ct = default);
     Task<List<RoomPriceHistoryDto>> GetRoomPriceHistoryAsync(int roomId, CancellationToken ct = default);
     //Task<string?> GetAllAsync();

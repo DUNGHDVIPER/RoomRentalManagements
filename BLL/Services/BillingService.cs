@@ -170,6 +170,8 @@ public class BillingService : IBillingService
         if (!IsUiStatusValid(uiStatus))
             return (false, "Status chỉ nhận: Unpaid, Paid, Overdue.");
 
+    public Task UpdateBillStatusAsync(int billId, int status, CancellationToken ct = default)
+         => throw new NotImplementedException();
         var roomKey = roomNo.Trim();
 
         var contract = await _db.Contracts

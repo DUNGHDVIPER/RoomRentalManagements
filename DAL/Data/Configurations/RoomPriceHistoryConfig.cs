@@ -2,16 +2,37 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DAL.Data.Configurations;
+namespace DAL.Data.Configurations.Property;
 
-public class RoomPriceHistoryConfig : IEntityTypeConfiguration<RoomPriceHistory>
+public class RoomPricingHistoryConfig : IEntityTypeConfiguration<RoomPricingHistory>
 {
-    public void Configure(EntityTypeBuilder<RoomPriceHistory> b)
+    public void Configure(EntityTypeBuilder<RoomPricingHistory> b)
     {
-        b.ToTable("RoomPriceHistories");
-        b.HasKey(x => x.Id);
+        b.ToTable("RoomPricingHistory");
 
-        b.Property(x => x.Price).HasPrecision(18, 2);
-        b.HasIndex(x => new { x.RoomId, x.FromDate });
+        b.HasKey(x => x.PriceId);
+
+        b.Property(x => x.PriceId)
+            .HasColumnName("PriceId");
+
+        b.Property(x => x.RoomId)
+            .IsRequired();
+
+        b.Property(x => x.OldPrice)
+            .HasColumnType("decimal(18,2)");
+
+        b.Property(x => x.NewPrice)
+            .HasColumnType("decimal(18,2)");
+
+        b.Property(x => x.ChangedAt)
+            .HasDefaultValueSql("SYSDATETIME()");
+
+        b.Property(x => x.Note)
+            .HasMaxLength(255);
+
+        b.HasOne(x => x.Room)
+            .WithMany(x => x.RoomPricingHistories)
+            .HasForeignKey(x => x.RoomId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
