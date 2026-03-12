@@ -25,6 +25,6 @@ public class TenantConfig : IEntityTypeConfiguration<Tenant>
          .HasForeignKey(x => x.TenantId)
          .OnDelete(DeleteBehavior.Cascade);
 
-        b.HasIndex(x => x.IdentityUserId).HasDatabaseName("IX_Tenants_IdentityUserId");
+        b.HasIndex(x => x.UserId).HasDatabaseName("IX_Tenants_IdentityUserId");
     }
 }

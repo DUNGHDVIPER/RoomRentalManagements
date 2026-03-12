@@ -64,6 +64,10 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
     public DbSet<BillItem> BillItems => Set<BillItem>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<BillStatusHistory> BillStatusHistories => Set<BillStatusHistory>();
+    // Utility readings
+    public DbSet<UtilityPrice> UtilityPrices => Set<UtilityPrice>();
+    public DbSet<UtilityReading> UtilityReadings => Set<UtilityReading>();
+    public DbSet<ExtraFee> ExtraFees => Set<ExtraFee>();
 
     // =========================
     // MAINTENANCE
@@ -74,9 +78,8 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
     {
         base.OnModelCreating(modelBuilder);
 
-        // Composite key RoomAmenity
-        modelBuilder.Entity<RoomAmenityEntity>()
-            .HasKey(x => new { x.RoomId, x.AmenityId });
+        // Dùng chung schema dbo cho toàn bộ app
+        modelBuilder.HasDefaultSchema("dbo");
 
         // Load entity configuration automatically
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
@@ -109,6 +112,59 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
         // AUDIT LOG FIX
         // =========================
         modelBuilder.Entity<AuditLog>(e =>
+        // Property / Room
+        modelBuilder.Entity<RoomEntity>(e =>
+        {
+            e.ToTable("Rooms", "dbo");
+        });
+
+        modelBuilder.Entity<AmenityEntity>(e =>
+        {
+            e.ToTable("Amenities", "dbo");
+        });
+
+        modelBuilder.Entity<RoomAmenityEntity>(e =>
+        {
+            e.ToTable("RoomAmenities", "dbo");
+            e.HasKey(x => new { x.RoomId, x.AmenityId });
+
+            e.HasOne(x => x.Room)
+                .WithMany(x => x.RoomAmenities)
+                .HasForeignKey(x => x.RoomId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(x => x.Amenity)
+                .WithMany(x => x.RoomAmenities)
+                .HasForeignKey(x => x.AmenityId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<RoomImageEntity>(e =>
+        {
+            e.ToTable("RoomImages", "dbo");
+        });
+
+        modelBuilder.Entity<RoomPricingHistoryEntity>(e =>
+        {
+            e.ToTable("RoomPriceHistories", "dbo");
+        });
+
+        // Contract -> PK identity ContractId, ignore base Id
+        modelBuilder.Entity<DAL.Entities.Contracts.Contract>(e =>
+        {
+            e.Ignore(x => x.Id);
+            e.HasKey(x => x.ContractId);
+            e.Property(x => x.ContractId).ValueGeneratedOnAdd();
+        });
+
+        // ContractVersion -> PK identity VersionId
+        modelBuilder.Entity<DAL.Entities.Contracts.ContractVersion>(e =>
+        {
+            e.HasKey(x => x.VersionId);
+            e.Property(x => x.VersionId).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<DAL.Entities.System.AuditLog>(e =>
         {
             e.HasKey(x => x.Id);
             e.Property(x => x.Id).ValueGeneratedOnAdd();

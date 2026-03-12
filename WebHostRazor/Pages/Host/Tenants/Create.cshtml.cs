@@ -123,7 +123,7 @@ public class CreateModel : PageModel
                 Gender = Input.Gender,
                 Status = Input.Status,
                 Address = Input.Address,
-                IdentityUserId = userId,
+                UserId = userId,
                 CreatedAt = DateTime.UtcNow
             };
 

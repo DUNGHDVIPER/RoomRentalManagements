@@ -1,4 +1,4 @@
-using DAL.Data;
+﻿using DAL.Data;
 using DAL.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +25,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(opt =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-// Cookie Auth (Identity dùng cookie mặc định, nhưng bạn có thể set path)
+// Cookie Auth
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Auth/Login";
@@ -33,35 +33,49 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Auth/AccessDenied";
 });
 
-// Authorization (nếu cần policy thì add ở đây)
+// Authorization
 builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
 
 // =====================
-// 2) Razor Components (Blazor Web App)
+// 2) Razor Components
 // =====================
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // =====================
-// 3) DI khác
+// 3) Services DI
 // =====================
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 var app = builder.Build();
 
 // =====================
-// 4) Migrate + Seed (PHẢI sau app.Build())
+// 4) Migrate + Seed
 // =====================
 await using (var scope = app.Services.CreateAsyncScope())
 {
-    // Migrate trước (khuyến nghị)
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
 
-    // Seed duy nhất từ DAL
     var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
     await IdentitySeeder.SeedAsync(roleMgr, userMgr);
+
+    // Reset password Admin
+    var admin = await userMgr.FindByEmailAsync("admin@demo.com");
+
+    if (admin != null)
+    {
+        var token = await userMgr.GeneratePasswordResetTokenAsync(admin);
+        await userMgr.ResetPasswordAsync(admin, token, "Admin@123");
+
+        await userMgr.SetLockoutEndDateAsync(admin, null);
+        admin.AccessFailedCount = 0;
+        await userMgr.UpdateAsync(admin);
+    }
 }
 
 // =====================
@@ -75,11 +89,10 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Nếu bạn có dùng antiforgery với form POST:
 app.UseAntiforgery();
 
 // =====================
-// 6) Map Blazor components
+// 6) Map Blazor
 // =====================
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();

@@ -9,7 +9,7 @@ public class BillDto
     public DateTime DueDate { get; set; }
     public String Status { get; set; }
     public decimal TotalAmount { get; set; }
-
+    public string? RoomName { get; set; }
     public List<BillItemDto> Items { get; set; } = new();
     public List<PaymentDto> Payments { get; set; } = new();
 }

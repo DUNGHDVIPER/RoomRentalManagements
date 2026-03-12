@@ -1,73 +1,131 @@
-﻿@page
+﻿@page "/Auth/Register"
 @model WebHostRazor.Pages.Auth.RegisterModel
+@{
+    Layout = null;
+}
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Register</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>User Register - Room Rental Management</title>
     <link rel="stylesheet" href="~/css/theme.css" />
+
+    <style>
+
+        /* checkbox terms */
+        .terms-checkbox {
+            display: flex;
+            justify-content: center; /* căn giữa */
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+            .terms-checkbox input[type="checkbox"] {
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+            }
+
+        .terms-text {
+            line-height: 1.5;
+        }
+
+            .terms-text a {
+                color: #4f46e5;
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+                .terms-text a:hover {
+                    text-decoration: underline;
+                }
+
+    </style>
 </head>
+
 <body class="bg-grad">
-    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
-        <div class="card p-18" style="max-width: 500px; width: 100%;">
-            <h1 style="text-align: center; margin-bottom: 20px;">Create Host Account</h1>
+
+    <div class="shell" style="justify-content:center;align-items:center;">
+
+        <div class="card p-18" style="width:min(520px,calc(100vw - 32px));">
+
+            <div style="display:flex;gap:12px;align-items:center;">
+                <div class="brand-logo">H</div>
+
+                <div>
+                    <div style="font-weight:950;font-size:18px;">
+                        Create User Account
+                    </div>
+
+                    <div class="muted">
+                        Join our room rental platform
+                    </div>
+                </div>
+            </div>
+
+            <hr class="hr" />
 
             @if (!string.IsNullOrEmpty(Model.Error))
             {
-                <div style="background: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                <div class="badge danger" style="padding:12px;border-radius:16px;margin-bottom:16px;">
                     @Model.Error
                 </div>
             }
 
-            <form method="post">
+            <form method="post" style="display:grid;gap:12px;">
+
                 @Html.AntiForgeryToken()
 
-                <div style="margin-bottom: 16px;">
-                    <label>Full Name *</label>
-                    <input class="input" asp-for="Form.FullName" />
-                    <span asp-validation-for="Form.FullName" style="color: red; font-size: 12px;"></span>
-                </div>
+                <input class="input" asp-for="Form.FullName" placeholder="Full Name *" />
+                <span asp-validation-for="Form.FullName" class="text-danger"></span>
 
-                <div style="margin-bottom: 16px;">
-                    <label>Email *</label>
-                    <input class="input" asp-for="Form.Email" type="email" />
-                    <span asp-validation-for="Form.Email" style="color: red; font-size: 12px;"></span>
-                </div>
+                <input class="input" asp-for="Form.Email" placeholder="Email Address *" type="email" />
+                <span asp-validation-for="Form.Email" class="text-danger"></span>
 
-                <div style="margin-bottom: 16px;">
-                    <label>Phone Number</label>
-                    <input class="input" asp-for="Form.PhoneNumber" />
-                    <span asp-validation-for="Form.PhoneNumber" style="color: red; font-size: 12px;"></span>
-                </div>
+                <input class="input" asp-for="Form.PhoneNumber" placeholder="Phone Number (Optional)" />
+                <span asp-validation-for="Form.PhoneNumber" class="text-danger"></span>
 
-                <div style="margin-bottom: 16px;">
-                    <label>Password *</label>
-                    <input class="input" asp-for="Form.Password" type="password" />
-                    <span asp-validation-for="Form.Password" style="color: red; font-size: 12px;"></span>
-                </div>
+                <input class="input" asp-for="Form.Password" type="password" placeholder="Password *" />
+                <span asp-validation-for="Form.Password" class="text-danger"></span>
 
-                <div style="margin-bottom: 16px;">
-                    <label>Confirm Password *</label>
-                    <input class="input" asp-for="Form.ConfirmPassword" type="password" />
-                    <span asp-validation-for="Form.ConfirmPassword" style="color: red; font-size: 12px;"></span>
-                </div>
+                <input class="input" asp-for="Form.ConfirmPassword" type="password" placeholder="Confirm Password *" />
+                <span asp-validation-for="Form.ConfirmPassword" class="text-danger"></span>
 
-                <div style="margin-bottom: 16px;">
-                    <label>
-                        <input type="checkbox" asp-for="Form.AcceptTerms" />
-                        I accept the Terms and Conditions *
-                    </label>
-                    <span asp-validation-for="Form.AcceptTerms" style="color: red; font-size: 12px;"></span>
-                </div>
+                <!-- checkbox đồng ý -->
+                <label class="terms-checkbox">
+                    <input asp-for="Form.AcceptTerms" type="checkbox" />
 
-                <button type="submit" class="btn-grad" style="width: 100%;">Create Account</button>
+                    <span class="terms-text">
+                        I agree to the
+                        <a href="#" class="link">Terms of Service</a>
+                        and
+                        <a href="#" class="link">Privacy Policy</a>
+                    </span>
+                </label>
+
+                <span asp-validation-for="Form.AcceptTerms" class="text-danger"></span>
+
+                <button class="btn-grad" type="submit">
+                    Create Account
+                </button>
+
             </form>
 
-            <div style="text-align: center; margin-top: 16px;">
-                <a href="/Auth/Login">Already have an account? Sign In</a>
+            <hr class="hr" />
+
+            <div style="text-align:center;">
+                <span class="muted">Already have an account?</span>
+                <a href="/Auth/Login" class="link">Sign in here</a>
             </div>
+
         </div>
+
     </div>
+
 </body>
 </html>

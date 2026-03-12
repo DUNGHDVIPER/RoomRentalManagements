@@ -32,7 +32,9 @@
                 <a class="link" href="/forgot">Forgot?</a>
             </div>
 
-            <button class="btn-grad" style="width:100%;" @onclick="DoLogin">Login</button>
+            <button type="button" class="btn-grad" style="width:100%;" @onclick="DoLogin">
+                Login
+            </button>
 
             @if (!string.IsNullOrWhiteSpace(error))
             {

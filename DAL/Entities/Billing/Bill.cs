@@ -5,7 +5,7 @@ namespace DAL.Entities.Billing;
 
 public class Bill : AuditableEntity<int>
 {
-    public long ContractId { get; set; }   // ✅ int -> long
+    public int ContractId { get; set; }   // ✅ int -> long
 
     public int Period { get; set; }
     public DateTime IssuedAt { get; set; } = DateTime.UtcNow;

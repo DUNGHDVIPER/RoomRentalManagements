@@ -13,9 +13,8 @@ using DAL.Entities.Common;
 
 namespace WebAdmin.MVC.Controllers;
 
-[Authorize(Roles = "Admin")]
-[Route("Contracts")]
-[Route("Admin/Contracts")]
+[Authorize(Roles = "Admin,SuperAdmin,Host")]
+[Route("[controller]")]
 public class ContractsController : Controller
 {
     private readonly AppDbContext _db;

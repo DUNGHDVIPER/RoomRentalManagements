@@ -41,3 +41,21 @@ public enum PaymentStatus
     Failed = 3,
     Refunded = 4
 }
+
+    public enum TicketCategory
+    {
+        Other = 0,
+        Electricity = 1,
+        Water = 2,
+        Internet = 3,
+        Maintenance = 4
+    }
+public enum SourceType
+{
+    Manual = 0,
+    Billing = 1,
+    Contract = 2,
+    Maintenance = 3,
+    System = 4
+}
+
