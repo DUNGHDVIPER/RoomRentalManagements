@@ -13,7 +13,7 @@ using FloorEntity = DAL.Entities.Property.Floor;
 using RoomAmenityEntity = DAL.Entities.Property.RoomAmenity;
 using RoomEntity = DAL.Entities.Property.Room;
 using RoomImageEntity = DAL.Entities.Property.RoomImage;
-using RoomPricingHistoryEntity = DAL.Entities.Property.RoomPriceHistory;
+using RoomPricingHistoryEntity = DAL.Entities.Property.RoomPricingHistory;
 
 namespace DAL.Data;
 
@@ -21,12 +21,16 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    // System
+    // =========================
+    // SYSTEM
+    // =========================
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<NotificationRecipient> NotificationRecipients => Set<NotificationRecipient>();
 
-    // Property
+    // =========================
+    // PROPERTY
+    // =========================
     public DbSet<BlockEntity> Blocks => Set<BlockEntity>();
     public DbSet<FloorEntity> Floors => Set<FloorEntity>();
     public DbSet<RoomEntity> Rooms => Set<RoomEntity>();
@@ -35,13 +39,17 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
     public DbSet<RoomImageEntity> RoomImages => Set<RoomImageEntity>();
     public DbSet<RoomPricingHistoryEntity> RoomPricingHistories => Set<RoomPricingHistoryEntity>();
 
-    // Tenanting
+    // =========================
+    // TENANTING
+    // =========================
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<TenantIdDoc> TenantIdDocs => Set<TenantIdDoc>();
     public DbSet<StayHistory> StayHistories => Set<StayHistory>();
     public DbSet<RoomResident> RoomResidents => Set<RoomResident>();
 
-    // Contracts
+    // =========================
+    // CONTRACTS
+    // =========================
     public DbSet<Contract> Contracts => Set<Contract>();
     public DbSet<ContractAttachment> ContractAttachments => Set<ContractAttachment>();
     public DbSet<ContractVersion> ContractVersions => Set<ContractVersion>();
@@ -49,7 +57,9 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
     public DbSet<ContractReminder> ContractReminders => Set<ContractReminder>();
     public DbSet<ContractReminderLog> ContractReminderLogs => Set<ContractReminderLog>();
 
-    // Billing
+    // =========================
+    // BILLING
+    // =========================
     public DbSet<Bill> Bills => Set<Bill>();
     public DbSet<BillItem> BillItems => Set<BillItem>();
     public DbSet<Payment> Payments => Set<Payment>();
@@ -59,7 +69,9 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
     public DbSet<UtilityReading> UtilityReadings => Set<UtilityReading>();
     public DbSet<ExtraFee> ExtraFees => Set<ExtraFee>();
 
-    // Maintenance (Ticket) - nếu bạn có
+    // =========================
+    // MAINTENANCE
+    // =========================
     public DbSet<DAL.Entities.Maintenance.Ticket> Tickets => Set<DAL.Entities.Maintenance.Ticket>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -69,12 +81,37 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
         // Dùng chung schema dbo cho toàn bộ app
         modelBuilder.HasDefaultSchema("dbo");
 
-        // Scan config đúng folder
-        modelBuilder.ApplyConfigurationsFromAssembly(
-            typeof(AppDbContext).Assembly,
-            t => t.Namespace != null && t.Namespace == "DAL.Data.Configurations"
-        );
+        // Load entity configuration automatically
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
+        // Map Room -> table Rooms
+        modelBuilder.Entity<RoomEntity>()
+            .ToTable("Rooms", "dbo");
+
+        // =========================
+        // CONTRACT FIX
+        // =========================
+        modelBuilder.Entity<Contract>(e =>
+        {
+            e.Ignore(x => x.Id);
+            e.HasKey(x => x.ContractId);
+
+            e.Property(x => x.ContractId)
+                .ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<ContractVersion>(e =>
+        {
+            e.HasKey(x => x.VersionId);
+
+            e.Property(x => x.VersionId)
+                .ValueGeneratedOnAdd();
+        });
+
+        // =========================
+        // AUDIT LOG FIX
+        // =========================
+        modelBuilder.Entity<AuditLog>(e =>
         // Property / Room
         modelBuilder.Entity<RoomEntity>(e =>
         {
@@ -141,6 +178,9 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
             .Property(x => x.NewValueJson)
             .HasColumnType("nvarchar(max)");
 
+        // =========================
+        // USER ROLE RELATION
+        // =========================
         modelBuilder.Entity<UserRole>()
             .HasKey(x => new { x.UserId, x.RoleId });
 
@@ -154,10 +194,36 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
             .WithMany(r => r.UserRoles)
             .HasForeignKey(x => x.RoleId);
 
+        // =========================
+        // UTILITY READING PRECISION
+        // =========================
         modelBuilder.Entity<UtilityReading>(e =>
         {
             e.Property(x => x.ElectricKwh).HasPrecision(18, 3);
             e.Property(x => x.WaterM3).HasPrecision(18, 3);
+        });
+        // =========================
+        // ROOM AMENITY RELATION
+        // =========================
+        modelBuilder.Entity<RoomAmenityEntity>(entity =>
+        {
+            // Composite Primary Key
+            entity.HasKey(x => new { x.RoomId, x.AmenityId });
+
+            // Room -> RoomAmenities (1 - N)
+            entity.HasOne(x => x.Room)
+                .WithMany(r => r.RoomAmenities)
+                .HasForeignKey(x => x.RoomId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Amenity -> RoomAmenities (1 - N)
+            entity.HasOne(x => x.Amenity)
+                .WithMany(a => a.RoomAmenities)
+                .HasForeignKey(x => x.AmenityId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Table name
+            entity.ToTable("RoomAmenities");
         });
     }
 }

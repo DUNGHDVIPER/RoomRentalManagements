@@ -1,51 +1,48 @@
 ﻿using DAL.Data;
-using DAL.Entities.Motel;
 using DAL.Entities.Property;
-using DAL.Repositories.Abstractions;
+using DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using RoomEntity = DAL.Entities.Property.Room;
 
 namespace DAL.Repositories.Implementations;
 
 public sealed class RoomRepository : IRoomRepository
-
 {
     private readonly AppDbContext _db;
-    public RoomRepository(AppDbContext db) => _db = db;
 
-    public Task<RoomEntity?> GetByIdAsync(int id, CancellationToken ct = default)
-     => _db.Rooms
-         .AsNoTracking()
-         .FirstOrDefaultAsync(r => r.Id == id, ct);
+    public RoomRepository(AppDbContext db)
+    {
+        _db = db;
+    }
 
     public async Task<IReadOnlyList<Room>> GetAllAsync(CancellationToken ct = default)
-    => (IReadOnlyList<Room>)await _db.Rooms
-        .AsNoTracking()
-        .OrderBy(r => r.RoomNo)   // ✅ RoomNo
-        .ToListAsync(ct);
+        => await _db.Rooms
+            .AsNoTracking()
+            .OrderBy(r => r.RoomCode)
+            .ToListAsync(ct);
 
-    public Task<Room?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public Task<Room?> GetByIdAsync(int id, CancellationToken ct = default)
+        => _db.Rooms
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.RoomId == id, ct);
+
+    public async Task AddAsync(Room entity, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        _db.Rooms.Add(entity);
+        await _db.SaveChangesAsync(ct);
     }
 
-    public Task AddAsync(Room entity, CancellationToken ct = default)
+    public async Task UpdateAsync(Room entity, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        _db.Rooms.Update(entity);
+        await _db.SaveChangesAsync(ct);
     }
 
-    public Task UpdateAsync(Room entity, CancellationToken ct = default)
+    public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
-    }
+        var room = await _db.Rooms.FindAsync(new object[] { id }, ct);
+        if (room == null) return;
 
-    public Task DeleteAsync(Guid id, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    Task<Room?> IRoomRepository.GetByIdAsync(int id, CancellationToken ct)
-    {
-        throw new NotImplementedException();
+        _db.Rooms.Remove(room);
+        await _db.SaveChangesAsync(ct);
     }
 }

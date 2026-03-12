@@ -1,16 +1,12 @@
-﻿using DAL.Entities.Common;
-using System.ComponentModel.DataAnnotations;
+﻿using DAL.Entities.Property;
 
 namespace DAL.Entities.Property;
 
-public class Amenity : AuditableEntity<int>
+public class RoomAmenity
 {
-    // ❌ XÓA dòng object? AmenityId
-    // public object? AmenityId { get; internal set; }
+    public int RoomId { get; set; }
+    public int AmenityId { get; set; }
 
-    // ✅ nếu DB cần cột AmenityId, ta map Id -> AmenityId ở Config
-    [Required]
-    public string AmenityName { get; set; } = null!;
-
-    public ICollection<RoomAmenity> RoomAmenities { get; set; } = new List<RoomAmenity>();
+    public Room Room { get; set; } = null!;
+    public Amenity Amenity { get; set; } = null!;
 }

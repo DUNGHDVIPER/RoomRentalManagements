@@ -1,5 +1,6 @@
 using BLL.Services;
 using BLL.Services.Interfaces;
+
 using DAL.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -52,8 +53,18 @@ builder.Services.ConfigureApplicationCookie(options =>
 // =====================
 // 4) BLL Services
 // =====================
+builder.Services.AddScoped<CloudinaryService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IBlockService, BlockService>();
+builder.Services.AddScoped<IBlockRepository, BlockRepository>();
+builder.Services.AddScoped<IFloorService, FloorService>();
+builder.Services.AddScoped<IFloorRepository, FloorRepository>();
+builder.Services.AddScoped<IAmenityService, AmenityService>();
+// (Nếu bạn có EmailService dùng trong WebAdminMVC thì mở dòng này)
+// builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IUtilityService, UtilityService>();
