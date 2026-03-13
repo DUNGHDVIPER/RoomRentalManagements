@@ -1,0 +1,16 @@
+﻿<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData"
+                   DefaultLayout="@typeof(WebCustomerBlazor.Components.Layout.MainLayout)" />
+    </Found>
+
+    <NotFound>
+        <LayoutView Layout="@typeof(WebCustomerBlazor.Components.Layout.MainLayout)">
+            <div class="container py-24">
+                <h2 class="h2">404</h2>
+                <p class="muted">Page not found.</p>
+                <a class="btn-grad" href="/">Go Home</a>
+            </div>
+        </LayoutView>
+    </NotFound>
+</Router>
